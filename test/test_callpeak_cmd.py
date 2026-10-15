@@ -2610,7 +2610,7 @@ def test_run_in_process_not_enough_pairs_exit(macs3_argparser, tmp_path,
 
 
 def test_run_uses_tempdir(macs3_argparser, tmp_path, write_bed, monkeypatch):
-    # the per-chromosome pileup files are created in --tempdir and removed
+    # The owned pileup directory is created beneath --tempdir and removed.
     monkeypatch.setattr(tempfile, "tempdir", tempfile.tempdir)
     td = tmp_path / "td"
     td.mkdir()
@@ -2629,7 +2629,10 @@ def test_run_uses_tempdir(macs3_argparser, tmp_path, write_bed, monkeypatch):
                                     + SYN + ["-n", "t", "--outdir", str(out),
                                              "--tempdir", str(td)])
     run(ns)
-    assert len([p for p in removed if p.parent == td]) == 2
+    pileup_files = [p for p in removed if td in p.parents]
+    assert len(pileup_files) == 2
+    assert len({p.parent for p in pileup_files}) == 1
+    assert all(p.parent.parent == td for p in pileup_files)
     assert list(td.iterdir()) == []
 
 

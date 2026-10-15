@@ -13,7 +13,8 @@ the distribution).
 # ------------------------------------
 
 import struct
-from tempfile import mkstemp
+import signal
+from tempfile import mkdtemp, mkstemp
 import os
 import sys
 from stat import S_ISREG
@@ -1592,6 +1593,40 @@ def mask_indices(mask: cnp.ndarray) -> cnp.ndarray:
     return out
 
 
+def shutdown_peak_pool(pool):
+    """Defer SIGINT until joining finishes, then restore the host's handler.
+
+    On Python 3.12 an interrupted Thread.join can mark a live executor manager
+    thread stopped. Retrying shutdown then returns before its workers finish.
+    Record SIGINT without raising inside join, and deliver it after shutdown.
+    """
+    interrupted = None
+    pending = []
+    handler = signal.getsignal(signal.SIGINT)
+    defer_signal = (threading.current_thread() is threading.main_thread() and
+                    callable(handler))
+
+    def defer(signum, frame):
+        pending.append((signum, frame))
+
+    if defer_signal:
+        signal.signal(signal.SIGINT, defer)
+    try:
+        while True:
+            try:
+                pool.shutdown(wait=True, cancel_futures=True)
+                break
+            except KeyboardInterrupt as exc:
+                interrupted = exc
+    finally:
+        if defer_signal:
+            signal.signal(signal.SIGINT, handler)
+    if pending:
+        handler(*pending[-1])
+    if interrupted is not None:
+        raise interrupted
+
+
 # CallerFromAlignments.destroy keeps a descriptor on at most this many
 # unlinked pileup files, those of at least this many bytes, for a
 # thread to close
@@ -1763,6 +1798,7 @@ class CallerFromAlignments:
     # Record the names of temporary files for storing pileup values of
     # each chromosome
     pileup_data_files: dict
+    pileup_directory: object
 
     def __init__(self,
                  treat,
@@ -1872,6 +1908,7 @@ class CallerFromAlignments:
         self.chromosomes = sorted(list(chr1.intersection(chr2)))
 
         self.pileup_data_files = {}
+        self.pileup_directory = None
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
         # step for optimal cutoff is 0.3 in -log10pvalue, we try from
@@ -1882,9 +1919,33 @@ class CallerFromAlignments:
         self.optimal_p_cutoff = 0
         self.cutoff_analysis_filename = cutoff_analysis_filename.encode()
 
+    @cython.cfunc
+    def _cleanup_failed_call(self):
+        """Discard incomplete call state after all workers have joined."""
+        # Pool scopes join their workers before reaching this boundary.
+        if self.save_bedGraph:
+            if self.bedGraph_treat_f != cython.NULL:
+                fclose(self.bedGraph_treat_f)
+                self.bedGraph_treat_f = cython.NULL
+            if self.bedGraph_ctrl_f != cython.NULL:
+                fclose(self.bedGraph_ctrl_f)
+                self.bedGraph_ctrl_f = cython.NULL
+        self.destroy()
+        # Partial histogram/table state must not influence the next call.
+        self.pscore_cache = PScoreCache()
+        self.qtable = QScoreTable()
+        self.slot_qscores = None
+        self.slot_above = None
+        self.pqtable.clear()
+        self.pvalue_length = dict.fromkeys(self.pvalue_length, 0)
+        self.pvalue_npeaks = dict.fromkeys(self.pvalue_npeaks, 0)
+        self.optimal_p_cutoff = 0
+
     @cython.ccall
     def destroy(self):
-        """Remove temporary pileup files created during peak calling.
+        """Remove the caller's owned pileup directory, including worker files
+        whose names were never returned. Cached paths are cleared so calling
+        again recreates storage using the standard tempfile location.
 
         Each file is unlinked here, so the temporary directory is left
         as before. Freeing a file's pages (2.75 GB for a large control)
@@ -1900,7 +1961,9 @@ class CallerFromAlignments:
         sizes: list = []
 
         try:
-            for f in self.pileup_data_files.values():
+            for name in (os.listdir(self.pileup_directory)
+                         if self.pileup_directory is not None else []):
+                f = os.fsencode(os.path.join(self.pileup_directory, name))
                 # os.path.isfile(f), keeping the size
                 try:
                     st = os.stat(f)
@@ -1923,6 +1986,10 @@ class CallerFromAlignments:
             raise
         if fds:
             close_unlinked_files_later(fds, sizes)
+        if self.pileup_directory is not None:
+            os.rmdir(self.pileup_directory)
+            self.pileup_directory = None
+        self.pileup_data_files.clear()
         return
 
     @cython.ccall
@@ -2006,13 +2073,16 @@ class CallerFromAlignments:
         # save data to temporary file, through the descriptor mkstemp
         # opened: reopening the name with truncation ("wb") makes ext4
         # flush the file to disk when it is closed
-        temp_fd, temp_filename = mkstemp()
-        self.pileup_data_files[chrom] = temp_filename.encode()
+        temp_fd, temp_filename = mkstemp(dir=self.pileup_directory)
+        self.pileup_data_files[chrom] = os.fsencode(temp_filename)
         try:
             write_pileup_file(temp_fd, self.chr_pos_treat_ctrl)
-        except Exception:
-            # fail to write then remove the key in pileup_data_files
-            self.pileup_data_files.pop(chrom)
+        except BaseException as exc:
+            # write_pileup_file owns and closes the descriptor, even on failure.
+            os.unlink(temp_filename)
+            self.pileup_data_files.pop(chrom, None)
+            if not isinstance(exc, Exception):
+                raise
         return
 
     @cython.cfunc
@@ -2288,12 +2358,10 @@ class CallerFromAlignments:
         pass's do.
         """
         batches: list
-        files: dict
         all_new: cython.bint
         chrom: bytes
 
         batches = self._chromosome_batches(n_workers)
-        files = {}
         # every worker's copy of the cache starts with no slot used
         self.pscore_cache.reset_histogram()
         # with no key held before the pass, every slot it uses is new
@@ -2315,15 +2383,12 @@ class CallerFromAlignments:
                 for future in as_completed(futures):
                     (chrom_files, keys, firsts, lengths) = future.result()
                     for (chrom, temp_filename) in chrom_files:
-                        files[chrom] = temp_filename
+                        if temp_filename is not None:
+                            self.pileup_data_files[chrom] = temp_filename
                     self.pscore_cache.merge_histogram(keys, firsts, lengths)
             finally:
-                pool.shutdown(wait=True, cancel_futures=True)
+                shutdown_peak_pool(pool)
 
-        for chrom in self.chromosomes:
-            temp_filename = files[chrom]
-            if temp_filename is not None:
-                self.pileup_data_files[chrom] = temp_filename
         if all_new:
             return self.pscore_cache.score_pending(n_workers, True)
         self.pscore_cache.score_pending(n_workers, False)
@@ -2673,75 +2738,83 @@ class CallerFromAlignments:
         tmp_bytes: bytes
         n_workers: cython.int
 
-        peaks = PeakIO()
+        if self.pileup_directory is None:
+            self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
+        try:
+            peaks = PeakIO()
 
-        # prepare p-q table
-        if self.qtable.n == 0:
-            info("#3 Pre-compute pvalue-qvalue table...")
-            if cutoff_analysis:
-                info("#3 Cutoff vs peaks called will be analyzed!")
-                self.__pre_computes(max_gap=max_gap, min_length=min_length)
+            # prepare p-q table
+            if self.qtable.n == 0:
+                info("#3 Pre-compute pvalue-qvalue table...")
+                if cutoff_analysis:
+                    info("#3 Cutoff vs peaks called will be analyzed!")
+                    self.__pre_computes(max_gap=max_gap, min_length=min_length)
+                else:
+                    self.__cal_pvalue_qvalue_table()
+
+            # prepare bedGraph file
+            if self.save_bedGraph:
+                self.bedGraph_treat_f = fopen(self.bedGraph_treat_filename, "w")
+                self.bedGraph_ctrl_f = fopen(self.bedGraph_control_filename, "w")
+
+                info("#3 In the peak calling step, the following will be performed simultaneously:")
+                info("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" %
+                     self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
+                info("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" %
+                     self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
+
+                if self.save_SPMR:
+                    info("#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads.")
+                elif self.treat_scaling_factor == 1:
+                    info("#3   Pileup will be based on sequencing depth in treatment.")
+                else:
+                    info("#3   Pileup will be based on sequencing depth in control.")
+
+                if self.trackline:
+                    # this line is REQUIRED by the wiggle format for UCSC browser
+                    tmp_bytes = ("track type=bedGraph name=\"treatment pileup\" description=\"treatment pileup after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
+                    fprintf(self.bedGraph_treat_f, tmp_bytes)
+                    tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
+                    fprintf(self.bedGraph_ctrl_f, tmp_bytes)
+
+            info("#3 Call peaks for each chromosome...")
+            n_workers = n_available_workers()
+            if not peak_processes_allowed(self.process_backend):
+                n_workers = 1
+            if n_workers > 1 and len(self.chromosomes) > 1 and not self.save_bedGraph:
+                # the bedGraph files are written chromosome by chromosome
+                # through one file handle, so -B keeps the serial loop
+                self._call_peaks_in_workers(peaks,
+                                            n_workers,
+                                            scoring_function_symbols,
+                                            score_cutoff_s,
+                                            min_length,
+                                            max_gap,
+                                            call_summits)
             else:
-                self.__cal_pvalue_qvalue_table()
+                for chrom in self.chromosomes:
+                    # treat/control bedGraph will be saved if requested by user.
+                    self.__chrom_call_peak_using_certain_criteria(peaks,
+                                                                  chrom,
+                                                                  scoring_function_symbols,
+                                                                  score_cutoff_s,
+                                                                  min_length,
+                                                                  max_gap,
+                                                                  call_summits,
+                                                                  self.save_bedGraph)
 
-        # prepare bedGraph file
-        if self.save_bedGraph:
-            self.bedGraph_treat_f = fopen(self.bedGraph_treat_filename, "w")
-            self.bedGraph_ctrl_f = fopen(self.bedGraph_control_filename, "w")
+            # close bedGraph file
+            if self.save_bedGraph:
+                fclose(self.bedGraph_treat_f)
+                self.bedGraph_treat_f = cython.NULL
+                fclose(self.bedGraph_ctrl_f)
+                self.bedGraph_ctrl_f = cython.NULL
+                self.save_bedGraph = False
 
-            info("#3 In the peak calling step, the following will be performed simultaneously:")
-            info("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" %
-                 self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
-            info("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" %
-                 self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
-
-            if self.save_SPMR:
-                info("#3   --SPMR is requested, so pileup will be normalized by sequencing depth in million reads.")
-            elif self.treat_scaling_factor == 1:
-                info("#3   Pileup will be based on sequencing depth in treatment.")
-            else:
-                info("#3   Pileup will be based on sequencing depth in control.")
-
-            if self.trackline:
-                # this line is REQUIRED by the wiggle format for UCSC browser
-                tmp_bytes = ("track type=bedGraph name=\"treatment pileup\" description=\"treatment pileup after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
-                fprintf(self.bedGraph_treat_f, tmp_bytes)
-                tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
-                fprintf(self.bedGraph_ctrl_f, tmp_bytes)
-
-        info("#3 Call peaks for each chromosome...")
-        n_workers = n_available_workers()
-        if not peak_processes_allowed(self.process_backend):
-            n_workers = 1
-        if n_workers > 1 and len(self.chromosomes) > 1 and not self.save_bedGraph:
-            # the bedGraph files are written chromosome by chromosome
-            # through one file handle, so -B keeps the serial loop
-            self._call_peaks_in_workers(peaks,
-                                        n_workers,
-                                        scoring_function_symbols,
-                                        score_cutoff_s,
-                                        min_length,
-                                        max_gap,
-                                        call_summits)
-        else:
-            for chrom in self.chromosomes:
-                # treat/control bedGraph will be saved if requested by user.
-                self.__chrom_call_peak_using_certain_criteria(peaks,
-                                                              chrom,
-                                                              scoring_function_symbols,
-                                                              score_cutoff_s,
-                                                              min_length,
-                                                              max_gap,
-                                                              call_summits,
-                                                              self.save_bedGraph)
-
-        # close bedGraph file
-        if self.save_bedGraph:
-            fclose(self.bedGraph_treat_f)
-            fclose(self.bedGraph_ctrl_f)
-            self.save_bedGraph = False
-
-        return peaks
+            return peaks
+        except BaseException:
+            self._cleanup_failed_call()
+            raise
 
     @cython.cfunc
     def _call_peaks_a_chromosome(self,
@@ -2821,16 +2894,18 @@ class CallerFromAlignments:
                                        initializer=initialize_peak_worker,
                                        initargs=(self,))
             try:
-                for part in pool.map(call_peaks_worker, tasks):
+                futures = [pool.submit(call_peaks_worker, task) for task in tasks]
+                for future in as_completed(futures):
+                    part = future.result()
                     for (chrom, temp_filename, chrom_peaks) in part:
                         results[chrom] = (temp_filename, chrom_peaks)
+                        if temp_filename is not None:
+                            self.pileup_data_files[chrom] = temp_filename
             finally:
-                pool.shutdown(wait=True, cancel_futures=True)
+                shutdown_peak_pool(pool)
 
         for chrom in self.chromosomes:
             (temp_filename, chrom_peaks) = results[chrom]
-            if temp_filename is not None:
-                self.pileup_data_files[chrom] = temp_filename
             for t in chrom_peaks:
                 peaks.add(chrom, t[0], t[1],
                           summit=t[2],
@@ -3639,99 +3714,107 @@ class CallerFromAlignments:
         chrs: set
         tmppeakset: list
 
-        lvl1peaks = PeakIO()
-        lvl2peaks = PeakIO()
+        if self.pileup_directory is None:
+            self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
+        try:
+            lvl1peaks = PeakIO()
+            lvl2peaks = PeakIO()
 
-        # prepare p-q table
-        if self.qtable.n == 0:
-            info("#3 Pre-compute pvalue-qvalue table...")
-            if cutoff_analysis:
-                info("#3 Cutoff value vs broad region calls will be analyzed!")
-                self.__pre_computes(max_gap=lvl2_max_gap, min_length=min_length)
-            else:
-                self.__cal_pvalue_qvalue_table()
+            # prepare p-q table
+            if self.qtable.n == 0:
+                info("#3 Pre-compute pvalue-qvalue table...")
+                if cutoff_analysis:
+                    info("#3 Cutoff value vs broad region calls will be analyzed!")
+                    self.__pre_computes(max_gap=lvl2_max_gap, min_length=min_length)
+                else:
+                    self.__cal_pvalue_qvalue_table()
 
-        # prepare bedGraph file
-        if self.save_bedGraph:
+            # prepare bedGraph file
+            if self.save_bedGraph:
 
-            self.bedGraph_treat_f = fopen(self.bedGraph_treat_filename, "w")
-            self.bedGraph_ctrl_f = fopen(self.bedGraph_control_filename, "w")
-            info("#3 In the peak calling step, the following will be performed simultaneously:")
-            info("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
-            info("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
+                self.bedGraph_treat_f = fopen(self.bedGraph_treat_filename, "w")
+                self.bedGraph_ctrl_f = fopen(self.bedGraph_control_filename, "w")
+                info("#3 In the peak calling step, the following will be performed simultaneously:")
+                info("#3   Write bedGraph files for treatment pileup (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_treat_pileup.bdg")
+                info("#3   Write bedGraph files for control lambda (after scaling if necessary)... %s" % self.bedGraph_filename_prefix.decode() + "_control_lambda.bdg")
 
-            if self.trackline:
-                # this line is REQUIRED by the wiggle format for UCSC browser
-                tmp_bytes = ("track type=bedGraph name=\"treatment pileup\" description=\"treatment pileup after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
-                fprintf(self.bedGraph_treat_f, tmp_bytes)
-                tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
-                fprintf(self.bedGraph_ctrl_f, tmp_bytes)
+                if self.trackline:
+                    # this line is REQUIRED by the wiggle format for UCSC browser
+                    tmp_bytes = ("track type=bedGraph name=\"treatment pileup\" description=\"treatment pileup after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
+                    fprintf(self.bedGraph_treat_f, tmp_bytes)
+                    tmp_bytes = ("track type=bedGraph name=\"control lambda\" description=\"control lambda after possible scaling for \'%s\'\"\n" % self.bedGraph_filename_prefix).encode()
+                    fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
-        info("#3 Call peaks for each chromosome...")
-        for chrom in self.chromosomes:
-            self.__chrom_call_broadpeak_using_certain_criteria(lvl1peaks,
-                                                               lvl2peaks,
-                                                               chrom,
-                                                               scoring_function_symbols,
-                                                               lvl1_cutoff_s,
-                                                               lvl2_cutoff_s,
-                                                               min_length,
-                                                               lvl1_max_gap,
-                                                               lvl2_max_gap,
-                                                               self.save_bedGraph)
+            info("#3 Call peaks for each chromosome...")
+            for chrom in self.chromosomes:
+                self.__chrom_call_broadpeak_using_certain_criteria(lvl1peaks,
+                                                                   lvl2peaks,
+                                                                   chrom,
+                                                                   scoring_function_symbols,
+                                                                   lvl1_cutoff_s,
+                                                                   lvl2_cutoff_s,
+                                                                   min_length,
+                                                                   lvl1_max_gap,
+                                                                   lvl2_max_gap,
+                                                                   self.save_bedGraph)
 
-        # close bedGraph file
-        if self.save_bedGraph:
-            fclose(self.bedGraph_treat_f)
-            fclose(self.bedGraph_ctrl_f)
-            # self.bedGraph_ctrl.close()
-            self.save_bedGraph = False
+            # close bedGraph file
+            if self.save_bedGraph:
+                fclose(self.bedGraph_treat_f)
+                self.bedGraph_treat_f = cython.NULL
+                fclose(self.bedGraph_ctrl_f)
+                self.bedGraph_ctrl_f = cython.NULL
+                # self.bedGraph_ctrl.close()
+                self.save_bedGraph = False
 
-        # now combine lvl1 and lvl2 peaks
-        chrs = lvl1peaks.get_chr_names()
-        broadpeaks = BroadPeakIO()
-        # use lvl2_peaks as linking regions between lvl1_peaks
-        for chrom in sorted(chrs):
-            lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
-            lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
-            lvl1peakschrom_next = iter(lvl1peakschrom).__next__
-            tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
-            # our assumption is lvl1 regions should be included in lvl2 regions
-            try:
-                lvl1 = lvl1peakschrom_next()
-                for i in range(len(lvl2peakschrom)):
-                    # for each lvl2 peak, find all lvl1 peaks inside
-                    # I assume lvl1 peaks can be ALL covered by lvl2 peaks.
-                    lvl2 = lvl2peakschrom[i]
+            # now combine lvl1 and lvl2 peaks
+            chrs = lvl1peaks.get_chr_names()
+            broadpeaks = BroadPeakIO()
+            # use lvl2_peaks as linking regions between lvl1_peaks
+            for chrom in sorted(chrs):
+                lvl1peakschrom = lvl1peaks.get_data_from_chrom(chrom)
+                lvl2peakschrom = lvl2peaks.get_data_from_chrom(chrom)
+                lvl1peakschrom_next = iter(lvl1peakschrom).__next__
+                tmppeakset = []             # to temporarily store lvl1 region inside a lvl2 region
+                # our assumption is lvl1 regions should be included in lvl2 regions
+                try:
+                    lvl1 = lvl1peakschrom_next()
+                    for i in range(len(lvl2peakschrom)):
+                        # for each lvl2 peak, find all lvl1 peaks inside
+                        # I assume lvl1 peaks can be ALL covered by lvl2 peaks.
+                        lvl2 = lvl2peakschrom[i]
 
-                    while True:
-                        if lvl2["start"] <= lvl1["start"] and lvl1["end"] <= lvl2["end"]:
-                            tmppeakset.append(lvl1)
-                            lvl1 = lvl1peakschrom_next()
-                        else:
-                            # make a hierarchical broad peak
-                            # print lvl2["start"], lvl2["end"], lvl2["score"]
-                            self.__add_broadpeak(broadpeaks,
-                                                 chrom,
-                                                 lvl2,
-                                                 tmppeakset)
-                            tmppeakset = []
-                            break
-            except StopIteration:
-                # no more strong (aka lvl1) peaks left
-                self.__add_broadpeak(broadpeaks,
-                                     chrom,
-                                     lvl2,
-                                     tmppeakset)
-                tmppeakset = []
-                # add the rest lvl2 peaks
-                for j in range(i+1, len(lvl2peakschrom)):
+                        while True:
+                            if lvl2["start"] <= lvl1["start"] and lvl1["end"] <= lvl2["end"]:
+                                tmppeakset.append(lvl1)
+                                lvl1 = lvl1peakschrom_next()
+                            else:
+                                # make a hierarchical broad peak
+                                # print lvl2["start"], lvl2["end"], lvl2["score"]
+                                self.__add_broadpeak(broadpeaks,
+                                                     chrom,
+                                                     lvl2,
+                                                     tmppeakset)
+                                tmppeakset = []
+                                break
+                except StopIteration:
+                    # no more strong (aka lvl1) peaks left
                     self.__add_broadpeak(broadpeaks,
                                          chrom,
-                                         lvl2peakschrom[j],
+                                         lvl2,
                                          tmppeakset)
+                    tmppeakset = []
+                    # add the rest lvl2 peaks
+                    for j in range(i+1, len(lvl2peakschrom)):
+                        self.__add_broadpeak(broadpeaks,
+                                             chrom,
+                                             lvl2peakschrom[j],
+                                             tmppeakset)
 
-        return broadpeaks
+            return broadpeaks
+        except BaseException:
+            self._cleanup_failed_call()
+            raise
 
     @cython.cfunc
     def __chrom_call_broadpeak_using_certain_criteria(self,
