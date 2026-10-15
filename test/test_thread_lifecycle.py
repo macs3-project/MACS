@@ -199,22 +199,27 @@ finally:
 @pytest.mark.parametrize('failure_kind,fail_at', [
     ('normal', 0), ('start', 2), ('start', 3), ('construct', 2),
 ])
-def test_public_worker_lifecycle(workflow, failure_kind, fail_at):
-    run_probe(workflow, failure_kind, fail_at)
+def test_public_worker_lifecycle(tmp_path, workflow, failure_kind, fail_at):
+    run_probe(tmp_path, workflow, failure_kind, fail_at)
 
 
 @pytest.mark.parametrize('workflow,failure_kind', [
     ('map', 'task'), ('model', 'task'), ('model', 'initializer'),
 ])
-def test_public_worker_exceptions(workflow, failure_kind):
-    run_probe(workflow, failure_kind, 0)
+def test_public_worker_exceptions(tmp_path, workflow, failure_kind):
+    run_probe(tmp_path, workflow, failure_kind, 0)
 
 
-def run_probe(workflow, failure_kind, fail_at):
+def run_probe(tmp_path, workflow, failure_kind, fail_at):
+    import MACS3
+
     root = Path(__file__).resolve().parents[1]
     env = os.environ.copy()
-    env['PYTHONPATH'] = str(root / 'test') + os.pathsep + str(root)
+    # Follow pytest's selected installation, which may be outside the checkout.
+    # Only expose the test directory for the shared model fixture helpers.
+    package_root = Path(MACS3.__file__).resolve().parent.parent
+    env['PYTHONPATH'] = str(package_root) + os.pathsep + str(root / 'test')
     result = subprocess.run(
         [sys.executable, '-c', SCRIPT, workflow, failure_kind, str(fail_at)],
-        cwd=root, env=env, capture_output=True, text=True, timeout=30)
+        cwd=tmp_path, env=env, capture_output=True, text=True, timeout=30)
     assert result.returncode == 0, result.stdout + result.stderr
