@@ -15,6 +15,7 @@ the distribution).
 import struct
 from tempfile import mkstemp
 import os
+import sys
 from stat import S_ISREG
 import threading
 import multiprocessing
@@ -1319,6 +1320,21 @@ def initialize_peak_worker(caller):
     _caller_for_workers = caller
 
 
+def peak_processes_allowed(process_backend: str) -> bool:
+    """Whether the current host supports the automatic Linux fork policy.
+
+    Python thread detection cannot detect native library threads or prevent
+    a host from starting a thread after this check. Embedded callers should
+    select ``serial`` when they cannot establish fork safety themselves.
+    """
+    return (process_backend == "auto"
+            and sys.platform == "linux"
+            and threading.current_thread() is threading.main_thread()
+            and threading.active_count() == 1
+            and not multiprocessing.current_process().daemon
+            and "fork" in multiprocessing.get_all_start_methods())
+
+
 def n_available_workers() -> int:
     """Return min(MAX_WORKERS, cores this process may run on), or 1
     when worker processes cannot be forked: on a platform without
@@ -1714,6 +1730,7 @@ class CallerFromAlignments:
     no_lambda_flag: bool
     # whether it's in PE mode, will be detected during initiation
     PE_mode: bool
+    process_backend: str
 
     # temporary data buffer
     # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
@@ -1765,7 +1782,8 @@ class CallerFromAlignments:
                  bedGraph_treat_filename: str = "TREAT.bdg",
                  bedGraph_control_filename: str = "CTRL.bdg",
                  cutoff_analysis_filename: str = "TMP.txt",
-                 save_SPMR: bool = False):
+                 save_SPMR: bool = False,
+                 process_backend: str = "auto"):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
@@ -1773,6 +1791,12 @@ class CallerFromAlignments:
         during calculation.
 
         treat and ctrl are either FWTrack or PETrackI objects.
+
+        process_backend: ``auto`` uses fork only in a Linux main thread
+            with no other detected Python threads, outside daemon processes.
+            Other hosts run serially. ``serial`` disables peak process pools.
+            Native threads and concurrent thread creation cannot be detected
+            reliably; embedded hosts should use ``serial`` when uncertain.
 
         treat_depth and ctrl_depth are effective depth in million:
                                     sequencing depth in million after
@@ -1802,6 +1826,10 @@ class CallerFromAlignments:
         chr1: set
         chr2: set
         p: cython.float
+
+        if process_backend not in ("auto", "serial"):
+            raise ValueError("process_backend must be 'auto' or 'serial'")
+        self.process_backend = process_backend
 
         # decide PE mode
         if isinstance(treat, FWTrack):
@@ -2275,6 +2303,10 @@ class CallerFromAlignments:
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
         with _worker_pool_lock:
+            if not peak_processes_allowed(self.process_backend):
+                for i in range(len(self.chromosomes)):
+                    self._pscore_stat_a_chromosome(i, True)
+                return self.pscore_cache.take_histogram()
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
                                        mp_context=multiprocessing.get_context("fork"),
                                        initializer=initialize_peak_worker,
@@ -2336,6 +2368,8 @@ class CallerFromAlignments:
         # p-score, is first summed per (observed, lambda) slot of the
         # p-score cache, then merged by p-score.
         n_workers = n_available_workers()
+        if not peak_processes_allowed(self.process_backend):
+            n_workers = 1
         if n_workers > 1 and len(self.chromosomes) > 1:
             (pscores, firsts, lengths) = self._pscore_stat_in_workers(n_workers)
             # where the serial loop leaves i, which the last loop
@@ -2679,6 +2713,8 @@ class CallerFromAlignments:
 
         info("#3 Call peaks for each chromosome...")
         n_workers = n_available_workers()
+        if not peak_processes_allowed(self.process_backend):
+            n_workers = 1
         if n_workers > 1 and len(self.chromosomes) > 1 and not self.save_bedGraph:
             # the bedGraph files are written chromosome by chromosome
             # through one file handle, so -B keeps the serial loop
@@ -2776,6 +2812,12 @@ class CallerFromAlignments:
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
         with _worker_pool_lock:
+            if not peak_processes_allowed(self.process_backend):
+                for chrom in self.chromosomes:
+                    self.__chrom_call_peak_using_certain_criteria(
+                        peaks, chrom, scoring_function_symbols, score_cutoff_s,
+                        min_length, max_gap, call_summits, False)
+                return
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
                                        mp_context=multiprocessing.get_context("fork"),
                                        initializer=initialize_peak_worker,

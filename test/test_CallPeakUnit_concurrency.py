@@ -17,8 +17,7 @@ import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
 
 same_names, broad, failure, parallel = map(int, sys.argv[1:])
-# Isolate caller state from the separate multithreaded-fork backend issue (#761):
-# another thread writing stderr during fork can leave its buffered lock inherited.
+# Keep logging quiet while exercising overlapping callers.
 logging.disable(logging.CRITICAL)
 
 
@@ -130,12 +129,13 @@ else:
 @pytest.mark.skipif(os.name != 'posix', reason='bounded process-group cleanup requires POSIX')
 @pytest.mark.parametrize('same_names', [False, True])
 @pytest.mark.parametrize('broad', [False, True])
-@pytest.mark.parametrize('scenario', ['parallel', 'serial', 'failure'])
+@pytest.mark.parametrize('scenario', ['host_fallback', 'serial', 'failure'])
 def test_independent_callers(tmp_path, same_names, broad, scenario):
     import multiprocessing
     import MACS3
-    if scenario != 'serial' and 'fork' not in multiprocessing.get_all_start_methods():
-        pytest.skip('fork backend is unavailable')
+    if scenario == 'failure' and (sys.platform != 'linux' or
+                                 'fork' not in multiprocessing.get_all_start_methods()):
+        pytest.skip('submission failure requires the supported Linux fork backend')
     env = os.environ.copy()
     env['TMPDIR'] = str(tmp_path)
     # Match the package pytest imported, including non-editable wheel installs.
@@ -145,7 +145,7 @@ def test_independent_callers(tmp_path, same_names, broad, scenario):
         os.pathsep + env['PYTHONPATH'] if env.get('PYTHONPATH') else '')
     process = subprocess.Popen(
         [sys.executable, '-c', SCRIPT, str(int(same_names)), str(int(broad)),
-         str(int(scenario == 'failure')), str(int(scenario == 'parallel'))],
+         str(int(scenario == 'failure')), str(int(scenario == 'host_fallback'))],
         cwd=tmp_path, env=env,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         start_new_session=True)

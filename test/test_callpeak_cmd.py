@@ -44,6 +44,7 @@ import math
 import os
 import re
 import tempfile
+import threading
 from pathlib import Path
 
 import numpy as np
@@ -2630,3 +2631,41 @@ def test_run_uses_tempdir(macs3_argparser, tmp_path, write_bed, monkeypatch):
     run(ns)
     assert len([p for p in removed if p.parent == td]) == 2
     assert list(td.iterdir()) == []
+
+
+@pytest.mark.parametrize("extra,suffixes", [
+    ([], NARROW_SUFFIXES[1:]),
+    (["--call-summits"], NARROW_SUFFIXES[1:]),
+    (["--broad"], ("_peaks.broadPeak", "_peaks.gappedPeak")),
+])
+def test_run_in_threaded_host_avoids_peak_pools(
+        macs3_argparser, run_macs3, tmp_path, write_bed, monkeypatch,
+        extra, suffixes):
+    import MACS3.Signal.CallPeakUnit as unit
+
+    reads = _block(20) + _block(30, chrom="chr2")
+    bed = write_bed(reads)
+    baseline_dir = tmp_path / "baseline"
+    baseline_dir.mkdir()
+    _ok(_cp(run_macs3, ["-t", bed] + SYN + extra, baseline_dir))
+    host_dir = tmp_path / "host"
+    host_dir.mkdir()
+
+    def forbidden_pool(*args, **kwargs):
+        pytest.fail("threaded CLI host created a peak process pool")
+
+    monkeypatch.setattr(unit, "ProcessPoolExecutor", forbidden_pool)
+    stop = threading.Event()
+    background = threading.Thread(target=stop.wait)
+    background.start()
+    try:
+        ns = macs3_argparser.parse_args(
+            ["callpeak", "-t", bed] + SYN + extra
+            + ["-n", "t", "--outdir", str(host_dir)])
+        run(ns)
+    finally:
+        stop.set()
+        background.join()
+    for suffix in suffixes:
+        assert (host_dir / ("t" + suffix)).read_bytes() == (
+            baseline_dir / ("t" + suffix)).read_bytes()
