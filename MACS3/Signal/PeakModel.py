@@ -12,6 +12,7 @@ the distribution).
 # ------------------------------------
 import os
 import threading
+from MACS3.Utilities.Threads import run_on_threads
 
 # ------------------------------------
 # MACS3 modules
@@ -614,14 +615,11 @@ def _run_on_threads(order: list, func, make_state=None) -> list:
                     errors.append(e)
                 return
 
-    threads = [threading.Thread(target=work) for _ in range(n_threads - 1)]
-    for t in threads:
-        t.start()
-    try:
-        work()
-    finally:
-        for t in threads:
-            t.join()
+    def stop(error):
+        with lock:
+            errors.append(error)
+
+    run_on_threads(work, n_threads - 1, stop)
     if errors:
         raise errors[0]
     return states
