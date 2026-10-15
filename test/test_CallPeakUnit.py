@@ -1275,7 +1275,8 @@ def test_qscore_of_every_significant_segment(tmp_path, caller_tmp):
 def test_destroy_removes_pileup_files(tmp_path, caller_tmp):
     calc = se_caller(tmp_path)
     calc.call_peaks(["p"], [3.0])
-    assert len(list(caller_tmp.iterdir())) == 2      # one per chromosome
+    files = [p for p in caller_tmp.rglob("*") if p.is_file()]
+    assert len(files) == 2      # one per chromosome
     calc.destroy()
     assert list(caller_tmp.iterdir()) == []
     calc.destroy()                                    # nothing left: no error
@@ -1287,7 +1288,7 @@ def test_call_peaks_after_destroy_recomputes(tmp_path, caller_tmp):
     calc.destroy()
     b = peak_rows(calc.call_peaks(["p"], [3.0], min_length=100))
     assert a == b
-    assert len(list(caller_tmp.iterdir())) == 2
+    assert len([p for p in caller_tmp.rglob("*") if p.is_file()]) == 2
 
 
 def test_destroy_before_calling(tmp_path, caller_tmp):
