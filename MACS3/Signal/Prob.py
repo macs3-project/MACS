@@ -345,6 +345,11 @@ def __poisson_cdf_large_lambda(k: uint32_t, a: float64_t) -> float64_t:
     num_parts = cython.cast(int32_t, (a / LSTEP))
     lastexp = exp(-1 * (a % LSTEP))
     nextcdf = EXPSTEP
+    # include the k=0 term of the sum; the loop below starts at i=1.
+    # (MACS 1.4 had `cdf = next` here; the initialization was lost in
+    # the MACS2 port, which summed from uninitialized memory, and the
+    # later zero-initialization still omitted this term.)
+    cdf = nextcdf
 
     num_parts -= 1
 
