@@ -15,6 +15,7 @@ from math import fabs
 from math import log1p          # as py_log1p
 from math import sqrt
 import sys
+from MACS3.Utilities.Performance import DEFAULTS
 # ------------------------------------
 # Other modules
 # ------------------------------------
@@ -607,7 +608,8 @@ def log10_poisson_cdf_Q_large_lambda(k: uint32_t, lbd: float64_t) -> float64_t:
 # Two float64 tables at 2**22 entries occupy 64 MiB. The current generation
 # stays cached; retired generations live only as long as active readers retain
 # them. Construction and overlapping readers can temporarily exceed 64 MiB.
-LN_SUM_MAX = cython.declare(int32_t, 1 << 22)
+LN_SUM_MAX = cython.declare(int32_t, DEFAULTS.poisson_log_cache_max_entries)
+_LN_SUM_MIN = cython.declare(int32_t, DEFAULTS.poisson_log_cache_min_entries)
 
 
 @cython.cclass
@@ -631,7 +633,7 @@ def acquire_log_tables(m: int64_t) -> _LogTables:
 
     if m < old.size or m >= LN_SUM_MAX or m < 1:
         return old
-    n = min(max(m + 1, 2 * old.size, 1024), LN_SUM_MAX)
+    n = min(max(m + 1, 2 * old.size, _LN_SUM_MIN), LN_SUM_MAX)
     try:
         new = _LogTables()
         new.sums = np.empty(n, dtype="f8")

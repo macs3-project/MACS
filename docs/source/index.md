@@ -158,7 +158,8 @@ from users.
 ## Contribute
 
 Please read our {doc}`Code of Conduct </CODE_OF_CONDUCT>` and
-{doc}`Contributing guide </CONTRIBUTING>`. If you have any questions,
+{doc}`Contributing guide </CONTRIBUTING>`. Developers can consult the
+[performance defaults inventory](docs/performance_defaults.md). If you have any questions,
 suggestion/ideas, or just want to have conversions with developers and
 other users in the community, we recommend using the [MACS
 Discussions](https://github.com/macs3-project/MACS/discussions)
@@ -197,6 +198,7 @@ If you are using MACS version 1, please cite our 2008 paper [Model-based Analysi
 
 docs/INSTALL.md
 docs/version_benchmark.md
+docs/performance_defaults.md
 docs/subcommands_index.md
 docs/fileformats_index.md
 docs/tutorial.md

@@ -13,6 +13,7 @@ the distribution).
 import os
 import threading
 from MACS3.Utilities.Threads import run_on_threads
+from MACS3.Utilities.Performance import DEFAULTS
 
 # ------------------------------------
 # MACS3 modules
@@ -47,7 +48,10 @@ from cython.cimports.libc.string import memcpy
 
 # at most this many threads find the peaks, and no more than the cores
 # this process may run on
-_MODEL_MAX_THREADS = cython.declare(cython.int, 8)
+_MODEL_MAX_THREADS = cython.declare(cython.int, DEFAULTS.cpu_limit)
+_MODEL_MIDPOINTS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_midpoints)
+_MODEL_PEAKS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_peaks)
+_MODEL_PAIRS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_pairs)
 
 _PeakScan = cython.struct(
     min_v=cython.float,
@@ -78,7 +82,7 @@ def _scan_push_mid(st: cython.pointer(_PeakScan), mid: cython.int) -> cython.bin
     new_mids: cython.p_int
 
     if st.n_mids == st.cap_mids:
-        new_cap = 2 * st.cap_mids if st.cap_mids > 0 else 64
+        new_cap = 2 * st.cap_mids if st.cap_mids > 0 else _MODEL_MIDPOINTS
         new_mids = cython.cast(cython.p_int,
                                realloc(st.mids, new_cap * cython.sizeof(cython.int)))
         if new_mids == cython.NULL:
@@ -147,7 +151,7 @@ def _scan_close(st: cython.pointer(_PeakScan)) -> cython.bint:
     summit = st.mids[(st.n_mids + 1) // 2 - 1]
     if st.summit_value < st.max_v:
         if st.n_peaks == st.cap_peaks:
-            new_cap = 2 * st.cap_peaks if st.cap_peaks > 0 else 256
+            new_cap = 2 * st.cap_peaks if st.cap_peaks > 0 else _MODEL_PEAKS
             new_summits = cython.cast(cython.p_int,
                                       realloc(st.summits, new_cap * cython.sizeof(cython.int)))
             if new_summits == cython.NULL:
@@ -453,7 +457,7 @@ def _pair_centers_c(ps: cython.p_int, ph: cython.p_float,
             if pn/mn < 2 and pn/mn > 0.5:
                 if pp < mp:
                     if n == cap[0]:
-                        new_cap = 2 * cap[0] if cap[0] > 0 else 1024
+                        new_cap = 2 * cap[0] if cap[0] > 0 else _MODEL_PAIRS
                         new_out = cython.cast(cython.p_int,
                                               realloc(out[0], new_cap * cython.sizeof(cython.int)))
                         if new_out == cython.NULL:
