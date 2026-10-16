@@ -42,7 +42,8 @@ import numpy as np
 from cython.cimports.MACS3.IO.cparser_layout import (
     FRAG_LOCAL_CHROMOSOMES as _FRAG_NLC, FRAG_LOCAL_RUNS as _FRAG_NRUN,
     INTERNER_INLINE_KEY_BYTES as _ISLOT_KEY,
-    INTERNER_ALIGNMENT_BYTES as _ISLOT_ALIGNMENT)
+    INTERNER_ALIGNMENT_BYTES as _ISLOT_ALIGNMENT,
+    InternerSlot as _ISlot, FragLocalMap as _FragLocalMap)
 from MACS3.Utilities.Performance import DEFAULTS
 from MACS3.Utilities.Constants import READ_BUFFER_SIZE
 from MACS3.Signal.FixWidthTrack import FWTrack
@@ -2442,10 +2443,8 @@ def _same_bytes(a: cython.p_uchar, b: cython.p_uchar,
 # One slot of _Interner's table, a 64-byte cache line: the key's hash,
 # its length + 1 (0: the slot is empty), its offset in the arena (keys
 # longer than _ISLOT_KEY bytes), its value, and the key itself when it
-# is at most _ISLOT_KEY bytes long
-_ISlot = cython.struct(h=cython.ulonglong, n1=cython.Py_ssize_t,
-                       off=cython.Py_ssize_t, value=cython.int,
-                       key=cython.uchar[_ISLOT_KEY])
+# is at most _ISLOT_KEY bytes long. Its native declaration and the bounded
+# local chromosome map live in cparser_layout.pxd for Cython 3.0 compatibility.
 
 # malloc aligns at least to ulonglong; one extra slot covers the shift
 # to the next alignment boundary on both 32- and 64-bit builds.
@@ -3359,7 +3358,7 @@ class _FragChunks:
         h: cython.ulonglong
         ci: cython.int
         bi: cython.int
-        lmap: cython.int[_FRAG_NLC]
+        lmap: _FragLocalMap
 
         # the chunk's chromosomes not in ctab, in order of appearance
         for k in range(job.nlc[j]):
