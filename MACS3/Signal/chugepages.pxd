@@ -50,6 +50,9 @@ cdef extern from *:
 	#define MACS3_HP_MAPPED ((size_t)0x6d61637333480002ULL)
 	/* the largest huge page size this is used with */
 	#define MACS3_HP_MAX_HUGE ((size_t)32 << 20)
+	/* Growth reservation policy; distinct from the overflow bound below. */
+	#define MACS3_HP_RESERVE_DIVISOR ((size_t)4)
+	#define MACS3_HP_RESERVE_PAGES ((size_t)1)
 
 	typedef struct {
 		size_t kind;
@@ -155,7 +158,8 @@ cdef extern from *:
 	static size_t macs3_hp_reserve_for(size_t size)
 	{
 		size_t need = size + MACS3_HP_HEAD;
-		return macs3_hp_round(need + need / 4 + macs3_hp_huge, macs3_hp_huge);
+		return macs3_hp_round(need + need / MACS3_HP_RESERVE_DIVISOR +
+			      MACS3_HP_RESERVE_PAGES * macs3_hp_huge, macs3_hp_huge);
 	}
 
 	static void *macs3_hp_mapped(size_t size)

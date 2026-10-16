@@ -13,6 +13,7 @@ the distribution).
 # ------------------------------------
 from itertools import groupby
 from operator import itemgetter
+from MACS3.Utilities.Performance import DEFAULTS
 import random
 import sys
 
@@ -86,6 +87,7 @@ def _g6(x: cython.double) -> str:
 # six integers of up to 20 characters, four "%.6g" texts of up to 13,
 # an int(10 * score) of up to 41, subpeak letters, tabs.
 LINE_SLACK = cython.declare(cython.Py_ssize_t, 256)
+_WRITER_MIN_BYTES = cython.declare(cython.Py_ssize_t, DEFAULTS.peak_writer_min_bytes)
 
 
 @cython.cfunc
@@ -158,8 +160,8 @@ class _TextBuf:
         cap = 2 * self.cap
         if cap < self.used + need:
             cap = self.used + need
-        if cap < 65536:
-            cap = 65536
+        if cap < _WRITER_MIN_BYTES:
+            cap = _WRITER_MIN_BYTES
         p = cython.cast(cython.p_char, PyMem_Realloc(self.buf, cap))
         if p == cython.NULL:
             raise MemoryError()

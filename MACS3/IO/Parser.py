@@ -39,6 +39,11 @@ from cython.cimports.MACS3.IO.cbgzf_mt import (bgzf_job_t, bgzf_pool_t,
                                               bgzf_task_fn)
 import numpy as np
 
+from cython.cimports.MACS3.IO.cparser_layout import (
+    FRAG_LOCAL_CHROMOSOMES as _FRAG_NLC, FRAG_LOCAL_RUNS as _FRAG_NRUN,
+    INTERNER_INLINE_KEY_BYTES as _ISLOT_KEY,
+    INTERNER_ALIGNMENT_BYTES as _ISLOT_ALIGNMENT)
+from MACS3.Utilities.Performance import DEFAULTS
 from MACS3.Utilities.Constants import READ_BUFFER_SIZE
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -109,8 +114,8 @@ def guess_parser(fname, buffer_size: cython.long = 100000):
 # Compressed BAM input is read _BAM_IN_SIZE bytes at a time and inflated
 # into a buffer of _BAM_OUT_SIZE bytes (grown if one record is larger),
 # whose records are then walked in C.
-_BAM_IN_SIZE = cython.declare(cython.Py_ssize_t, 1048576)
-_BAM_OUT_SIZE = cython.declare(cython.Py_ssize_t, 4194304)
+_BAM_IN_SIZE = cython.declare(cython.Py_ssize_t, DEFAULTS.bam_serial_input_bytes)
+_BAM_OUT_SIZE = cython.declare(cython.Py_ssize_t, DEFAULTS.bam_serial_output_bytes)
 # bytes of an alignment record before read_name, after block_size
 _BAM_CORE_SIZE = cython.declare(cython.Py_ssize_t, 32)
 
@@ -119,11 +124,11 @@ _BAM_CORE_SIZE = cython.declare(cython.Py_ssize_t, 32)
 # are split into blocks, which are inflated into _BAM_PAR_OUT bytes
 # following _BAM_PAR_HEAD bytes kept for the unconsumed tail of the
 # previous batch.
-_BAM_MAX_THREADS = cython.declare(cython.int, 8)
-_BAM_PAR_IN = cython.declare(cython.Py_ssize_t, 4194304)
-_BAM_PAR_OUT = cython.declare(cython.Py_ssize_t, 16777216)
-_BAM_PAR_HEAD = cython.declare(cython.Py_ssize_t, 262144)
-_BAM_PAR_MAXJOBS = cython.declare(cython.Py_ssize_t, 8192)
+_BAM_MAX_THREADS = cython.declare(cython.int, DEFAULTS.cpu_limit)
+_BAM_PAR_IN = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_batch_input_bytes)
+_BAM_PAR_OUT = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_batch_output_bytes)
+_BAM_PAR_HEAD = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_tail_reserve_bytes)
+_BAM_PAR_MAXJOBS = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_max_batch_jobs)
 
 # one of the two batches of the parallel path
 _BAMBatch = cython.struct(
@@ -2238,18 +2243,22 @@ class BowtieParser(GenericParser):
 
 # fragments are gathered in batches of this many before they are
 # appended to the track
-_FRAG_BATCH = cython.declare(cython.Py_ssize_t, 262144)
+_FRAG_BATCH = cython.declare(cython.Py_ssize_t, DEFAULTS.frag_append_batch_records)
 # With the inflate pool running (a BGZF file on two or more cores), a
 # window of at least _FRAG_PAR_MIN bytes is cut at line ends into
 # _FRAG_TASKS_PER_THREAD chunks per thread, whose lines the pool's threads
 # parse (_frag_chunk)
-_FRAG_PAR_MIN = cython.declare(cython.Py_ssize_t, 65536)
-_FRAG_TASKS_PER_THREAD = cython.declare(cython.int, 2)
+_FRAG_PAR_MIN = cython.declare(cython.Py_ssize_t, DEFAULTS.frag_parallel_min_bytes)
+_FRAG_TASKS_PER_THREAD = cython.declare(cython.int, DEFAULTS.frag_tasks_per_thread)
 # per chunk: at most _FRAG_NLC chromosomes not known before the window,
 # and runs of one chromosome, up to _FRAG_NRUN, each appended in one
 # add_loc_arrays call (a chunk of more runs goes through _FragBatch)
-_FRAG_NLC = cython.declare(cython.int, 8)
-_FRAG_NRUN = cython.declare(cython.int, 8)
+# _FRAG_NLC and _FRAG_NRUN are compile-time bounds from cparser_layout.
+_FRAG_INTERNER_SLOTS = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.frag_interner_initial_slots)
+_FRAG_INTERNER_ARENA = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.frag_interner_initial_arena_bytes)
+_FRAG_CHROMOSOMES = cython.declare(cython.Py_ssize_t, DEFAULTS.frag_initial_chromosomes)
 # the fewest bytes of a line _frag_chunk parses: "c\t0\t1\t\t1\n"
 _FRAG_MIN_LINE = cython.declare(cython.Py_ssize_t, 9)
 # multipliers of _hash_bytes
@@ -2436,8 +2445,16 @@ def _same_bytes(a: cython.p_uchar, b: cython.p_uchar,
 # is at most _ISLOT_KEY bytes long
 _ISlot = cython.struct(h=cython.ulonglong, n1=cython.Py_ssize_t,
                        off=cython.Py_ssize_t, value=cython.int,
-                       key=cython.uchar[36])
-_ISLOT_KEY = cython.declare(cython.Py_ssize_t, 36)
+                       key=cython.uchar[_ISLOT_KEY])
+
+# malloc aligns at least to ulonglong; one extra slot covers the shift
+# to the next alignment boundary on both 32- and 64-bit builds.
+if (_FRAG_NLC <= 0 or _FRAG_NRUN <= 0 or _ISLOT_KEY < 24 or
+        _ISLOT_ALIGNMENT <= 0 or
+        (_ISLOT_ALIGNMENT & (_ISLOT_ALIGNMENT - 1)) != 0 or
+        cython.sizeof(_ISlot) > _ISLOT_ALIGNMENT or
+        cython.sizeof(_ISlot) < _ISLOT_ALIGNMENT - cython.sizeof(cython.ulonglong)):
+    raise ValueError("Invalid FRAG interner or chunk layout")
 
 
 @cython.final
@@ -2467,7 +2484,7 @@ class _Interner:
         self.alen = 0
         self.acap = 0
         self.arena = cython.NULL
-        self.new_slots(1024)
+        self.new_slots(_FRAG_INTERNER_SLOTS)
 
     def __dealloc__(self):
         free(self.raw)
@@ -2489,12 +2506,14 @@ class _Interner:
         k: cython.Py_ssize_t
         j: cython.Py_ssize_t
 
+        if nslots <= 0 or (nslots & (nslots - 1)) != 0:
+            raise ValueError("FRAG interner capacity must be a positive power of two")
         raw = calloc(nslots + 1, cython.sizeof(_ISlot))
         if raw == cython.NULL:
             raise MemoryError()
         slots = cython.cast(cython.pointer(_ISlot),
-                            (cython.cast(cython.size_t, raw) + 63) &
-                            ~cython.cast(cython.size_t, 63))
+                            (cython.cast(cython.size_t, raw) + _ISLOT_ALIGNMENT - 1) &
+                            ~cython.cast(cython.size_t, _ISLOT_ALIGNMENT - 1))
         k = nslots
         while k > 1:
             shift -= 1
@@ -2584,7 +2603,7 @@ class _Interner:
             memcpy(cython.address(s.key[0]), p, n)
         else:
             if self.alen + n > self.acap:
-                newcap = self.acap if self.acap > 0 else 16384
+                newcap = self.acap if self.acap > 0 else _FRAG_INTERNER_ARENA
                 while self.alen + n > newcap:
                     newcap *= 2
                 tmp = realloc(self.arena, newcap)
@@ -2724,7 +2743,7 @@ class _FragBatch:
         self.gright = self.gright_a
         self.gcount = self.gcount_a
         self.gbc = self.gbc_a
-        self.size_chroms(64)
+        self.size_chroms(_FRAG_CHROMOSOMES)
         self.epoch = 0
 
     @cython.cfunc
@@ -3340,7 +3359,7 @@ class _FragChunks:
         h: cython.ulonglong
         ci: cython.int
         bi: cython.int
-        lmap: cython.int[8]
+        lmap: cython.int[_FRAG_NLC]
 
         # the chunk's chromosomes not in ctab, in order of appearance
         for k in range(job.nlc[j]):

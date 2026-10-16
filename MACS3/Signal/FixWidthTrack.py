@@ -21,7 +21,8 @@ import io
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.Signal.PileupV2 import pileup_from_PN_shifted, over_two_pv_array
 from MACS3.Signal.Pileup import se_all_in_one_pileup_max3
-from MACS3.Utilities.Threads import MIN_THREADED_SIZE, map_chromosomes
+from MACS3.Utilities.Threads import map_chromosomes
+from MACS3.Utilities.Performance import DEFAULTS
 
 # ------------------------------------
 # Other modules
@@ -38,7 +39,7 @@ from cython.cimports.MACS3.Signal.crefcount import Py_REFCNT
 # ------------------------------------
 # finalize and filter_dup hand a chromosome of at least this many
 # positions to map_chromosomes, and run any other on the spot
-_MIN_THREADED_SIZE = cython.declare(cython.long, MIN_THREADED_SIZE)
+_MIN_THREADED_SIZE = cython.declare(cython.long, DEFAULTS.min_parallel_track_elements)
 
 # ------------------------------------
 # Misc functions

@@ -20,6 +20,7 @@ import sys
 from stat import S_ISREG
 import threading
 from MACS3.Utilities.Threads import run_on_threads
+from MACS3.Utilities.Performance import DEFAULTS
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -84,11 +85,19 @@ PScoreSlot = cython.struct(key=cython.ulonglong,
 PScorePending = cython.struct(key=cython.ulonglong,
                               slot=cython.ulonglong)
 
-PSCORE_CACHE_INIT_SIZE: cython.Py_ssize_t = 1 << 16
+# Retain the Python name; native consumers use the typed import-time copy.
+PSCORE_CACHE_INIT_SIZE = DEFAULTS.pscore_initial_slots
+_PSCORE_CACHE_INIT_SIZE = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.pscore_initial_slots)
+_PSCORE_PENDING_RESERVE = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.pscore_initial_pending_keys)
+_QSCORE_MIN_SLOTS = cython.declare(cython.Py_ssize_t, DEFAULTS.qscore_min_slots)
+_CHROMOSOME_TASKS_PER_WORKER = cython.declare(
+    cython.long, DEFAULTS.chromosome_tasks_per_worker)
 
 # score_pending hands out the pending keys to its threads this many at
 # a time.
-PENDING_CHUNK = cython.declare(cython.Py_ssize_t, 8192)
+PENDING_CHUNK = cython.declare(cython.Py_ssize_t, DEFAULTS.pscore_pending_chunk_keys)
 
 
 @cython.cfunc
@@ -141,11 +150,11 @@ class PScoreCache:
 
     def __cinit__(self):
         self.slots = cython.cast(cython.pointer(PScoreSlot),
-                                 calloc(PSCORE_CACHE_INIT_SIZE,
+                                 calloc(_PSCORE_CACHE_INIT_SIZE,
                                         cython.sizeof(PScoreSlot)))
         if self.slots == cython.NULL:
             raise MemoryError()
-        self.mask = PSCORE_CACHE_INIT_SIZE - 1
+        self.mask = _PSCORE_CACHE_INIT_SIZE - 1
         self.n = 0
         self.pending = cython.NULL
         self.n_pending = 0
@@ -281,7 +290,7 @@ class PScoreCache:
 
         if self.n_pending + extra <= self.pending_capacity:
             return 0
-        capacity = max(2 * self.pending_capacity, 4096)
+        capacity = max(2 * self.pending_capacity, _PSCORE_PENDING_RESERVE)
         while capacity < self.n_pending + extra:
             capacity *= 2
         p = cython.cast(cython.pointer(PScorePending),
@@ -890,7 +899,7 @@ class QScoreTable:
     n: cython.Py_ssize_t        # number of used slots
 
     def __cinit__(self, n_hint: cython.Py_ssize_t = 0):
-        capacity: cython.ulonglong = 16
+        capacity: cython.ulonglong = _QSCORE_MIN_SLOTS
 
         while capacity < cython.cast(cython.ulonglong, n_hint) * 2:
             capacity *= 2
@@ -1306,7 +1315,8 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 # ------------------------------------
 
 # the most worker processes one call uses
-MAX_WORKERS: cython.int = 8
+MAX_WORKERS = DEFAULTS.cpu_limit
+_MAX_WORKERS = cython.declare(cython.int, DEFAULTS.cpu_limit)
 # Set only in child processes by the pool initializer; never in the parent.
 _caller_for_workers = None
 # Forked pools must not inherit descriptors from another live caller pool.
@@ -1343,8 +1353,8 @@ def n_available_workers() -> int:
     if multiprocessing.current_process().daemon:
         return 1
     if hasattr(os, "sched_getaffinity"):
-        return min(MAX_WORKERS, len(os.sched_getaffinity(0)))
-    return min(MAX_WORKERS, os.cpu_count() or 1)
+        return min(_MAX_WORKERS, len(os.sched_getaffinity(0)))
+    return min(_MAX_WORKERS, os.cpu_count() or 1)
 
 
 def n_locations(track, chrom: bytes) -> int:
@@ -1630,8 +1640,10 @@ def shutdown_peak_pool(pool):
 # CallerFromAlignments.destroy keeps a descriptor on at most this many
 # unlinked pileup files, those of at least this many bytes, for a
 # thread to close
-CLOSE_LATER_MAX_FILES = cython.declare(cython.Py_ssize_t, 256)
-CLOSE_LATER_MIN_BYTES = cython.declare(cython.longlong, 1 << 20)
+CLOSE_LATER_MAX_FILES = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.deferred_close_max_files)
+CLOSE_LATER_MIN_BYTES = cython.declare(
+    cython.longlong, DEFAULTS.deferred_close_min_bytes)
 
 
 def close_unlinked_files(fds: list):
@@ -1686,7 +1698,8 @@ def close_unlinked_files_later(fds: list, sizes: list):
 
 
 # how many puts ahead the q-score loops prefetch a slot of the table
-QTABLE_PREFETCH_AHEAD = cython.declare(cython.Py_ssize_t, 16)
+QTABLE_PREFETCH_AHEAD = cython.declare(
+    cython.Py_ssize_t, DEFAULTS.qtable_prefetch_ahead_slots)
 
 
 @cython.cfunc
@@ -2317,7 +2330,7 @@ class CallerFromAlignments:
             total += w
         order.sort()
 
-        target = total // (32 * n_workers)
+        target = total // (_CHROMOSOME_TASKS_PER_WORKER * n_workers)
         batches = []
         batch = []
         batch_weight = 0

@@ -32,11 +32,13 @@ cdef extern from *:
 	#include <sys/mman.h>
 	#include <unistd.h>
 	#endif
+	/* Minimum allocation bytes worth advising; unrelated to IO buffers. */
+	#define MACS3_HUGE_ADVICE_MIN_BYTES ((size_t)1 << 22)
 	static void macs3_advise_huge_pages(void *p, size_t n) {
 	#if defined(__linux__) && defined(MADV_HUGEPAGE)
 		long page = sysconf(_SC_PAGESIZE);
 		size_t start, end;
-		if (p == NULL || n < ((size_t)1 << 22) || page <= 0)
+		if (p == NULL || n < MACS3_HUGE_ADVICE_MIN_BYTES || page <= 0)
 			return;
 		start = ((size_t)p + (size_t)page - 1) & ~((size_t)page - 1);
 		end = ((size_t)p + n) & ~((size_t)page - 1);

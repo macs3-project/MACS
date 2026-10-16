@@ -10,15 +10,16 @@ parallel. Every thread is joined before map_chromosomes returns.
 """
 import os
 import threading
+from MACS3.Utilities.Performance import DEFAULTS
 
 # at most this many threads, the calling one included
-MAX_THREADS = 8
+MAX_THREADS = DEFAULTS.cpu_limit
 
 # The track methods run a chromosome with fewer elements than this on the
 # calling thread rather than through map_chromosomes. Its work is too short
 # to pay for handing the GIL between threads, and a track of many small
 # contigs then runs as it did before.
-MIN_THREADED_SIZE = 65536
+MIN_THREADED_SIZE = DEFAULTS.min_parallel_track_elements
 
 
 def n_threads() -> int:
