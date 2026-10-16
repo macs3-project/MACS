@@ -222,3 +222,9 @@ customized fields in VCF flavor:
 ##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality score">
 ##FORMAT=<ID=PL,Number=3,Type=Integer,Description="Normalized, Phred-scaled genotype likelihoods for 00, 01, 11 genotype">
 ```
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

@@ -12,6 +12,7 @@ the distribution).
 import sys
 import os
 from math import log
+from MACS3.Utilities.Execution import UNSET, resolve_execution_policy
 
 # ------------------------------------
 # MACS3 modules
@@ -37,6 +38,26 @@ from MACS3.Utilities.Logger import logging
 logger = logging.getLogger(__name__)
 
 
+def validate_execution_options(options, *, callvar=False):
+    """Resolve once for all phases; preserve callvar's legacy default one."""
+    threads = getattr(options, 'threads', None)
+    legacy = getattr(options, 'np', None) if callvar else None
+    if legacy is not None:
+        if threads is not None and threads != legacy:
+            raise ValueError('--threads conflicts with --multiple-processing')
+        threads = legacy
+    policy = resolve_execution_policy(
+        threads, getattr(options, 'process_backend', UNSET),
+        execution_policy=getattr(options, 'execution_policy', None),
+        default_threads=1 if callvar else None)
+    options.execution_policy = policy
+    if callvar:
+        # Keep the request, like options.threads, so revalidating an options
+        # object cannot mistake a clamped value for a conflicting override.
+        options.np = policy.requested_threads
+    return policy
+
+
 def opt_validate_callpeak(options):
     """Validate options from a OptParser object.
 
@@ -49,6 +70,8 @@ def opt_validate_callpeak(options):
     options.warn = logger.warning
     options.debug = logger.debug
     options.info = logger.info
+
+    validate_execution_options(options)
 
     # gsize
     try:
@@ -269,6 +292,8 @@ def opt_validate_filterdup(options):
     options.debug = logger.debug
     options.info = logger.info
 
+    validate_execution_options(options)
+
     # gsize
     try:
         options.gsize = efgsize[options.gsize]
@@ -338,6 +363,8 @@ def opt_validate_randsample(options):
     options.debug = logger.debug
     options.info = logger.info
 
+    validate_execution_options(options)
+
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -398,6 +425,8 @@ def opt_validate_refinepeak(options):
     options.debug = logger.debug
     options.info = logger.info
 
+    validate_execution_options(options)
+
     # format
 
     options.gzip_flag = False           # if the input is gzip file
@@ -442,6 +471,8 @@ def opt_validate_predictd(options):
     options.warn = logger.warning
     options.debug = logger.debug
     options.info = logger.info
+
+    validate_execution_options(options)
 
     # gsize
     try:
@@ -518,6 +549,8 @@ def opt_validate_pileup(options):
     options.warn = logger.warning
     options.debug = logger.debug
     options.info = logger.info
+
+    validate_execution_options(options)
 
     # format
 
@@ -673,10 +706,10 @@ def opt_validate_callvar(options):
     options.debug = logger.debug
     options.info = logger.info
 
+    validate_execution_options(options, callvar=True)
+
     # methods should be valid:
 
-    if options.np <= 0:
-        options.np = 1
     return options
 
 
@@ -692,6 +725,8 @@ def opt_validate_hmmratac(options):
     options.warn = logger.warning
     options.debug = logger.debug
     options.info = logger.info
+
+    validate_execution_options(options)
 
     # input options.argtxt for hmmratac
     options.argtxt = "# Command line: %s\n" % " ".join(sys.argv[1:])

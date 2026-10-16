@@ -28,6 +28,7 @@ if "cython" not in sys.modules:
     sys.modules["cython"] = cython_stub
 
 from MACS3.Signal.PeakDetect import PeakDetect
+from MACS3.Utilities.Execution import resolve_execution_policy
 
 
 class DummyTrack:
@@ -275,6 +276,7 @@ def opt_and_log(**overrides):
     log = Messages()
     opt = make_opt(info=log.info.append, debug=log.debug.append,
                    warn=log.warn.append, **overrides)
+    opt.execution_policy = resolve_execution_policy(1)
     return opt, log
 
 
@@ -350,7 +352,8 @@ def expected_caller_args(opt, treat, control):
         ds = [l]
     if opt.nolambda:
         ds, scales = [], []
-    return dict(d=d_arg, ctrl_d_s=ds, ctrl_scaling_factor_s=scales,
+    return dict(execution_policy=opt.execution_policy,
+                d=d_arg, ctrl_d_s=ds, ctrl_scaling_factor_s=scales,
                 treat_scaling_factor=treat_scale, lambda_bg=lambda_bg,
                 end_shift=opt.shift, save_bedGraph=opt.store_bdg,
                 bedGraph_filename_prefix=opt.name,
@@ -367,6 +370,8 @@ def assert_caller_args(got, exp):
     for k, v in exp.items():
         if k in ("lambda_bg", "treat_scaling_factor", "d"):
             assert got[k] == pytest.approx(v, rel=1e-6), k
+        elif k == "execution_policy":
+            assert got[k] is v
         elif k == "ctrl_scaling_factor_s":
             assert got[k] == pytest.approx(v, rel=1e-12), k
         else:

@@ -18,6 +18,7 @@ from collections import Counter
 # own python modules
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_refinepeak
 # from MACS3.Signal.Prob import binomial_cdf_inv
 from MACS3.IO.PeakIO import PeakIO
@@ -33,6 +34,10 @@ def run(o_options):
     """
     # Parse options...
     options = opt_validate_refinepeak(o_options)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
     # end of parsing commandline options
     info = options.info
     # warn = options.warn
@@ -106,14 +111,17 @@ def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
+    validate_execution_options(options)
     options.info("# read treatment tags...")
-    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     treat = tp.build_fwtrack()
     # treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(tfile, buffer_size=options.buffer_size)
+            tp = options.parser(tfile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             treat = tp.append_fwtrack(treat)
             # treat.sort()
     treat.finalize()

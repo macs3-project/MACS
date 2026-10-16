@@ -95,3 +95,9 @@ conversion:
 ```bash
 macs3 filterdup -i input.bam -o output.bedpe -f BAMPE --keep-dup all
 ```
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

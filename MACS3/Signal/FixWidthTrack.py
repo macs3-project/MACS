@@ -22,6 +22,7 @@ from MACS3.IO.PeakIO import PeakIO
 from MACS3.Signal.PileupV2 import pileup_from_PN_shifted, over_two_pv_array
 from MACS3.Signal.Pileup import se_all_in_one_pileup_max3
 from MACS3.Utilities.Threads import map_chromosomes
+from MACS3.Utilities.Execution import resolve_execution_policy
 from MACS3.Utilities.Performance import DEFAULTS
 
 # ------------------------------------
@@ -163,10 +164,13 @@ class FWTrack:
     length = cython.declare(cython.ulonglong, visibility="public")
     fw = cython.declare(cython.int, visibility="public")
 
+    execution_policy = cython.declare(object, visibility="readonly")
+
     def __init__(self,
                  fw: cython.int = 0,
                  anno: str = "",
-                 buffer_size: cython.long = 100000):
+                 buffer_size: cython.long = 100000, *,
+                 execution_policy=None, threads=None):
         """Initialize an empty fixed-width track.
         
         Parameters
@@ -178,6 +182,8 @@ class FWTrack:
         buffer_size : int, optional
             Number of positions allocated per growth chunk for each strand array.
         """
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
         self.fw = fw
         self.locations = {}    # location pairs: two strands
         self.pointer = {}      # location pairs
@@ -346,7 +352,8 @@ class FWTrack:
                 sizes.append(size)
             else:
                 self.total += self._finalize_chrom(c)
-        for kept in map_chromosomes(self._finalize_chrom, big, sizes):
+        for kept in map_chromosomes(self._finalize_chrom, big, sizes,
+                                     execution_policy=self.execution_policy):
             self.total += kept
 
         self.is_sorted = True
@@ -588,7 +595,7 @@ class FWTrack:
             else:
                 self.total += self._filter_dup_chrom(k, maxnum)
         for kept in map_chromosomes(self._filter_dup_chrom, big, sizes,
-                                    maxnum):
+                                    maxnum, execution_policy=self.execution_policy):
             self.total += kept
 
         self.length = self.fw * self.total

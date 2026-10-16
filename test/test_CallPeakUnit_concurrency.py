@@ -15,6 +15,12 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+
+def execution_policy(budget):
+    return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
+
+budget = 1
 
 same_names, broad, failure, parallel = map(int, sys.argv[1:])
 # Keep logging quiet while exercising overlapping callers.
@@ -30,7 +36,8 @@ def caller(job):
             track.add_loc(chrom, pos, 0)
     track.finalize()
     return unit.CallerFromAlignments(track, None, d=200, ctrl_d_s=[],
-                                    ctrl_scaling_factor_s=[], lambda_bg=0.5)
+                                    ctrl_scaling_factor_s=[], lambda_bg=0.5,
+                                    execution_policy=execution_policy(1 if job == 0 and not failure else budget))
 
 
 def run(calc, job):
@@ -52,7 +59,7 @@ def run(calc, job):
 
 
 
-unit.n_available_workers = lambda: 1
+budget = 1
 baseline = []
 for job in range(2):
     calc = caller(job)
@@ -65,7 +72,6 @@ for job in range(2):
 assert baseline[0] != baseline[1]
 
 real_executor = unit.ProcessPoolExecutor
-barrier = threading.Barrier(2, timeout=15)
 
 
 class FailingExecutor(real_executor):
@@ -81,7 +87,7 @@ class FailingExecutor(real_executor):
 
 
 if failure:
-    unit.n_available_workers = lambda: 2
+    budget = 3
     unit.ProcessPoolExecutor = FailingExecutor
     calc = caller(0)
     try:
@@ -102,23 +108,19 @@ if failure:
         later.destroy()
 else:
     unit.ProcessPoolExecutor = real_executor
-    local = threading.local()
-
-    def workers():
-        if not getattr(local, 'entered', False):
-            local.entered = True
-            barrier.wait()
-        return 2 if parallel else 1
-
-    unit.n_available_workers = workers
+    budget = 3 if parallel else 1
     for repeat in range(3):
         callers = [caller(job) for job in range(2)]
         try:
             with ThreadPoolExecutor(max_workers=2) as executor:
-                results = list(executor.map(lambda job: run(callers[job], job), range(2)))
+                barrier = threading.Barrier(2, timeout=15)
+                def concurrent_run(job):
+                    barrier.wait()
+                    return run(callers[job], job)
+                results = list(executor.map(concurrent_run, range(2)))
                 assert results == baseline, (results, baseline)
                 # Reuse each caller's q-table/cache as well as testing fresh instances.
-                results = list(executor.map(lambda job: run(callers[job], job), range(2)))
+                results = list(executor.map(concurrent_run, range(2)))
                 assert results == baseline, (results, baseline)
         finally:
             for calc in callers:

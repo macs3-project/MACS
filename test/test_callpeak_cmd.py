@@ -38,6 +38,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import filecmp
 import logging
 import math
@@ -220,8 +221,8 @@ def _xls_without_cmdline(path):
     return [ln for ln in _lines(path) if not ln.startswith("# Command line:")]
 
 
-def _messages(parse_log, proc, level=None):
-    msgs = parse_log(proc.stderr)
+def _messages(parse_analysis_log, proc, level=None):
+    msgs = parse_analysis_log(proc.stderr)
     if level is None:
         return [m for _, m in msgs]
     return [m for lv, m in msgs if lv == level]
@@ -584,11 +585,11 @@ def test_block_xls(run_macs3, tmp_path, write_bed):
                     Q20, "t_peak_1"])
 
 
-def test_block_log_messages(run_macs3, tmp_path, write_bed, parse_log):
+def test_block_log_messages(run_macs3, tmp_path, write_bed, parse_analysis_log):
     out = tmp_path / "out"
     bed = write_bed(_block(20))
     proc = _ok(_cp(run_macs3, ["-t", bed, "-f", "BED"] + SYN + ["-B"], out))
-    msgs = [m for lv, m in parse_log(proc.stderr) if lv]
+    msgs = [m for lv, m in parse_analysis_log(proc.stderr) if lv]
     assert msgs == [
         "",
         "#1 read tag files...",
@@ -681,14 +682,14 @@ def test_shift_moves_block(run_macs3, tmp_path, write_bed, shift, strand,
     (-25, "# Sequencing ends will be shifted towards 5' by 25 bp(s)"),
     (0, None),
 ])
-def test_shift_reported(run_macs3, tmp_path, write_bed, parse_log, shift,
+def test_shift_reported(run_macs3, tmp_path, write_bed, parse_analysis_log, shift,
                         line):
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20))] + SYN
                    + ["--shift", str(shift)], out))
     xls = _lines(_out(out, "t", "_peaks.xls"))
     shift_lines = [ln for ln in xls if "shifted" in ln]
-    msgs = [m for m in _messages(parse_log, proc, "INFO") if "shifted" in m]
+    msgs = [m for m in _messages(parse_analysis_log, proc, "INFO") if "shifted" in m]
     if line is None:
         assert shift_lines == [] and msgs == []
     else:
@@ -724,12 +725,12 @@ def test_max_gap_and_tsize_merge_blocks(run_macs3, tmp_path, write_bed,
 
 
 @pytest.mark.parametrize("tsize", [29, 75])
-def test_tsize_reported(run_macs3, tmp_path, write_bed, parse_log, tsize):
+def test_tsize_reported(run_macs3, tmp_path, write_bed, parse_analysis_log, tsize):
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20))] + SYN
                    + ["-s", str(tsize)], out))
     assert "#1 tag size is determined as %d bps" % tsize in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
     assert "# tag size is determined as %d bps" % tsize in \
         _lines(_out(out, "t", "_peaks.xls"))
 
@@ -770,7 +771,7 @@ def test_qvalue_cutoff(run_macs3, tmp_path, write_bed, qvalue, npeaks):
 
 
 @pytest.mark.parametrize("pvalue,npeaks", [("1e-34", 1), ("1e-35", 0)])
-def test_pvalue_cutoff(run_macs3, tmp_path, write_bed, parse_log, pvalue,
+def test_pvalue_cutoff(run_macs3, tmp_path, write_bed, parse_analysis_log, pvalue,
                        npeaks):
     # P20 = 34.47 > 34 but < 35
     out = tmp_path / "out"
@@ -781,7 +782,7 @@ def test_pvalue_cutoff(run_macs3, tmp_path, write_bed, parse_log, pvalue,
     assert "# pvalue cutoff = %.2e" % float(pvalue) in xls
     assert "# qvalue cutoff" not in "\n".join(xls)
     assert "#3 Call peaks with given -log10pvalue cutoff: %.5f ..." % \
-        (-math.log10(float(pvalue))) in _messages(parse_log, proc, "INFO")
+        (-math.log10(float(pvalue))) in _messages(parse_analysis_log, proc, "INFO")
 
 
 def test_pvalue_score_columns(run_macs3, tmp_path, write_bed):
@@ -812,7 +813,7 @@ def test_fe_cutoff(run_macs3, tmp_path, write_bed, fe, npeaks):
 # lambda options without a control
 # ------------------------------------
 
-def test_nolambda(run_macs3, tmp_path, write_bed, parse_log):
+def test_nolambda(run_macs3, tmp_path, write_bed, parse_analysis_log):
     # the lambda is lambda_bg = 0.02 everywhere
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20))] + SYN
@@ -826,7 +827,7 @@ def test_nolambda(run_macs3, tmp_path, write_bed, parse_log):
                     ".", 21 / (1 + _f32(0.02)), p, q, "50"])
     assert "# local lambda is disabled!" in _lines(_out(out, "t",
                                                         "_peaks.xls"))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "# local lambda is disabled!" in info
     assert "#3 !!!! DYNAMIC LAMBDA IS DISABLED !!!!" in info
 
@@ -886,7 +887,7 @@ def test_gsize_header(run_macs3, tmp_path, write_bed, gsize, text):
     # auto: binomial 1 - 1e-5 quantile of Bin(20, 1/100) = 4
     ("auto", int(binom.ppf(1 - 1e-5, 20, 1 / 100.0)), "100"),
 ])
-def test_keep_dup(run_macs3, tmp_path, write_bed, parse_log, keepdup, kept,
+def test_keep_dup(run_macs3, tmp_path, write_bed, parse_analysis_log, keepdup, kept,
                   gsize):
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20)), "--nomodel",
@@ -895,7 +896,7 @@ def test_keep_dup(run_macs3, tmp_path, write_bed, parse_log, keepdup, kept,
     assert _lines(_out(out, "t", "_treat_pileup.bdg"))[1] == \
         "chr1\t1000\t1100\t%d.00000" % kept
     xls = _lines(_out(out, "t", "_peaks.xls"))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     if keepdup == "all":
         assert not [ln for ln in xls if "after filtering" in ln]
         assert not [m for m in info if "filter out redundant" in m]
@@ -930,7 +931,7 @@ def test_keep_dup_is_per_strand(run_macs3, tmp_path, write_bed):
 # bedGraph options
 # ------------------------------------
 
-def test_spmr(run_macs3, tmp_path, write_bed, parse_log):
+def test_spmr(run_macs3, tmp_path, write_bed, parse_analysis_log):
     # values divided by the treatment depth in millions (20 / 1e6)
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20))] + SYN
@@ -945,7 +946,7 @@ def test_spmr(run_macs3, tmp_path, write_bed, parse_log):
         _lines(_out(out, "t", "_peaks.xls"))
     assert ("#3   --SPMR is requested, so pileup will be normalized by "
             "sequencing depth in million reads.") in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
 
 
 def test_spmr_does_not_change_peaks(run_macs3, tmp_path, write_bed):
@@ -1258,7 +1259,7 @@ def test_control_window_smaller_than_d(run_macs3, tmp_path, write_bed,
     (["--to-large"], 20,
      ["chr1\t0\t800\t0.20000", "chr1\t800\t1100\t1.00000"], "treatment"),
 ], ids=["small", "large", "to-large"])
-def test_scale_to(run_macs3, tmp_path, write_bed, parse_log, extra, treat_v,
+def test_scale_to(run_macs3, tmp_path, write_bed, parse_analysis_log, extra, treat_v,
                   lam_lines, which):
     proc, out = _run_with_control(run_macs3, tmp_path, write_bed, extra,
                                   ctrl=_control_reads(20, 1300, 20, 5000))
@@ -1266,11 +1267,11 @@ def test_scale_to(run_macs3, tmp_path, write_bed, parse_log, extra, treat_v,
         "chr1\t1000\t1100\t%d.00000" % treat_v
     assert _lines(_out(out, "t", "_control_lambda.bdg")) == lam_lines
     assert "#3   Pileup will be based on sequencing depth in %s." % which in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
 
 
 def test_scale_to_small_when_treatment_is_larger(run_macs3, tmp_path,
-                                                 write_bed, parse_log):
+                                                 write_bed, parse_analysis_log):
     # 40 treatment reads, 20 control reads: the treatment is scaled down
     # by 20 / 40 and the control is unscaled (lambda_bg from the control)
     proc, out = _run_with_control(run_macs3, tmp_path, write_bed,
@@ -1280,16 +1281,16 @@ def test_scale_to_small_when_treatment_is_larger(run_macs3, tmp_path,
     assert _lines(_out(out, "t", "_control_lambda.bdg")) == [
         "chr1\t0\t800\t0.20000", "chr1\t800\t1100\t1.00000"]
     assert "#3   Pileup will be based on sequencing depth in control." in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
 
 
-def test_down_sample_control(run_macs3, tmp_path, write_bed, parse_log):
+def test_down_sample_control(run_macs3, tmp_path, write_bed, parse_analysis_log):
     # the 40 control reads at 1300 are sampled down to 20; any sample
     # gives the same track: slocal 20 * 100 / 1000 = 2, llocal 0.2
     proc, out = _run_with_control(run_macs3, tmp_path, write_bed,
                                   ["--down-sample", "--seed", "3"],
                                   ctrl=_block(40, start=1300))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "#3 User prefers to use random sampling instead of linear " \
         "scaling." in info
     assert "#3 MACS is random sampling control tags..." in info
@@ -1301,11 +1302,11 @@ def test_down_sample_control(run_macs3, tmp_path, write_bed, parse_log):
         "chr1\t1000\t1100\t20.00000"
 
 
-def test_down_sample_treatment(run_macs3, tmp_path, write_bed, parse_log):
+def test_down_sample_treatment(run_macs3, tmp_path, write_bed, parse_analysis_log):
     proc, out = _run_with_control(run_macs3, tmp_path, write_bed,
                                   ["--down-sample", "--seed", "3"],
                                   treat=_block(40))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "#3 MACS is random sampling treatment tags..." in info
     assert "#3 20 Tags from treatment are kept" in info
     assert _lines(_out(out, "t", "_treat_pileup.bdg"))[1] == \
@@ -1313,12 +1314,12 @@ def test_down_sample_treatment(run_macs3, tmp_path, write_bed, parse_log):
 
 
 def test_down_sample_without_seed_warns(run_macs3, tmp_path, write_bed,
-                                        parse_log):
+                                        parse_analysis_log):
     proc, _ = _run_with_control(run_macs3, tmp_path, write_bed,
                                 ["--down-sample"],
                                 ctrl=_block(40, start=1300))
     assert "#3 Your results may not be reproducible due to the random " \
-        "sampling!" in _messages(parse_log, proc, "WARNING")
+        "sampling!" in _messages(parse_analysis_log, proc, "WARNING")
 
 
 def test_down_sample_seed_is_reproducible(run_macs3, tmp_path, write_bed):
@@ -1404,7 +1405,7 @@ def _cutoff_rows():
 
 
 def test_cutoff_analysis_high_cutoffs(run_macs3, tmp_path, write_bed,
-                                      parse_log):
+                                      parse_analysis_log):
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20))] + SYN
                    + ["--cutoff-analysis"], out))
@@ -1413,7 +1414,7 @@ def test_cutoff_analysis_high_cutoffs(run_macs3, tmp_path, write_bed,
     expected = [r for r in _cutoff_rows() if "\t100\t" in r]
     assert lines[1:len(expected) + 1] == expected
     assert "#3 Cutoff vs peaks called will be analyzed!" in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
 
 
 def test_cutoff_analysis_does_not_change_peaks(run_macs3, tmp_path,
@@ -1604,7 +1605,7 @@ def test_broad_cutoff_equal_to_strong(run_macs3, tmp_path, write_bed):
     assert len(rows) == 1
 
 
-def test_broad_with_pvalue(run_macs3, tmp_path, write_bed, parse_log):
+def test_broad_with_pvalue(run_macs3, tmp_path, write_bed, parse_analysis_log):
     # -p 1e-3 (strong: p > 3) and --broad-cutoff 0.5 (weak: p > 0.30103)
     # are p-value cutoffs. Pileup 0 against lambda 0.24 has p = 0.67, so
     # the whole [0, 3100) is one weak region; only [1000, 1100) is strong
@@ -1619,7 +1620,7 @@ def test_broad_with_pvalue(run_macs3, tmp_path, write_bed, parse_log):
     assert "# pvalue cutoff for broad/weak regions = 5.00e-01" in xls
     assert ("#3 Call broad peaks with given level1 -log10pvalue cutoff and "
             "level2: 3.00000, 0.30103...") in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
     lam = _f32(0.24)
     length = {20: 100, 2: 200, 0: 2800}
     pscores = {k: _pscore(k, lam) for k in length}
@@ -1655,7 +1656,7 @@ MODEL_IDS = ["default", "bw200", "bw150", "dmin15", "mfold2-50"]
     ([], 469), (["--bw", "200"], 294), (["--bw", "150"], 162),
     (["--d-min", "15"], 469), (["-m", "2", "50"], 469),
 ], ids=MODEL_IDS)
-def test_model_paired_peaks(run_macs3, tmp_path, test_dir, parse_log, extra,
+def test_model_paired_peaks(run_macs3, tmp_path, test_dir, parse_analysis_log, extra,
                             npairs):
     """Number of paired peaks; the log and the xls report the same d
     and alternative d.
@@ -1665,7 +1666,7 @@ def test_model_paired_peaks(run_macs3, tmp_path, test_dir, parse_log, extra,
     """
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, _ctcf_args(test_dir, CTCF_SE) + extra, out))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "#2 Total number of paired peaks: %d" % npairs in info
     d = [m for m in info if m.startswith("#2 predicted fragment length is ")]
     altd = [m for m in info
@@ -1707,7 +1708,7 @@ def test_model_r_script(run_macs3, tmp_path, test_dir, bw):
 
 @pytest.mark.parametrize("mfold,npairs", [(["10", "30"], 95),
                                           (["40", "50"], 5)])
-def test_model_not_enough_pairs(run_macs3, tmp_path, test_dir, parse_log,
+def test_model_not_enough_pairs(run_macs3, tmp_path, test_dir, parse_analysis_log,
                                 mfold, npairs):
     """Too few paired peaks stops the run with exit code 1.
 
@@ -1717,7 +1718,7 @@ def test_model_not_enough_pairs(run_macs3, tmp_path, test_dir, parse_log,
     out = tmp_path / "out"
     proc = _cp(run_macs3, _ctcf_args(test_dir, CTCF_SE) + ["-m"] + mfold, out)
     assert proc.returncode == 1
-    warn = _messages(parse_log, proc, "WARNING")
+    warn = _messages(parse_analysis_log, proc, "WARNING")
     assert warn == [
         "#2 MACS3 needs at least 100 paired peaks at + and - strand to build "
         "the model, but can only find %d! Please make your MFOLD range "
@@ -1729,23 +1730,23 @@ def test_model_not_enough_pairs(run_macs3, tmp_path, test_dir, parse_log,
 
 
 def test_model_not_enough_pairs_synthetic(run_macs3, tmp_path, write_bed,
-                                          parse_log):
+                                          parse_analysis_log):
     # one block has no + / - peak pair at all
     proc = _cp(run_macs3, ["-t", write_bed(_block(20)), "-g", "100000"],
                tmp_path / "out")
     assert proc.returncode == 1
     assert "#2 Total number of paired peaks: 0" in \
-        _messages(parse_log, proc, "INFO")
+        _messages(parse_analysis_log, proc, "INFO")
 
 
 def test_fix_bimodal_falls_back_to_extsize(run_macs3, tmp_path, write_bed,
-                                           parse_log):
+                                           parse_analysis_log):
     # same input as above, but --fix-bimodal continues with d = extsize
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", write_bed(_block(20)), "-g", "100000",
                                "--keep-dup", "all", "--fix-bimodal",
                                "--extsize", "100"], out))
-    warn = _messages(parse_log, proc, "WARNING")
+    warn = _messages(parse_analysis_log, proc, "WARNING")
     assert warn[-2:] == ["#2 Skipped...",
                          "#2 Since --fix-bimodal is set, MACS will use 100 "
                          "as fragment length"]
@@ -1757,7 +1758,7 @@ def test_fix_bimodal_falls_back_to_extsize(run_macs3, tmp_path, write_bed,
 
 @pytest.mark.parametrize("fix", [False, True])
 def test_model_d_below_twice_tag_size(run_macs3, tmp_path, test_dir,
-                                      parse_log, fix):
+                                      parse_analysis_log, fix):
     """With -s 200 the predicted d (about 229) is below 2 * tag size:
     the warning names the predicted d, and --fix-bimodal replaces it by
     the tag size.
@@ -1768,12 +1769,12 @@ def test_model_d_below_twice_tag_size(run_macs3, tmp_path, test_dir,
     out = tmp_path / "out"
     extra = ["-s", "200"] + (["--fix-bimodal"] if fix else [])
     proc = _ok(_cp(run_macs3, _ctcf_args(test_dir, CTCF_SE) + extra, out))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     d = int(re.fullmatch(r"#2 predicted fragment length is (\d+) bps",
                          [m for m in info if m.startswith(
                              "#2 predicted fragment length")][0]).group(1))
     assert d < 2 * 200
-    warn = _messages(parse_log, proc, "WARNING")
+    warn = _messages(parse_analysis_log, proc, "WARNING")
     assert warn[0] == ("#2 Since the d (%d) calculated from paired-peaks are "
                        "smaller than 2*tag length, it may be influenced by "
                        "unknown sequencing problem!" % d)
@@ -1794,7 +1795,7 @@ def test_model_d_below_twice_tag_size(run_macs3, tmp_path, test_dir,
 
 
 def test_model_verbose3_debug_lines(run_macs3, tmp_path, test_dir,
-                                    parse_log):
+                                    parse_analysis_log):
     """--verbose 3 adds the model summary at DEBUG level.
 
     Pins the current output. min_tags, max_tags and the peak counts come
@@ -1804,9 +1805,9 @@ def test_model_verbose3_debug_lines(run_macs3, tmp_path, test_dir,
     """
     proc = _ok(_cp(run_macs3, _ctcf_args(test_dir, CTCF_SE)
                    + ["--verbose", "3"], tmp_path / "out"))
-    debug = _messages(parse_log, proc, "DEBUG")
+    debug = _messages(parse_analysis_log, proc, "DEBUG")
     assert debug[1].startswith("Chromosome: ") and "chr22" in debug[1]
-    d = [m for m in _messages(parse_log, proc, "INFO")
+    d = [m for m in _messages(parse_analysis_log, proc, "INFO")
          if m.startswith("#2 predicted fragment length is ")][0].split()[-2]
     assert debug[-2:] == ["#2   d: %s" % d,
                           "#2   scan_window: %d" % (2 * int(d))]
@@ -1829,7 +1830,7 @@ def test_model_verbose3_debug_lines(run_macs3, tmp_path, test_dir,
     # the default level shows none of them
     proc2 = _ok(_cp(run_macs3, _ctcf_args(test_dir, CTCF_SE),
                     tmp_path / "out2"))
-    assert _messages(parse_log, proc2, "DEBUG") == []
+    assert _messages(parse_analysis_log, proc2, "DEBUG") == []
 
 
 def test_ctcf_outputs_consistent(run_macs3, tmp_path, test_dir):
@@ -1856,11 +1857,11 @@ def test_ctcf_outputs_consistent(run_macs3, tmp_path, test_dir):
 
 
 def test_ctcf_verbose0_quiet_optvalidator_logger(run_macs3, tmp_path,
-                                                 test_dir, parse_log):
+                                                 test_dir, parse_analysis_log):
     # --verbose 0 silences the messages of callpeak itself
     proc = _ok(_cp(run_macs3, _ctcf_args(test_dir, CTCF_SE)
                    + ["--verbose", "0"], tmp_path / "out"))
-    msgs = _messages(parse_log, proc)
+    msgs = _messages(parse_analysis_log, proc)
     assert not [m for m in msgs if m.startswith("#1") or m.startswith("#2")
                 or m.startswith("#4") or m == "Done!"]
 
@@ -1915,7 +1916,7 @@ def test_sam_plus_strand_matches_bed(run_macs3, tmp_path, make_alignments):
 
 
 @pytest.mark.parametrize("fmt", ["BED", "BAM", "SAM", "ELAND", "ELANDEXPORT"])
-def test_auto_detects_format(run_macs3, tmp_path, make_alignments, parse_log,
+def test_auto_detects_format(run_macs3, tmp_path, make_alignments, parse_analysis_log,
                              fmt):
     # SAM with + strand reads only: SAMParser raises TypeError on
     # minus-strand reads in this version
@@ -1924,7 +1925,7 @@ def test_auto_detects_format(run_macs3, tmp_path, make_alignments, parse_log,
     path = _write_se_format(tmp_path, fmt, reads, make_alignments)
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", path] + SYN + ["-B"], out))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "Detected format is: %s" % fmt in info
     assert ("* Input file is gzipped." in info) == (fmt == "BAM")
     expected = _coverage_segments(_se_expected_intervals(reads))
@@ -1932,12 +1933,12 @@ def test_auto_detects_format(run_macs3, tmp_path, make_alignments, parse_log,
         _bdg_lines("chr1", expected)
 
 
-def test_auto_gzipped_bed(run_macs3, tmp_path, write_bed, parse_log):
+def test_auto_gzipped_bed(run_macs3, tmp_path, write_bed, parse_analysis_log):
     gz = write_bed(_block(20), name="reads.bed.gz")
     plain = write_bed(_block(20), name="reads.bed")
     proc = _ok(_cp(run_macs3, ["-t", gz] + SYN + ["-B"], tmp_path / "a"))
     _ok(_cp(run_macs3, ["-t", plain] + SYN + ["-B"], tmp_path / "b"))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "Detected format is: BED" in info
     assert "* Input file is gzipped." in info
     _same_outputs(tmp_path / "a", tmp_path / "b", "t")
@@ -1992,7 +1993,7 @@ PE_FORMATS = ["BAMPE", "BEDPE", "FRAG"]
 
 @pytest.mark.parametrize("fmt", PE_FORMATS)
 def test_pe_formats_give_same_pileup(run_macs3, tmp_path, make_alignments,
-                                     make_pe_pair, parse_log, fmt):
+                                     make_pe_pair, parse_analysis_log, fmt):
     path = _write_pe_format(tmp_path, fmt, PE_FRAGS, make_alignments,
                             make_pe_pair)
     out = tmp_path / "out"
@@ -2002,7 +2003,7 @@ def test_pe_formats_give_same_pileup(run_macs3, tmp_path, make_alignments,
     assert _lines(_out(out, "t", "_treat_pileup.bdg")) == \
         _bdg_lines("chr1", expected)
     mean = sum(r - l for l, r in PE_FRAGS) / len(PE_FRAGS)    # 157.0
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "#1 mean fragment size is determined as %.1f bp from treatment" \
         % mean in info
     assert "#1  total fragments in treatment: 15" in info
@@ -2042,7 +2043,7 @@ def test_bampe_skips_improper_pairs(run_macs3, tmp_path, make_alignments,
 
 
 def test_bedpe_keep_dup_default_filters(run_macs3, tmp_path, write_bedpe,
-                                        parse_log):
+                                        parse_analysis_log):
     # 5 identical fragments: one is kept by default
     path = write_bedpe([("chr1", 10000, 10200)] * 5)
     out = tmp_path / "out"
@@ -2051,7 +2052,7 @@ def test_bedpe_keep_dup_default_filters(run_macs3, tmp_path, write_bedpe,
     assert _lines(_out(out, "t", "_treat_pileup.bdg"))[1] == \
         "chr1\t10000\t10200\t1.00000"
     assert "#1 filter out redundant fragments by allowing at most 1 " \
-        "identical fragment(s)" in _messages(parse_log, proc, "INFO")
+        "identical fragment(s)" in _messages(parse_analysis_log, proc, "INFO")
     xls = _lines(_out(out, "t", "_peaks.xls"))
     assert "# fragments after filtering in treatment: 1" in xls
     assert "# maximum duplicate fragments in treatment = 1" in xls
@@ -2107,7 +2108,7 @@ def test_frag_max_count(run_macs3, tmp_path, write_frag, maxcount, heights,
             in xls) == (maxcount not in (None, "0"))
 
 
-def test_frag_barcodes(run_macs3, tmp_path, write_frag, parse_log):
+def test_frag_barcodes(run_macs3, tmp_path, write_frag, parse_analysis_log):
     frag = write_frag([("chr1", 10000, 10200, "A", 5),
                        ("chr1", 20000, 20200, "B", 3),
                        ("chr1", 30000, 30200, "A", 2)])
@@ -2116,7 +2117,7 @@ def test_frag_barcodes(run_macs3, tmp_path, write_frag, parse_log):
     out = tmp_path / "out"
     proc = _ok(_cp(run_macs3, ["-t", frag, "-f", "FRAG", "-g", "100000",
                                "-B", "--barcodes", bc], out))
-    info = _messages(parse_log, proc, "INFO")
+    info = _messages(parse_analysis_log, proc, "INFO")
     assert "#1 extract fragments with given barcodes" in info
     assert "#   extracted 7 fragments in treatment" in info
     assert _lines(_out(out, "t", "_treat_pileup.bdg")) == [
@@ -2267,12 +2268,12 @@ def test_frag_control_lambda_single_window(run_macs3, tmp_path, write_frag):
 ], ids=["gsize", "keepdup-word", "keepdup-negative", "keepdup-float",
         "extsize0", "extsize-negative", "broad-summits", "mfold",
         "maxcount-negative"])
-def test_validation_errors(run_macs3, tmp_path, write_bed, parse_log, extra,
+def test_validation_errors(run_macs3, tmp_path, write_bed, parse_analysis_log, extra,
                            errors):
     proc = _cp(run_macs3, ["-t", write_bed(_block(20))] + extra,
                tmp_path / "out")
     assert proc.returncode == 1
-    assert [(lv, m) for lv, m in parse_log(proc.stderr)] == \
+    assert [(lv, m) for lv, m in parse_analysis_log(proc.stderr)] == \
         [("ERROR", e) for e in errors]
     assert list((tmp_path / "out").iterdir()) == []
 

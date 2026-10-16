@@ -45,6 +45,7 @@ from cython.cimports.MACS3.IO.cparser_layout import (
     INTERNER_ALIGNMENT_BYTES as _ISLOT_ALIGNMENT,
     InternerSlot as _ISlot, FragLocalMap as _FragLocalMap)
 from MACS3.Utilities.Performance import DEFAULTS
+from MACS3.Utilities.Execution import resolve_execution_policy
 from MACS3.Utilities.Constants import READ_BUFFER_SIZE
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -71,7 +72,8 @@ else:
 
 
 @cython.ccall
-def guess_parser(fname, buffer_size: cython.long = 100000):
+def guess_parser(fname, buffer_size: cython.long = 100000,
+                 execution_policy=None, threads=None):
     """Return the first parser that recognises ``fname`` as a supported format.
 
     Args:
@@ -93,9 +95,11 @@ def guess_parser(fname, buffer_size: cython.long = 100000):
                            "SAM": SAMParser,
                            "BOWTIE": BowtieParser}
 
+    execution_policy = resolve_execution_policy(
+        threads, execution_policy=execution_policy)
     for f in ordered_parser_dict:
         p = ordered_parser_dict[f]
-        t_parser = p(fname, buffer_size=buffer_size)
+        t_parser = p(fname, buffer_size=buffer_size, execution_policy=execution_policy)
         debug("Testing format %s" % f)
         s = t_parser.sniff()
         if s:
@@ -120,12 +124,10 @@ _BAM_OUT_SIZE = cython.declare(cython.Py_ssize_t, DEFAULTS.bam_serial_output_byt
 # bytes of an alignment record before read_name, after block_size
 _BAM_CORE_SIZE = cython.declare(cython.Py_ssize_t, 32)
 
-# BGZF input is inflated on min(_BAM_MAX_THREADS, cores) threads when
-# more than one core is available: _BAM_PAR_IN compressed bytes at a time
+# BGZF inflation uses the invocation thread budget: _BAM_PAR_IN compressed bytes at a time
 # are split into blocks, which are inflated into _BAM_PAR_OUT bytes
 # following _BAM_PAR_HEAD bytes kept for the unconsumed tail of the
 # previous batch.
-_BAM_MAX_THREADS = cython.declare(cython.int, DEFAULTS.cpu_limit)
 _BAM_PAR_IN = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_batch_input_bytes)
 _BAM_PAR_OUT = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_batch_output_bytes)
 _BAM_PAR_HEAD = cython.declare(cython.Py_ssize_t, DEFAULTS.bgzf_tail_reserve_bytes)
@@ -140,14 +142,6 @@ _BAMBatch = cython.struct(
     jobs=cython.pointer(bgzf_job_t),  # one per block
     njobs=cython.Py_ssize_t,
     out_len=cython.Py_ssize_t)       # bytes the blocks inflate to
-
-
-def _inflate_threads() -> int:
-    """Return how many threads inflate a BGZF file (BAM, or a BGZF
-    fragment file): min(8, the cores this process may run on)."""
-    if hasattr(os, "sched_getaffinity"):
-        return min(_BAM_MAX_THREADS, len(os.sched_getaffinity(0)))
-    return min(_BAM_MAX_THREADS, os.cpu_count() or 1)
 
 
 def _starts_with_bgzf(filename: str) -> bool:
@@ -201,7 +195,7 @@ class _BAMStream:
     parallel path first: ``_BAM_PAR_IN`` compressed bytes at a time are
     split into BGZF blocks by their headers, and the blocks are inflated
     by libdeflate (``bgzf_mt.c``), each checked against its CRC32 and
-    ISIZE, on ``_inflate_threads()`` threads, the next batch
+    ISIZE, on the invocation's budgeted threads, the next batch
     while the caller walks the records of the current one, and the
     compressed input of the batch after it is read while the threads
     inflate. From the
@@ -274,7 +268,8 @@ class _BAMStream:
         self.window = False
 
     def __init__(self, filename: str, gzipped: cython.bint,
-                 parallel: cython.bint = True, window: cython.bint = False):
+                 parallel: cython.bint = True, window: cython.bint = False,
+                 threads: cython.int = 1):
         i: cython.int
         nthreads: cython.int
 
@@ -292,7 +287,7 @@ class _BAMStream:
             if inflateInit2(cython.address(self.strm), 15 + 16) != Z_OK:
                 raise MemoryError("zlib could not be initialized")
             self.zready = True
-            nthreads = _inflate_threads() if parallel else 1
+            nthreads = threads if parallel else 1
             if nthreads > 1:
                 self.pool = bgzf_pool_new(nthreads)
         if self.pool != cython.NULL:
@@ -1127,14 +1122,20 @@ class GenericParser:
     tag_size: cython.int
     fhd: object
     buffer_size: cython.long
+    execution_policy = cython.declare(object, visibility="readonly")
+    execution_threads: cython.int
 
-    def __init__(self, filename: str, buffer_size: cython.long = 100000):
+    def __init__(self, filename: str, buffer_size: cython.long = 100000, *,
+                 execution_policy=None, threads=None):
         """Prepare the parser and open the target file.
 
         Args:
             filename: Path to the input alignment file.
             buffer_size: Chunk size used when reading the stream.
         """
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
+        self.execution_threads = self.execution_policy.threads
         self.filename = filename
         self.gzipped = True
         self.tag_size = -1
@@ -1206,7 +1207,8 @@ class GenericParser:
         chromosome: bytes
         tmp: bytes = b""
 
-        fwtrack = FWTrack(buffer_size=self.buffer_size)
+        fwtrack = FWTrack(buffer_size=self.buffer_size,
+                            execution_policy=self.execution_policy)
         i = 0
         while True:
             # for each block of input
@@ -1435,7 +1437,8 @@ class BEDPEParser(GenericParser):
         m: cython.long = 0          # sum of fragment lengths
         tmp: bytes = b""
 
-        petrack = PETrackI(buffer_size=self.buffer_size)
+        petrack = PETrackI(buffer_size=self.buffer_size,
+                            execution_policy=self.execution_policy)
         add_loc = petrack.add_loc
 
         while True:
@@ -1876,13 +1879,17 @@ class BAMParser(GenericParser):
     bodies. After a failed append, discard the partially modified track.
     """
     def __init__(self, filename: str,
-                 buffer_size: cython.long = 100000):
+                 buffer_size: cython.long = 100000, *,
+                 execution_policy=None, threads=None):
         """Prepare the parser and open the BAM file.
 
         Args:
             filename: Path to the BAM file.
             buffer_size: Chunk size used when reading BGZF blocks.
         """
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
+        self.execution_threads = self.execution_policy.threads
         self.filename = filename
         self.gzipped = True
         self.tag_size = -1
@@ -2009,7 +2016,8 @@ class BAMParser(GenericParser):
         stream: _BAMStream
 
         self.fhd.close()
-        stream = _BAMStream(self.filename, self.gzipped)
+        stream = _BAMStream(self.filename, self.gzipped,
+                            threads=self.execution_threads)
         try:
             stream.skip(offset)
         except BaseException:
@@ -2024,7 +2032,8 @@ class BAMParser(GenericParser):
         references: list
         rlengths: dict
 
-        fwtrack = FWTrack(buffer_size=self.buffer_size)
+        fwtrack = FWTrack(buffer_size=self.buffer_size,
+                            execution_policy=self.execution_policy)
         # after this, ptr at list of alignments
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
@@ -2096,7 +2105,8 @@ class BAMPEParser(BAMParser):
         references: list
         rlengths: dict
 
-        petrack = PETrackI(buffer_size=self.buffer_size)
+        petrack = PETrackI(buffer_size=self.buffer_size,
+                            execution_policy=self.execution_policy)
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
         # for convenience, only count valid pairs
@@ -3505,7 +3515,7 @@ class FragParser(GenericParser):
         negative, capping its count at ``max_count`` when that is set,
         and calling ``petrack.add_loc``, as earlier versions did line by
         line. The file is decompressed in large blocks (``_BAMStream``,
-        on ``_inflate_threads()`` threads when the file starts with a
+        on the invocation's budgeted threads when the file starts with a
         BGZF block, as tabix-indexed fragment files do, and serially
         otherwise; the blocks are the serial path's either way), whose
         lines are parsed in C; the fragments of a block
@@ -3599,10 +3609,11 @@ class FragParser(GenericParser):
         self.fhd.close()
         stream = _BAMStream(self.filename, self.gzipped,
                             self.gzipped and _starts_with_bgzf(self.filename),
-                            True)
+                            True, self.execution_threads)
         stream.skip(offset)
         if fast and stream.pool != cython.NULL:
-            tasks = _inflate_threads() * _FRAG_TASKS_PER_THREAD
+            tasks = (cython.cast(cython.Py_ssize_t, self.execution_threads) *
+                     _FRAG_TASKS_PER_THREAD)
             chunks = _FragChunks(tasks)
             chunks.job.capped = capped
             chunks.job.cap = cython.cast(cython.int, cap)
@@ -3904,7 +3915,8 @@ class FragParser(GenericParser):
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
 
-        petrack = PETrackII(buffer_size=self.buffer_size)
+        petrack = PETrackII(buffer_size=self.buffer_size,
+                            execution_policy=self.execution_policy)
         try:
             i = self.load_petrack(petrack, max_count, cython.address(m))
         finally:

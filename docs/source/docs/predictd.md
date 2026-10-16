@@ -87,3 +87,9 @@ Then you can use R to make a figure for the model:
 ```bash
 Rscript model.R
 ```
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

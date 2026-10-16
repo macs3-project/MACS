@@ -50,6 +50,7 @@ from cython.cimports.MACS3.Signal.chugepages import (macs3_hp_available,
 
 from MACS3.Utilities.Logger import logging
 from MACS3.Utilities.Threads import map_chromosomes
+from MACS3.Utilities.Execution import resolve_execution_policy
 from MACS3.Utilities.Performance import DEFAULTS
 
 logger = logging.getLogger(__name__)
@@ -675,7 +676,10 @@ class PETrackI:
     average_template_length = cython.declare(cython.float, visibility="public")
     is_destroyed: bool
 
-    def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
+    execution_policy = cython.declare(object, visibility="readonly")
+
+    def __init__(self, anno: str = "", buffer_size: cython.long = 100000, *,
+                 execution_policy=None, threads=None):
         """Initialize an empty paired-end track.
         
         Parameters
@@ -687,6 +691,8 @@ class PETrackI:
         """
         # dictionary with chrname as key, nparray with
         # [('l','i4'),('r','i4')] as value
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
         # size is to remember the number of the fragments added to this chromosome
@@ -910,7 +916,8 @@ class PETrackI:
             else:
                 self._sort_chrom(c)
             self.total += self.size[c]
-        map_chromosomes(self._sort_chrom, big, sizes)
+        map_chromosomes(self._sort_chrom, big, sizes,
+                                    execution_policy=self.execution_policy)
 
         self.is_sorted = True
         self.average_template_length = cython.cast(cython.float, self.length) / self.total
@@ -1187,7 +1194,8 @@ class PETrackI:
             else:
                 self.length -= self._filter_dup_chrom(k, maxnum)
                 self.total += self.size[k]
-        removed = map_chromosomes(self._filter_dup_chrom, big, sizes, maxnum)
+        removed = map_chromosomes(self._filter_dup_chrom, big, sizes, maxnum,
+                                  execution_policy=self.execution_policy)
         for i in range(len(big)):
             self.length -= cython.cast(cython.ulonglong, removed[i])
             self.total += self.size[big[i]]
@@ -1376,7 +1384,8 @@ class PETrackI:
         loc: cnp.ndarray
 
         ret_petrackI = PETrackI(anno=self.annotation,
-                                buffer_size=self.buffer_size)
+                                buffer_size=self.buffer_size,
+                                execution_policy=self.execution_policy)
         chrnames = self.get_chr_names()
 
         if seed >= 0:
@@ -1770,9 +1779,14 @@ class PETrackII:
     average_template_length = cython.declare(cython.float, visibility="public")
     is_destroyed: bool
 
-    def __init__(self, anno: str = "", buffer_size: cython.long = 100000):
+    execution_policy = cython.declare(object, visibility="readonly")
+
+    def __init__(self, anno: str = "", buffer_size: cython.long = 100000, *,
+                 execution_policy=None, threads=None):
         # dictionary with chrname as key, nparray with
         # [('l','i4'),('r','i4'),('c','u2')] as value
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
         self.locations = {}
         # dictionary with chrname as key, size of the above nparray as value
         # size is to remember the size of the fragments added to this chromosome
@@ -2127,7 +2141,8 @@ class PETrackII:
                 sizes.append(self.size[c])
             else:
                 self.total += self._sort_chrom(c)  # self.size[c]
-        for count in map_chromosomes(self._sort_chrom, big, sizes):
+        for count in map_chromosomes(self._sort_chrom, big, sizes,
+                                    execution_policy=self.execution_policy):
             self.total += count  # self.size[c]
 
         assert self.total > 0, "Error: no fragments in PETrackII"
@@ -2292,7 +2307,7 @@ class PETrackII:
         chromosome: bytes
         ret: PETrackII
 
-        ret = PETrackII()
+        ret = PETrackII(execution_policy=self.execution_policy)
         chrs = self.get_chr_names()
 
         # first we need to convert barcodes into integers in our
@@ -2884,7 +2899,8 @@ class PETrackII:
         else:
             rs_shuffle = np.random.shuffle
 
-        ret = PETrackII(anno=self.annotation, buffer_size=self.buffer_size)
+        ret = PETrackII(anno=self.annotation, buffer_size=self.buffer_size,
+                        execution_policy=self.execution_policy)
         ret.barcode_dict = dict(self.barcode_dict)
         ret.barcode_last_n = self.barcode_last_n
 

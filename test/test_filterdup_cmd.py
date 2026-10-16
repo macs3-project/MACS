@@ -8,6 +8,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import gzip
 import logging
 import os
@@ -166,7 +167,8 @@ def cmd_messages(caplog):
     """(level, message) of the records logged by the command itself."""
     return [(r.levelname, MEM_PREFIX.sub("", r.getMessage()))
             for r in caplog.records
-            if r.name == "MACS3.Utilities.OptValidator"]
+            if r.name == "MACS3.Utilities.OptValidator"
+            and not is_execution_message(MEM_PREFIX.sub("", r.getMessage()))]
 
 
 @pytest.fixture(autouse=True)
@@ -259,22 +261,22 @@ def test_cli_argparse_error_exit_code_and_usage(run_macs3):
 # opt_validate_filterdup reached through the CLI
 # ------------------------------------
 
-def test_cli_invalid_gsize(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_invalid_gsize(run_macs3, parse_analysis_log, se_bed, tmp_path):
     proc = run_macs3(["filterdup", "-i", se_bed, "-g", "xyz",
                       "--outdir", tmp_path, "-o", "out.bed"], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "Error when interpreting --gsize option: xyz"),
         ("ERROR", "Available shortcuts of effective genome sizes are "
                   "hs,mm,ce,dm")]
     assert not (tmp_path / "out.bed").exists()
 
 
-def test_cli_invalid_keep_dup(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_invalid_keep_dup(run_macs3, parse_analysis_log, se_bed, tmp_path):
     proc = run_macs3(["filterdup", "-i", se_bed, "--keep-dup", "abc",
                       "--outdir", tmp_path], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "--keep-dup should be 'auto', 'all' or an integer!")]
     assert proc.stdout == ""
 
@@ -341,7 +343,7 @@ def test_binomial_cutoffs_of_the_small_data_set():
     assert binom_cutoff(15, 100000) == 1
 
 
-def test_cli_keep_dup_auto_log(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_keep_dup_auto_log(run_macs3, parse_analysis_log, se_bed, tmp_path):
     """Exact log of an auto run: 15 tags, binomial cutoff 2 for
     -g 1000, 13 tags kept (one extra copy at 100+ and at 700-), redundant
     rate 2/15."""
@@ -350,7 +352,7 @@ def test_cli_keep_dup_auto_log(run_macs3, parse_log, se_bed, tmp_path):
     proc = run_macs3(["filterdup", "-i", se_bed, "-f", "BED", "-g", "1000",
                       "--outdir", tmp_path, "-o", "out.bed"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read tag files..."),
         ("INFO", "# read treatment tags..."),
         ("INFO", "# tag size = 36"),
@@ -395,13 +397,13 @@ def test_keep_dup_all_skips_filtering_log(macs3_argparser, caplog, se_bed,
 # -o/--ofile, --outdir and --dry-run
 # ------------------------------------
 
-def test_cli_stdout_default(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_stdout_default(run_macs3, parse_analysis_log, se_bed, tmp_path):
     proc = run_macs3(["filterdup", "-i", se_bed, "--keep-dup", "all"],
                      timeout=60)
     assert proc.returncode == 0, proc.stderr
     assert proc.stdout.splitlines() == expected_bed(SE_READS)
     assert proc.stdout.endswith("\n")
-    log = parse_log(proc.stderr)
+    log = parse_analysis_log(proc.stderr)
     assert log[-1] == ("INFO", "finished! Check stdout.")
     assert ("INFO", "Detected format is: BED") in log
     assert sorted(os.listdir(tmp_path)) == ["TMPDIR", "reads.bed"]
@@ -434,13 +436,13 @@ def test_stdout_in_process(macs3_argparser, capsys, se_bed, tmp_path):
         expected_bed(SE_READS, maxdup=1)
 
 
-def test_cli_dry_run(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_dry_run(run_macs3, parse_analysis_log, se_bed, tmp_path):
     proc = run_macs3(["filterdup", "-i", se_bed, "-f", "BED", "-g", "1000",
                       "--dry-run", "--outdir", tmp_path, "-o", "dry.bed"],
                      timeout=60)
     assert proc.returncode == 0, proc.stderr
     assert proc.stdout == ""
-    log = [m for _, m in parse_log(proc.stderr)]
+    log = [m for _, m in parse_analysis_log(proc.stderr)]
     assert log[-5:] == [" max_dup_tags based on binomal = 2",
                         "filter out redundant tags at the same location and "
                         "the same strand by allowing at most 2 tag(s)",
@@ -538,12 +540,12 @@ def test_sam_bam_plus_strand_reads(macs3_argparser, write_bed,
         assert read_lines(tmp_path / "out.bed") == expected_bed(reads)
 
 
-def test_cli_auto_gzipped_bed(run_macs3, parse_log, write_bed, tmp_path):
+def test_cli_auto_gzipped_bed(run_macs3, parse_analysis_log, write_bed, tmp_path):
     path = write_bed(bed_lines(SE_READS), name="reads.bed.gz")
     proc = run_macs3(["filterdup", "-i", path, "--keep-dup", "all",
                       "--outdir", tmp_path, "-o", "out.bed"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    log = parse_log(proc.stderr)
+    log = parse_analysis_log(proc.stderr)
     assert log[:5] == [("INFO", "# read tag files..."),
                        ("INFO", "# read treatment tags..."),
                        ("INFO", "Detected format is: BED"),
@@ -641,14 +643,14 @@ def test_paired_end_formats(macs3_argparser, write_bedpe, make_alignments,
         expected_bedpe(PE_FRAGS, maxdup)
 
 
-def test_cli_paired_end_log(run_macs3, parse_log, make_alignments,
+def test_cli_paired_end_log(run_macs3, parse_analysis_log, make_alignments,
                             make_pe_pair, tmp_path):
     path = write_bampe(PE_FRAGS, make_alignments, make_pe_pair)
     proc = run_macs3(["filterdup", "-i", path, "-f", "BAMPE",
                       "--keep-dup", "1", "--outdir", tmp_path,
                       "-o", "out.bedpe"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read input file in Paired-end mode."),
         ("INFO", "# read treatment fragments..."),
         ("INFO", "8 fragments have been read."),
@@ -764,7 +766,7 @@ def count_gz_lines(path):
         return sum(1 for line in fh if line.strip())
 
 
-def test_cli_standard_result_se(run_macs3, parse_log, test_dir, tmp_path):
+def test_cli_standard_result_se(run_macs3, parse_analysis_log, test_dir, tmp_path):
     """Pins the current output. Compared with
     test/standard_results_filterdup/run_filterdup_result.bed, the
     upstream expected output (one chromosome, so the order is fixed).
@@ -780,7 +782,7 @@ def test_cli_standard_result_se(run_macs3, parse_log, test_dir, tmp_path):
         std.read_bytes()
     t0 = count_gz_lines(chip)
     t1 = len(read_lines(std))
-    log = [m for _, m in parse_log(proc.stderr)]
+    log = [m for _, m in parse_analysis_log(proc.stderr)]
     assert "# total tags in alignment file: %d" % t0 in log
     assert " max_dup_tags based on binomal = %d" % \
         binom_cutoff(t0, 52000000) in log

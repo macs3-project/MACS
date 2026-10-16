@@ -8,6 +8,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import gzip
 import logging
 import re
@@ -171,7 +172,8 @@ def read_lines(path):
 def cmd_messages(caplog):
     return [(r.levelname, MEM_PREFIX.sub("", r.getMessage()))
             for r in caplog.records
-            if r.name == "MACS3.Utilities.OptValidator"]
+            if r.name == "MACS3.Utilities.OptValidator"
+            and not is_execution_message(MEM_PREFIX.sub("", r.getMessage()))]
 
 
 @pytest.fixture(autouse=True)
@@ -257,22 +259,22 @@ def test_cli_missing_ofile(run_macs3, se_bed):
 # ------------------------------------
 
 @pytest.mark.parametrize("extsize", ["0", "-5"])
-def test_cli_extsize_must_be_positive(run_macs3, parse_log, se_bed, tmp_path,
+def test_cli_extsize_must_be_positive(run_macs3, parse_analysis_log, se_bed, tmp_path,
                                       extsize):
     proc = run_macs3(["pileup", "-i", se_bed, "-f", "BED", "--extsize",
                       extsize, "--outdir", tmp_path, "-o", "out.bdg"],
                      timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [("ERROR", "--extsize must > 0!")]
+    assert parse_analysis_log(proc.stderr) == [("ERROR", "--extsize must > 0!")]
     assert not (tmp_path / "out.bdg").exists()
 
 
-def test_cli_negative_max_count(run_macs3, parse_log, frag_file, tmp_path):
+def test_cli_negative_max_count(run_macs3, parse_analysis_log, frag_file, tmp_path):
     proc = run_macs3(["pileup", "-i", frag_file, "-f", "FRAG",
                       "--max-count", "-1", "--outdir", tmp_path,
                       "-o", "out.bdg"], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "--max-count can't be a negative value")]
 
 
@@ -380,7 +382,7 @@ def test_bam_pileup_is_clipped_at_chromosome_end(macs3_argparser,
     assert read_lines(tmp_path / "bam.bdg")[-1] == "chr1\t5900\t6000\t1.00000"
 
 
-def test_cli_log_single_end(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_log_single_end(run_macs3, parse_analysis_log, se_bed, tmp_path):
     """``macs3 pileup`` runs pileup_v2_cmd since upstream 88af6b3 (#734),
     which logs "extend each read downstream by N bps" instead of
     pileup_cmd's "extend each read towards downstream direction with N
@@ -388,7 +390,7 @@ def test_cli_log_single_end(run_macs3, parse_log, se_bed, tmp_path):
     proc = run_macs3(["pileup", "-i", se_bed, "-f", "BED", "--outdir",
                       tmp_path, "-o", "out.bdg"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read alignment files..."),
         ("INFO", "# read tags..."),
         ("INFO", "tag size is determined as 36 bps"),
@@ -509,13 +511,13 @@ def test_paired_end_exact_text(macs3_argparser, write_bedpe, tmp_path):
         "chr1\t40\t60\t1.00000\n")
 
 
-def test_cli_log_paired_end(run_macs3, parse_log, pe_bedpe, tmp_path):
+def test_cli_log_paired_end(run_macs3, parse_analysis_log, pe_bedpe, tmp_path):
     """``macs3 pileup`` runs pileup_v2_cmd since upstream 88af6b3 (#734),
     which logs "# Pileup paired-end alignment file with PileupV2."."""
     proc = run_macs3(["pileup", "-i", pe_bedpe, "-f", "BEDPE",
                       "--outdir", tmp_path, "-o", "out.bdg"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read alignment files..."),
         ("INFO", "# read input file in Paired-end mode."),
         ("INFO", "# read fragments..."),

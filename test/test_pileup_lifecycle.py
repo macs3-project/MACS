@@ -24,13 +24,16 @@ import time
 import numpy as np
 import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+
+def execution_policy(budget):
+    return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
 
 scenario, mode, backend = sys.argv[1:]
 root = Path(tempfile.gettempdir())
 sentinel = root / 'unrelated-user-file'
 sentinel.write_bytes(b'keep me')
 before = set(root.iterdir())
-unit.n_available_workers = lambda: 2
 pools = []
 original_executor = unit.ProcessPoolExecutor
 
@@ -40,7 +43,8 @@ def recording_executor(*args, **kwargs):
 
 unit.ProcessPoolExecutor = recording_executor
 
-def make(background=0.5):
+def make(background=0.5, selected_backend=None):
+    selected_backend = backend if selected_backend is None else selected_backend
     track = FWTrack(fw=50)
     for chrom in [b'chr1', b'chr2']:
         for pos in [1000] * 20 + [9000]:
@@ -48,7 +52,9 @@ def make(background=0.5):
     track.finalize()
     return unit.CallerFromAlignments(
         track, None, d=200, ctrl_d_s=[], ctrl_scaling_factor_s=[],
-        lambda_bg=background, process_backend=backend,
+        lambda_bg=background, process_backend=selected_backend,
+        execution_policy=ExecutionPolicy(3, 3, CPUAvailability(64, (), ()),
+                                         requested_process_backend=selected_backend),
         cutoff_analysis_filename=str(root.parent / 'cutoff.tsv'),
         save_bedGraph=scenario == 'bedgraph_retry',
         bedGraph_treat_filename=str(root.parent / 'treat.bdg'),
@@ -82,7 +88,10 @@ output_names = (['cutoff.tsv'] if scenario == 'cutoff_retry' else
 expected_outputs = {name: (root.parent / name).read_bytes() for name in output_names}
 baseline_caller.destroy()
 clean()
-caller = make(0.0 if scenario == 'zero_lambda' else 0.5)
+fault_backend = ('auto' if scenario.startswith('pool_') or scenario in (
+    'interrupt', 'shutdown_interrupt', 'shutdown_signal', 'shutdown_custom_signal')
+    else backend)
+caller = make(0.0 if scenario == 'zero_lambda' else 0.5, fault_backend)
 real_write = unit.write_pileup_file
 real_executor = unit.ProcessPoolExecutor
 real_eligible = unit.peak_processes_allowed

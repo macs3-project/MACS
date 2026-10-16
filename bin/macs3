@@ -21,6 +21,7 @@ import tempfile
 # own python modules
 # ------------------------------------
 from MACS3.Utilities.Constants import MACS_VERSION
+from MACS3.Utilities.Execution import UNSET
 
 # ------------------------------------
 # Main function
@@ -165,6 +166,17 @@ def prepare_argparser():
     return argparser
 
 
+def add_execution_options(parser, processes=False):
+    parser.add_argument('--threads', type=int, default=None,
+                        help='Total MACS3 CPU budget including the caller; limits threads and process workers. '
+                             'Use 1 for serial execution. Default: MACS3_NUM_THREADS or 8 (callvar: 1); '
+                             'clamped to available CPUs. Third-party pools are configured separately.')
+    if processes:
+        parser.add_argument('--process-backend', choices=('auto', 'serial'), default=UNSET,
+                            help='Process policy: auto uses fork only in a safe Linux host; '
+                                 'serial disables process pools. Threads still obey --threads.')
+
+
 def add_outdir_option(parser):
     parser.add_argument("--outdir", dest="outdir", type=str, default='',
                         help="If specified all output files will be written to that directory. Default: the current working directory")
@@ -225,6 +237,7 @@ def add_callpeak_parser(subparsers):
     # group for output files
     group_output = argparser_callpeak.add_argument_group("Output arguments")
     add_outdir_option(group_output)
+    add_execution_options(argparser_callpeak, processes=True)
     group_output.add_argument("-n", "--name", dest="name", type=str,
                               help="Experiment name, which will be used to generate output file names. DEFAULT: \"NA\"",
                               default="NA")
@@ -338,6 +351,7 @@ def add_filterdup_parser(subparsers):
     argparser_filterdup.add_argument("--verbose", dest="verbose", type=int, default=2,
                                      help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
     add_outdir_option(argparser_filterdup)
+    add_execution_options(argparser_filterdup)
     argparser_filterdup.add_argument("-o", "--ofile", dest="outputfile", type=str,
                                      help="Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
                                      default="stdout")
@@ -492,6 +506,7 @@ def add_randsample_parser(subparsers):
                                       help="Output BED file name. If not specified, will write to standard output. Note, if the input format is BAMPE or BEDPE, the output will be in BEDPE format. DEFAULT: stdout",
                                       default=None)
     add_outdir_option(argparser_randsample)
+    add_execution_options(argparser_randsample)
     argparser_randsample.add_argument("-s", "--tsize", dest="tsize", type=int, default=None,
                                       help="Tag size. This will override the auto detected tag size. DEFAULT: Not set")
     argparser_randsample.add_argument("-f", "--format", dest="format", type=str,
@@ -562,6 +577,7 @@ def add_refinepeak_parser(subparsers):
                                       help="Set verbose level. 0: only show critical message, 1: show additional warning message, 2: show process information, 3: show debug messages. If you want to know where are the duplicate reads, use 3. DEFAULT:2")
 
     add_outdir_option(argparser_refinepeak)
+    add_execution_options(argparser_refinepeak)
     add_output_group(argparser_refinepeak)
     return
 
@@ -592,6 +608,7 @@ def add_predictd_parser(subparsers):
                                     help="Select the regions within MFOLD range of high-confidence enrichment ratio against background to build model. Fold-enrichment in regions must be lower than upper limit, and higher than the lower limit. Use as \"-m 10 30\". DEFAULT:5 50")
 
     add_outdir_option(argparser_predictd)
+    add_execution_options(argparser_predictd)
     argparser_predictd.add_argument("--rfile", dest="rfile", type=str, default="predictd_model.R",
                                     help="PREFIX of filename of R script for drawing X-correlation figure. DEFAULT:'predictd_model.R' and R file will be predicted_model.R")
     argparser_predictd.add_argument("--buffer-size", dest="buffer_size", type=int, default="100000",
@@ -611,6 +628,7 @@ def add_pileup_parser(subparsers,
     argparser_pileup.add_argument("-o", "--ofile", dest="outputfile", type=str, required=True,
                                   help="Output bedGraph file name. If not specified, will write to standard output. REQUIRED.")
     add_outdir_option(argparser_pileup)
+    add_execution_options(argparser_pileup)
     argparser_pileup.add_argument("-f", "--format", dest="format", type=str,
                                   choices=("AUTO", "BAM", "SAM", "BED", "ELAND", "ELANDMULTI", "ELANDEXPORT", "BOWTIE", "BAMPE", "BEDPE", "FRAG"),
                                   help="Format of tag file, \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\", \"BOWTIE\", \"BAMPE\", \"BEDPE\", or \"FRAG\". The default AUTO option will let '%(prog)s' decide which format the file is. DEFAULT: \"AUTO\", MACS3 will pick a format from \"AUTO\", \"BED\", \"ELAND\", \"ELANDMULTI\", \"ELANDEXPORT\", \"SAM\", \"BAM\" and \"BOWTIE\". If the format is BAMPE, BEDPE or FRAG, please specify it explicitly. Please note that when the format is BAMPE, BEDPE or FRAG, the -B and --extsize options would be ignored, and MACS3 will process the input in Paired-End mode.",
@@ -672,6 +690,7 @@ To call variants:
     # group for output files
     group_output = argparser_callvar.add_argument_group("Output arguments")
     add_outdir_option(group_output)
+    add_execution_options(argparser_callvar, processes=True)
     group_output.add_argument("-o", "--ofile", dest="ofile", type=str, required=True,
                               help="Output VCF file name.")
     group_output.add_argument("--verbose", dest="verbose", type=int, default=2,
@@ -698,8 +717,8 @@ To call variants:
                             help="The maximum Allele-Ratio allowed while calculating likelihood for allele-specific binding. If we allow higher maxAR, we may mistakenly assign some homozygous loci as heterozygous. Default:0.95", default=0.95)
     # group for misc
     group_misc = argparser_callvar.add_argument_group("Misc arguments")
-    group_misc.add_argument("-m", "--multiple-processing", dest="np", type=int, default=1,
-                            help="CPU used for mutliple processing. Please note that, assigning more CPUs does not guarantee the process being faster. Creating too many parrallel processes need memory operations and  may negate benefit from multi processing. Default: 1")
+    group_misc.add_argument("-m", "--multiple-processing", dest="np", type=int, default=None,
+                            help="Legacy spelling of --threads. Default: 1 for callvar; conflicts with a different explicit --threads value.")
     return
 
 
@@ -893,6 +912,7 @@ plus an extra option for the HMM model file like `macs3 hmmratac
     group_output = argparser_hmmratac.add_argument_group("Output arguments")
 
     add_outdir_option(group_output)
+    add_execution_options(argparser_hmmratac)
     group_output.add_argument("-n", "--name", dest="name", type=str,
                               help="Name for this experiment, which will be used as a prefix to generate output file names. DEFAULT: \"NA\"",
                               default="NA")

@@ -11,6 +11,7 @@ the distribution).
 # Python modules
 # ------------------------------------
 import cython
+from MACS3.Utilities.Execution import resolve_execution_policy
 
 # ------------------------------------
 # MACS3 modules
@@ -43,6 +44,8 @@ class PeakDetect:
         """Initialize the PeakDetect object.
 
         """
+        self.execution_policy = resolve_execution_policy(
+            execution_policy=getattr(opt, "execution_policy", None))
         self.opt = opt
         self.info = opt.info
         self.debug = opt.debug
@@ -231,6 +234,7 @@ class PeakDetect:
             ctrl_scale_s = []
 
         scorecalculator = CallerFromAlignments(self.treat, self.control,
+                                               execution_policy=self.execution_policy,
                                                d=d, ctrl_d_s=ctrl_d_s,
                                                treat_scaling_factor=treat_scale,
                                                ctrl_scaling_factor_s=ctrl_scale_s,
@@ -347,6 +351,7 @@ class PeakDetect:
             ctrl_d_s = []
 
         scorecalculator = CallerFromAlignments(self.treat, None,
+                                               execution_policy=self.execution_policy,
                                                d=d,
                                                ctrl_d_s=ctrl_d_s,
                                                treat_scaling_factor=treat_scale,
