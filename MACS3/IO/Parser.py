@@ -26,7 +26,6 @@ from cython.cimports.libc.stdlib import atoi, malloc, calloc, realloc, free
 from cython.cimports.libc.string import memcpy, memmove, memset, memchr
 from cython.cimports.cpython.bytes import (PyBytes_FromStringAndSize,
                                          PyBytes_AS_STRING)
-from cython.cimports.cpython.exc import PyErr_CheckSignals
 from cython.cimports.cpython.bytearray import PyByteArray_AS_STRING
 from cython.cimports.MACS3.IO.czlib import (z_stream, inflateInit2, inflate,
                                            inflateReset, inflateEnd, Z_OK,
@@ -3383,10 +3382,10 @@ class FragParser(GenericParser):
             if thisline and (thisline[:5] != b"track") \
                and (thisline[:7] != b"browser") \
                and (thisline[0] != 35):  # 35 is b"#"
+                # Rewind only the first data line. Empty/header-only
+                # input stays at EOF, including an unterminated header.
+                self.fhd.seek(-l_line, 1)
                 break
-
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -3553,278 +3552,286 @@ class FragParser(GenericParser):
             chunks.job.capped = capped
             chunks.job.cap = cython.cast(cython.int, cap)
 
-        while True:
-            if jc < nch:
-                # the next chunk the threads parsed: its fragments, then
-                # its lines from the first one they did not take
-                total += chunks.emit(jc, petrack, chroms, ctab, btab, batch)
-                m += chunks.job.msum[jc]
-                p = chunks.job.fail[jc]
-                segend = chunks.job.cuts[jc + 1]
-                jc += 1
-            else:
-                more = stream.refill(need)
-                p = stream.buf + stream.start
-                q = stream.buf + stream.end
-                # the lines are those before stop, one past the last newline
-                # in the window; every scan of them ends at a newline
-                stop = p
-                if p < q and memchr(p, 10, q - p) != cython.NULL:
-                    stop = q
-                    while (stop - 1)[0] != 10:
-                        stop -= 1
-                segend = stop
-                nch = 0
-                jc = 0
-                if (tasks > 0 and stream.pool != cython.NULL and
-                        stop - p >= _FRAG_PAR_MIN):
-                    # the window's lines in chunks, parsed on the inflate
-                    # pool's threads with the tables as they are now
-                    chunks.cut(p, stop, tasks)
-                    _itab_of(cython.address(chunks.job.ctab), ctab)
-                    _itab_of(cython.address(chunks.job.btab), btab)
-                    with cython.nogil:
-                        bgzf_pool_run(stream.pool, _frag_chunk,
-                                      cython.address(chunks.job), tasks)
-                    nch = tasks
-                    continue
-            while p < segend:
-                ok = False
-                words = False
-                csame = False
-                if fast:
-                    # The usual line in one pass: a chromosome that is not
-                    # empty, a tab, one to nine digits, a tab, one to nine
-                    # digits that are more than the first, a tab, a
-                    # barcode, a tab and one to nine digits. Its fields are
-                    # the ones the general walk below finds (the digits
-                    # after the fourth tab put it before the rstripped
-                    # end, and atoi stops where the digits do), so a line
-                    # it takes gives the same fragment.
-                    t = p
-                    if (_LITTLE_ENDIAN and lastn < 8 and p + 8 <= stop and
-                            p[lastn] == 9):
-                        # the last line's chromosome, a name of up to seven
-                        # bytes, followed by a tab
-                        memcpy(cython.address(cw), p, 8)
-                        if (cw & lastm) == lastw:
-                            t = p + lastn
-                            csame = True
-                    if not csame:
-                        while t[0] != 9 and t[0] != 10:
-                            t += 1
-                    clen = t - p
-                    if t[0] == 9 and clen > 0:
-                        # Each end is first read as being as long as the
-                        # same end of the line before, which in a sorted
-                        # file it nearly always is, and only scanned for
-                        # its end when it is not.
-                        s = t + 1
-                        t = cython.NULL
-                        if _LITTLE_ENDIAN and s + 10 <= stop:
-                            t = _frag_digits_tab(s, gl, cython.address(left))
-                            if t == cython.NULL:
-                                t = _frag_digits_w(s, cython.address(left))
-                                if t != cython.NULL:
-                                    gl = t - s
-                        else:
-                            t = _frag_digits(s, cython.address(left))
-                        if t != cython.NULL and t[0] == 9:
+        try:
+            while True:
+                if jc < nch:
+                    # the next chunk the threads parsed: its fragments, then
+                    # its lines from the first one they did not take
+                    total += chunks.emit(jc, petrack, chroms, ctab, btab, batch)
+                    m += chunks.job.msum[jc]
+                    p = chunks.job.fail[jc]
+                    segend = chunks.job.cuts[jc + 1]
+                    jc += 1
+                else:
+                    more = stream.refill(need)
+                    p = stream.buf + stream.start
+                    q = stream.buf + stream.end
+                    # the lines are those before stop, one past the last newline
+                    # in the window; every scan of them ends at a newline
+                    stop = p
+                    if p < q and memchr(p, 10, q - p) != cython.NULL:
+                        stop = q
+                        while (stop - 1)[0] != 10:
+                            stop -= 1
+                    segend = stop
+                    nch = 0
+                    jc = 0
+                    if (tasks > 0 and stream.pool != cython.NULL and
+                            stop - p >= _FRAG_PAR_MIN):
+                        # the window's lines in chunks, parsed on the inflate
+                        # pool's threads with the tables as they are now
+                        chunks.cut(p, stop, tasks)
+                        _itab_of(cython.address(chunks.job.ctab), ctab)
+                        _itab_of(cython.address(chunks.job.btab), btab)
+                        with cython.nogil:
+                            bgzf_pool_run(stream.pool, _frag_chunk,
+                                          cython.address(chunks.job), tasks)
+                        nch = tasks
+                        continue
+                while p < segend:
+                    ok = False
+                    words = False
+                    csame = False
+                    if fast:
+                        # The usual line in one pass: a chromosome that is not
+                        # empty, a tab, one to nine digits, a tab, one to nine
+                        # digits that are more than the first, a tab, a
+                        # barcode, a tab and one to nine digits. Its fields are
+                        # the ones the general walk below finds (the digits
+                        # after the fourth tab put it before the rstripped
+                        # end, and atoi stops where the digits do), so a line
+                        # it takes gives the same fragment.
+                        t = p
+                        if (_LITTLE_ENDIAN and lastn < 8 and p + 8 <= stop and
+                                p[lastn] == 9):
+                            # the last line's chromosome, a name of up to seven
+                            # bytes, followed by a tab
+                            memcpy(cython.address(cw), p, 8)
+                            if (cw & lastm) == lastw:
+                                t = p + lastn
+                                csame = True
+                        if not csame:
+                            while t[0] != 9 and t[0] != 10:
+                                t += 1
+                        clen = t - p
+                        if t[0] == 9 and clen > 0:
+                            # Each end is first read as being as long as the
+                            # same end of the line before, which in a sorted
+                            # file it nearly always is, and only scanned for
+                            # its end when it is not.
                             s = t + 1
                             t = cython.NULL
                             if _LITTLE_ENDIAN and s + 10 <= stop:
-                                t = _frag_digits_tab(s, gr, cython.address(right))
+                                t = _frag_digits_tab(s, gl, cython.address(left))
                                 if t == cython.NULL:
-                                    t = _frag_digits_w(s, cython.address(right))
+                                    t = _frag_digits_w(s, cython.address(left))
                                     if t != cython.NULL:
-                                        gr = t - s
+                                        gl = t - s
                             else:
-                                t = _frag_digits(s, cython.address(right))
-                            if t != cython.NULL and t[0] == 9 and right > left:
-                                bstart = t + 1
-                                t = bstart
-                                if (_LITTLE_ENDIAN and bstart + 24 <= stop and
-                                        bstart[gb] == 9):
-                                    # the barcode as long as the last one:
-                                    # no control byte (so no tab or
-                                    # newline) before its end
-                                    memcpy(cython.address(k0), bstart, 8)
-                                    memcpy(cython.address(k1), bstart + 8, 8)
-                                    memcpy(cython.address(k2), bstart + 16, 8)
-                                    if (((_below_space(k0) & bm0) |
-                                         (_below_space(k1) & bm1) |
-                                         (_below_space(k2) & bm2)) == 0):
-                                        k0 &= bm0
-                                        k1 &= bm1
-                                        k2 &= bm2
-                                        blen = gb
-                                        words = True
-                                if not words and _LITTLE_ENDIAN and bstart + 24 <= stop:
-                                    # the first tab or newline in the next
-                                    # 24 bytes, a word at a time, and the
-                                    # barcode's words up to it
-                                    memcpy(cython.address(k0), bstart, 8)
-                                    mark = _tab_or_newline(k0)
-                                    if mark != 0:
-                                        blen = _lowest_mark(mark)
-                                        k0 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
-                                        k1 = 0
-                                        k2 = 0
-                                        words = True
-                                    else:
+                                t = _frag_digits(s, cython.address(left))
+                            if t != cython.NULL and t[0] == 9:
+                                s = t + 1
+                                t = cython.NULL
+                                if _LITTLE_ENDIAN and s + 10 <= stop:
+                                    t = _frag_digits_tab(s, gr, cython.address(right))
+                                    if t == cython.NULL:
+                                        t = _frag_digits_w(s, cython.address(right))
+                                        if t != cython.NULL:
+                                            gr = t - s
+                                else:
+                                    t = _frag_digits(s, cython.address(right))
+                                if t != cython.NULL and t[0] == 9 and right > left:
+                                    bstart = t + 1
+                                    t = bstart
+                                    if (_LITTLE_ENDIAN and bstart + 24 <= stop and
+                                            bstart[gb] == 9):
+                                        # the barcode as long as the last one:
+                                        # no control byte (so no tab or
+                                        # newline) before its end
+                                        memcpy(cython.address(k0), bstart, 8)
                                         memcpy(cython.address(k1), bstart + 8, 8)
-                                        mark = _tab_or_newline(k1)
+                                        memcpy(cython.address(k2), bstart + 16, 8)
+                                        if (((_below_space(k0) & bm0) |
+                                             (_below_space(k1) & bm1) |
+                                             (_below_space(k2) & bm2)) == 0):
+                                            k0 &= bm0
+                                            k1 &= bm1
+                                            k2 &= bm2
+                                            blen = gb
+                                            words = True
+                                    if not words and _LITTLE_ENDIAN and bstart + 24 <= stop:
+                                        # the first tab or newline in the next
+                                        # 24 bytes, a word at a time, and the
+                                        # barcode's words up to it
+                                        memcpy(cython.address(k0), bstart, 8)
+                                        mark = _tab_or_newline(k0)
                                         if mark != 0:
                                             blen = _lowest_mark(mark)
-                                            k1 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
+                                            k0 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
+                                            k1 = 0
                                             k2 = 0
-                                            blen += 8
                                             words = True
                                         else:
-                                            memcpy(cython.address(k2), bstart + 16, 8)
-                                            mark = _tab_or_newline(k2)
+                                            memcpy(cython.address(k1), bstart + 8, 8)
+                                            mark = _tab_or_newline(k1)
                                             if mark != 0:
                                                 blen = _lowest_mark(mark)
-                                                k2 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
-                                                blen += 16
+                                                k1 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
+                                                k2 = 0
+                                                blen += 8
                                                 words = True
                                             else:
-                                                t = bstart + 24
+                                                memcpy(cython.address(k2), bstart + 16, 8)
+                                                mark = _tab_or_newline(k2)
+                                                if mark != 0:
+                                                    blen = _lowest_mark(mark)
+                                                    k2 &= (cython.cast(cython.ulonglong, 1) << (8 * blen)) - 1
+                                                    blen += 16
+                                                    words = True
+                                                else:
+                                                    t = bstart + 24
+                                        if words:
+                                            # the next barcode is guessed as long
+                                            gb = blen
+                                            bm0 = _low_bytes(blen)
+                                            bm1 = _low_bytes(blen - 8)
+                                            bm2 = _low_bytes(blen - 16)
                                     if words:
-                                        # the next barcode is guessed as long
-                                        gb = blen
-                                        bm0 = _low_bytes(blen)
-                                        bm1 = _low_bytes(blen - 8)
-                                        bm2 = _low_bytes(blen - 16)
-                                if words:
-                                    t = bstart + blen
-                                while t[0] != 9 and t[0] != 10:
-                                    t += 1
+                                        t = bstart + blen
+                                    while t[0] != 9 and t[0] != 10:
+                                        t += 1
+                                    if t[0] == 9:
+                                        blen = t - bstart
+                                        nl = _frag_digits(t + 1, cython.address(count))
+                                        if nl != cython.NULL:
+                                            while nl[0] != 10:
+                                                nl += 1
+                                            ok = True
+                    if not ok:
+                        words = False
+                        csame = False
+                        nl = cython.cast(cython.p_uchar, memchr(p, 10, stop - p))
+                        if fast:
+                            # bytes.rstrip(): drop trailing ASCII whitespace
+                            e = nl
+                            while e > p and ((e - 1)[0] == 32 or 9 <= (e - 1)[0] <= 13):
+                                e -= 1
+                            # the first five tabs, as bytes.split(b'\t') would cut
+                            nt = 0
+                            t = p
+                            while t < e:
                                 if t[0] == 9:
-                                    blen = t - bstart
-                                    nl = _frag_digits(t + 1, cython.address(count))
-                                    if nl != cython.NULL:
-                                        while nl[0] != 10:
-                                            nl += 1
-                                        ok = True
-                if not ok:
-                    words = False
-                    csame = False
-                    nl = cython.cast(cython.p_uchar, memchr(p, 10, stop - p))
-                    if fast:
-                        # bytes.rstrip(): drop trailing ASCII whitespace
-                        e = nl
-                        while e > p and ((e - 1)[0] == 32 or 9 <= (e - 1)[0] <= 13):
-                            e -= 1
-                        # the first five tabs, as bytes.split(b'\t') would cut
-                        nt = 0
-                        t = p
-                        while t < e:
-                            if t[0] == 9:
-                                tabs[nt] = t
-                                nt += 1
-                                if nt == 5:
-                                    break
-                            t += 1
-                        if nt >= 4:
-                            f4end = tabs[4] if nt == 5 else e
-                            clen = tabs[0] - p
-                            left = _frag_atoi(tabs[0] + 1, tabs[1])
-                            if clen == 0 or left < 0:
-                                # skipped, as add_line skips it
-                                p = nl + 1
-                                continue
-                            right = _frag_atoi(tabs[1] + 1, tabs[2])
-                            if right > left:
-                                count = _frag_atoi(tabs[3] + 1, f4end)
-                                bstart = tabs[2] + 1
-                                blen = tabs[3] - bstart
-                                ok = True
-                if ok:
-                    # pe_parse_line's C int to unsigned short
-                    count = cython.cast(cython.ushort, count)
-                    if capped and cap < count:
-                        count = cap
-                    if csame or (lastc >= 0 and lastn == clen and
-                                 _same_bytes(lastp, p, clen)):
-                        ci = lastc
-                    else:
-                        h = _hash_bytes(p, clen)
-                        ci = ctab.find(p, clen, h)
-                        if ci < 0:
-                            ci = len(chroms)
-                            chroms.append(PyBytes_FromStringAndSize(
-                                cython.cast(cython.p_char, p), clen))
-                            ctab.add(p, clen, h, ci)
-                        lastc = ci
-                        # the name's bytes, held by chroms
-                        lastp = cython.cast(cython.p_uchar,
-                                            PyBytes_AS_STRING(chroms[ci]))
-                        lastn = clen
-                        # and, when shorter than eight bytes, as a word
-                        if clen < 8:
-                            lastw = 0
-                            memcpy(cython.address(lastw), lastp, clen)
-                            lastm = _low_bytes(clen)
-                    if words:
-                        h = _hash_words(k0, k1, k2, blen)
-                        bi = btab.find_words(k0, k1, k2, blen, h)
-                    else:
-                        h = _hash_bytes(bstart, blen)
-                        bi = btab.find(bstart, blen, h)
-                    if bi < 0:
-                        bi = petrack.barcode_id(PyBytes_FromStringAndSize(
-                            cython.cast(cython.p_char, bstart), blen))
-                        btab.add(bstart, blen, h, bi)
-                    k = batch.n
-                    batch.chrom[k] = ci
-                    batch.left[k] = left
-                    batch.right[k] = right
-                    batch.count[k] = count
-                    batch.bc[k] = bi
-                    batch.n = k + 1
-                    total += 1
-                    m += right - left
-                    if batch.n == batch.cap:
-                        batch.flush(petrack, chroms)
+                                    tabs[nt] = t
+                                    nt += 1
+                                    if nt == 5:
+                                        break
+                                t += 1
+                            if nt >= 4:
+                                f4end = tabs[4] if nt == 5 else e
+                                clen = tabs[0] - p
+                                left = _frag_atoi(tabs[0] + 1, tabs[1])
+                                if clen == 0 or left < 0:
+                                    # skipped, as add_line skips it
+                                    p = nl + 1
+                                    continue
+                                right = _frag_atoi(tabs[1] + 1, tabs[2])
+                                if right > left:
+                                    count = _frag_atoi(tabs[3] + 1, f4end)
+                                    bstart = tabs[2] + 1
+                                    blen = tabs[3] - bstart
+                                    ok = True
+                    if ok:
+                        # pe_parse_line's C int to unsigned short
+                        count = cython.cast(cython.ushort, count)
+                        if capped and cap < count:
+                            count = cap
+                        if csame or (lastc >= 0 and lastn == clen and
+                                     _same_bytes(lastp, p, clen)):
+                            ci = lastc
+                        else:
+                            h = _hash_bytes(p, clen)
+                            ci = ctab.find(p, clen, h)
+                            if ci < 0:
+                                ci = len(chroms)
+                                chroms.append(PyBytes_FromStringAndSize(
+                                    cython.cast(cython.p_char, p), clen))
+                                ctab.add(p, clen, h, ci)
+                            lastc = ci
+                            # the name's bytes, held by chroms
+                            lastp = cython.cast(cython.p_uchar,
+                                                PyBytes_AS_STRING(chroms[ci]))
+                            lastn = clen
+                            # and, when shorter than eight bytes, as a word
+                            if clen < 8:
+                                lastw = 0
+                                memcpy(cython.address(lastw), lastp, clen)
+                                lastm = _low_bytes(clen)
+                        if words:
+                            h = _hash_words(k0, k1, k2, blen)
+                            bi = btab.find_words(k0, k1, k2, blen, h)
+                        else:
+                            h = _hash_bytes(bstart, blen)
+                            bi = btab.find(bstart, blen, h)
+                        if bi < 0:
+                            bi = petrack.barcode_id(PyBytes_FromStringAndSize(
+                                cython.cast(cython.p_char, bstart), blen))
+                            btab.add(bstart, blen, h, bi)
+                        k = batch.n
+                        batch.chrom[k] = ci
+                        batch.left[k] = left
+                        batch.right[k] = right
+                        batch.count[k] = count
+                        batch.bc[k] = bi
+                        batch.n = k + 1
+                        total += 1
+                        m += right - left
+                        if batch.n == batch.cap:
+                            batch.flush(petrack, chroms)
+                        p = nl + 1
+                        continue
+                    # this line, in its place in the file, as line by line
+                    batch.flush(petrack, chroms)
+                    while total >= nextlog:
+                        info(" %d fragments parsed" % nextlog)
+                        nextlog += 1000000
+                    if self.add_line(add_loc, PyBytes_FromStringAndSize(
+                            cython.cast(cython.p_char, p), nl - p), max_count,
+                            cython.address(flen)):
+                        total += 1
+                        m += flen
                     p = nl + 1
+                if jc < nch:
                     continue
-                # this line, in its place in the file, as line by line
+                stream.start = p - stream.buf
                 batch.flush(petrack, chroms)
                 while total >= nextlog:
                     info(" %d fragments parsed" % nextlog)
                     nextlog += 1000000
+                if not more:
+                    break
+                # the unconsumed bytes hold no newline: read on past them
+                need = stream.end - stream.start + 1
+
+            if stream.end > stream.start:
+                # All complete lines have been flushed. Validate the remaining
+                # record once, using the same path as other non-fast lines.
                 if self.add_line(add_loc, PyBytes_FromStringAndSize(
-                        cython.cast(cython.p_char, p), nl - p), max_count,
+                        cython.cast(cython.p_char, stream.buf + stream.start),
+                        stream.end - stream.start), max_count,
                         cython.address(flen)):
                     total += 1
                     m += flen
-                p = nl + 1
-            if jc < nch:
-                continue
-            stream.start = p - stream.buf
-            batch.flush(petrack, chroms)
-            while total >= nextlog:
-                info(" %d fragments parsed" % nextlog)
-                nextlog += 1000000
-            if not more:
-                break
-            # the unconsumed bytes hold no newline: read on past them
-            need = stream.end - stream.start + 1
-
-        if stream.end > stream.start:
-            # The last line has no newline. The line-by-line reader this
-            # replaces never returned on such a file: its loop re-split
-            # that line forever without parsing it. Kept as it was.
-            while True:
-                PyErr_CheckSignals()
-        stream.close()
+        finally:
+            stream.close()
         msum[0] = m
         return total
 
     @cython.ccall
     def build_petrack(self, max_count=0):
         """Return a ``PETrackII`` populated with fragments and barcodes.
+
+        The last record may omit its newline. Empty/header-only input or
+        input with no accepted fragments raises ``ValueError``.
 
         Args:
             max_count: Optional cap applied to per-fragment count values.
@@ -3843,19 +3850,27 @@ class FragParser(GenericParser):
         m: cython.long = 0          # sum of fragment lengths
 
         petrack = PETrackII(buffer_size=self.buffer_size)
-        i = self.load_petrack(petrack, max_count, cython.address(m))
+        try:
+            i = self.load_petrack(petrack, max_count, cython.address(m))
+        finally:
+            self.close()
+        if i == 0:
+            raise ValueError("No valid fragments found in FRAG input")
 
         self.d = cython.cast(cython.float, m) / i
         self.n = i
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
 
-        self.close()
         petrack.set_rlengths({"DUMMYCHROM": 0})
         return petrack
 
     @cython.ccall
     def append_petrack(self, petrack, max_count=0):
         """Append barcode-aware fragments to an existing ``PETrackI``.
+
+        The last record may omit its newline. An empty load preserves this
+        parser's existing statistics; if it has no prior fragments, it raises
+        ``ValueError``. Statistics describe this parser, not the supplied track.
 
         Args:
             petrack: Existing paired-end track to append to.
@@ -3876,12 +3891,17 @@ class FragParser(GenericParser):
         i: cython.long = 0          # number of fragments
         m: cython.long = 0          # sum of fragment lengths
 
-        i = self.load_petrack(petrack, max_count, cython.address(m))
+        try:
+            i = self.load_petrack(petrack, max_count, cython.address(m))
+        finally:
+            self.close()
+        if self.n + i == 0:
+            raise ValueError("No valid fragments found in FRAG input")
 
-        self.d = (self.d * self.n + m) / (self.n + i)
-        self.n += i
+        if i > 0:
+            self.d = (self.d * self.n + m) / (self.n + i)
+            self.n += i
 
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
-        self.close()
         petrack.set_rlengths({"DUMMYCHROM": 0})
         return petrack
