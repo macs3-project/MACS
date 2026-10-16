@@ -40,3 +40,15 @@ discarded:
     3. this read is the second read in the pair (NOTE: the first read
        in the pair is already enough for MACS to get enough
        information)
+
+## Truncated BAM input
+
+BAM and BAMPE track loaders reject a file ending inside an alignment's
+four-byte size field or declared record body with an `EOFError` describing
+the expected and available bytes. This applies to raw BAM and gzip/BGZF
+input, even when the compressed members have valid checksums. EOF between
+complete records is accepted. Command-line commands fail instead of
+reporting success with an incomplete track.
+
+An append operation may have added earlier records before detecting the
+error. Discard the supplied track after a failed append.

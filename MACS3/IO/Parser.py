@@ -764,6 +764,22 @@ class _BAMStream:
 
 
 @cython.cfunc
+def _bam_check_eof(stream: _BAMStream):
+    """Reject an incomplete alignment left by an unsuccessful refill."""
+    remaining: cython.Py_ssize_t = stream.end - stream.start
+    expected: cython.Py_ssize_t
+
+    if remaining == 0:
+        return
+    if remaining < 4:
+        raise EOFError("Truncated BAM block_size field: expected 4 bytes, "
+                       "found %d" % remaining)
+    expected = _le_int32(stream.buf + stream.start)
+    raise EOFError("Truncated BAM record body: expected %d bytes, found %d"
+                   % (expected, remaining - 4))
+
+
+@cython.cfunc
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.initializedcheck(False)
@@ -922,6 +938,7 @@ def _bam_load_fwtrack(stream: _BAMStream, references: list,
         while total >= nextlog:
             info(" %d reads parsed" % nextlog)
             nextlog += 1000000
+    _bam_check_eof(stream)
     return total
 
 
@@ -1066,6 +1083,7 @@ def _bam_load_petrack(stream: _BAMStream, references: list, petrack,
         while total >= nextlog:
             info(" %d fragments parsed" % nextlog)
             nextlog += 1000000
+    _bam_check_eof(stream)
     tlen_sum[0] += m
     return total
 
@@ -1846,7 +1864,11 @@ class SAMParser(GenericParser):
 
 @cython.cclass
 class BAMParser(GenericParser):
-    """Parser for BAM binary alignment files."""
+    """Parser for BAM binary alignment files.
+
+    Track loaders raise EOFError for incomplete alignment size fields or
+    bodies. After a failed append, discard the partially modified track.
+    """
     def __init__(self, filename: str,
                  buffer_size: cython.long = 100000):
         """Prepare the parser and open the BAM file.
@@ -1982,7 +2004,11 @@ class BAMParser(GenericParser):
 
         self.fhd.close()
         stream = _BAMStream(self.filename, self.gzipped)
-        stream.skip(offset)
+        try:
+            stream.skip(offset)
+        except BaseException:
+            stream.close()
+            raise
         return stream
 
     @cython.ccall
@@ -1996,8 +2022,10 @@ class BAMParser(GenericParser):
         # after this, ptr at list of alignments
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
-        i = _bam_load_fwtrack(stream, references, fwtrack)
-        stream.close()
+        try:
+            i = _bam_load_fwtrack(stream, references, fwtrack)
+        finally:
+            stream.close()
 
         info("%d reads have been read." % i)
         fwtrack.set_rlengths(rlengths)
@@ -2012,8 +2040,10 @@ class BAMParser(GenericParser):
 
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
-        i = _bam_load_fwtrack(stream, references, fwtrack)
-        stream.close()
+        try:
+            i = _bam_load_fwtrack(stream, references, fwtrack)
+        finally:
+            stream.close()
 
         info("%d reads have been read." % i)
         # fwtrack.finalize()
@@ -2027,6 +2057,9 @@ class BAMParser(GenericParser):
 @cython.cclass
 class BAMPEParser(BAMParser):
     """Parser for paired-end BAM files that yields fragment spans.
+
+    Track loaders raise EOFError for incomplete alignment size fields or
+    bodies. After a failed append, discard the partially modified track.
 
     Attributes:
         n: Total number of fragments.
@@ -2061,8 +2094,10 @@ class BAMPEParser(BAMParser):
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
         # for convenience, only count valid pairs
-        i = _bam_load_petrack(stream, references, petrack, cython.address(m))
-        stream.close()
+        try:
+            i = _bam_load_petrack(stream, references, petrack, cython.address(m))
+        finally:
+            stream.close()
 
         info("%d fragments have been read." % i)
         self.d = m / i
@@ -2098,8 +2133,10 @@ class BAMPEParser(BAMParser):
         references, rlengths = self.get_references()
         stream = self.alignment_stream()
         # for convenience, only count valid pairs
-        i = _bam_load_petrack(stream, references, petrack, cython.address(m))
-        stream.close()
+        try:
+            i = _bam_load_petrack(stream, references, petrack, cython.address(m))
+        finally:
+            stream.close()
 
         info("%d fragments have been read." % i)
         self.d = (self.d * self.n + m) / (self.n + i)
