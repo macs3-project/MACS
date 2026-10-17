@@ -88,3 +88,9 @@ In this example, the program will pile up the alignments in the
 `treatment.bam` file and write the result to `piledup.bedGraph`. The
 input file is in BAM format, and we extend each sequencing tag into a
 147bps fragment for pileup.
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

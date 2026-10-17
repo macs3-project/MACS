@@ -8,11 +8,11 @@ on threads. That work releases the GIL in its C loops and in the numpy
 calls it makes (sort, take, boolean indexing, sum), so chromosomes run in
 parallel. Every thread is joined before map_chromosomes returns.
 """
-import os
 import threading
 from MACS3.Utilities.Performance import DEFAULTS
+from MACS3.Utilities.Execution import resolve_execution_policy
 
-# at most this many threads, the calling one included
+# Informational compatibility alias; jobs use an explicit ExecutionPolicy.
 MAX_THREADS = DEFAULTS.cpu_limit
 
 # The track methods run a chromosome with fewer elements than this on the
@@ -22,11 +22,9 @@ MAX_THREADS = DEFAULTS.cpu_limit
 MIN_THREADED_SIZE = DEFAULTS.min_parallel_track_elements
 
 
-def n_threads() -> int:
-    """min(MAX_THREADS, the cores this process may run on)."""
-    if hasattr(os, "sched_getaffinity"):
-        return min(MAX_THREADS, len(os.sched_getaffinity(0)))
-    return min(MAX_THREADS, os.cpu_count() or 1)
+def n_threads(execution_policy=None) -> int:
+    """Return the invocation's total thread budget (caller included)."""
+    return resolve_execution_policy(execution_policy=execution_policy).threads
 
 
 def run_on_threads(work, n_workers, on_error, args=()):
@@ -51,20 +49,22 @@ def run_on_threads(work, n_workers, on_error, args=()):
             thread.join()
 
 
-def map_chromosomes(fn, chroms: list, sizes: list, *args) -> list:
+def map_chromosomes(fn, chroms: list, sizes: list, *args,
+                    execution_policy=None) -> list:
     """Return [fn(c, *args) for c in chroms], calling fn once per
     chromosome.
 
     sizes[i] is the number of elements of chroms[i]. With two or more
-    chromosomes and n_threads() above 1, the chromosomes run largest
-    first on min(n_threads(), len(chroms)) threads, the calling one
+    chromosomes and a budget above 1, the chromosomes run largest
+    first on min(budget, len(chroms)) threads, the calling one
     included; otherwise they run on the calling thread in the order
     given. The calls must not depend on each other. The first exception
     raised stops the calls not yet started and is re-raised once every
     thread has stopped.
     """
     results = [None] * len(chroms)
-    n = min(n_threads(), len(chroms)) if len(chroms) >= 2 else 1
+    budget = n_threads(execution_policy)
+    n = min(budget, len(chroms)) if len(chroms) >= 2 else 1
     if n < 2:
         for i in range(len(chroms)):
             results[i] = fn(chroms[i], *args)

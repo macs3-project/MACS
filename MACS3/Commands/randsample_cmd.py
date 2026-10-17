@@ -18,6 +18,7 @@ import sys
 # own python modules
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
+from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_randsample
 
 # ------------------------------------
@@ -27,6 +28,10 @@ from MACS3.Utilities.OptValidator import opt_validate_randsample
 
 def run(options0):
     options = opt_validate_randsample(options0)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
     # end of parsing commandline options
     info = options.info
     # warn = options.warn
@@ -82,8 +87,10 @@ def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
+    validate_execution_options(options)
     options.info("# read treatment tags...")
-    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
@@ -92,7 +99,8 @@ def load_tag_files_options(options):
     if len(options.ifile) > 1:
         # multiple input
         for ifile in options.ifile[1:]:
-            tp = options.parser(ifile, buffer_size=options.buffer_size)
+            tp = options.parser(ifile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             treat = tp.append_fwtrack(treat)
             # treat.sort()
     treat.finalize()
@@ -105,15 +113,18 @@ def load_frag_files_options(options):
     """From the options, load treatment fragments and control fragments (if available).
 
     """
+    validate_execution_options(options)
     options.info("# read treatment fragments...")
 
-    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     treat = tp.build_petrack()
     # treat.sort()
     if len(options.ifile) > 1:
         # multiple input
         for ifile in options.ifile[1:]:
-            tp = options.parser(ifile, buffer_size=options.buffer_size)
+            tp = options.parser(ifile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             treat = tp.append_petrack(treat)
             # treat.sort()
     treat.finalize()

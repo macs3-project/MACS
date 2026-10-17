@@ -19,8 +19,10 @@ import os
 import sys
 from stat import S_ISREG
 import threading
-from MACS3.Utilities.Threads import run_on_threads
+from MACS3.Utilities.Threads import run_on_threads, map_chromosomes
 from MACS3.Utilities.Performance import DEFAULTS
+from MACS3.Utilities.Execution import (UNSET, resolve_execution_policy,
+                                      process_backend_reason)
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -60,6 +62,7 @@ from MACS3.Utilities.Logger import logging
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
+execution_info = logging.getLogger("MACS3.Utilities.Execution").info
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
@@ -1314,9 +1317,8 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 # Worker processes for the p-score table
 # ------------------------------------
 
-# the most worker processes one call uses
+# Informational compatibility alias for the default total CPU request.
 MAX_WORKERS = DEFAULTS.cpu_limit
-_MAX_WORKERS = cython.declare(cython.int, DEFAULTS.cpu_limit)
 # Set only in child processes by the pool initializer; never in the parent.
 _caller_for_workers = None
 # Forked pools must not inherit descriptors from another live caller pool.
@@ -1336,25 +1338,14 @@ def peak_processes_allowed(process_backend: str) -> bool:
     a host from starting a thread after this check. Embedded callers should
     select ``serial`` when they cannot establish fork safety themselves.
     """
-    return (process_backend == "auto"
-            and sys.platform == "linux"
-            and threading.current_thread() is threading.main_thread()
-            and threading.active_count() == 1
-            and not multiprocessing.current_process().daemon
-            and "fork" in multiprocessing.get_all_start_methods())
+    return process_backend_reason(process_backend) is None
 
 
-def n_available_workers() -> int:
-    """Return min(MAX_WORKERS, cores this process may run on), or 1
-    when worker processes cannot be forked: on a platform without
-    fork, or inside a daemonic process, which may not have children."""
-    if "fork" not in multiprocessing.get_all_start_methods():
-        return 1
-    if multiprocessing.current_process().daemon:
-        return 1
-    if hasattr(os, "sched_getaffinity"):
-        return min(_MAX_WORKERS, len(os.sched_getaffinity(0)))
-    return min(_MAX_WORKERS, os.cpu_count() or 1)
+def n_available_workers(execution_policy=None) -> int:
+    """Allowed child processes, reserving one budget slot for the parent."""
+    policy = resolve_execution_policy(execution_policy=execution_policy)
+    return (policy.process_workers
+            if peak_processes_allowed(policy.process_backend) else 0)
 
 
 def n_locations(track, chrom: bytes) -> int:
@@ -1668,33 +1659,41 @@ def close_unlinked_files(fds: list):
     return
 
 
-def close_unlinked_files_later(fds: list, sizes: list):
-    """Close ``fds``, descriptors on unlinked files of ``sizes`` bytes,
-    on up to n_available_workers() threads, so that the kernel frees
-    the files' pages, tens of milliseconds per GB on one thread, while
-    the caller goes on. Each thread gets about the same number of
-    bytes: the largest file goes to the thread with the fewest bytes
-    so far. The threads are not daemons, so the interpreter waits for
-    them before it exits. A thread that cannot be started closes its
-    files here."""
-    n_threads: cython.Py_ssize_t = min(n_available_workers(), len(fds))
-    groups: list = [[] for _ in range(n_threads)]
-    loads: list = [0] * n_threads
-    j: cython.Py_ssize_t
-    k: cython.Py_ssize_t
+def close_unlinked_files_later(fds: list, sizes: list, execution_policy=None):
+    """Close unlinked files within the budget, joining before returning.
 
+    The compatibility name is retained. At budget one no thread starts.
+    Unclaimed descriptors are closed here even if worker startup fails.
+    """
+    policy = resolve_execution_policy(execution_policy=execution_policy)
+    if not fds:
+        return
+    n = min(policy.threads, len(fds))
+    groups = [[] for _ in range(n)]
+    loads = [0] * n
     for j in sorted(range(len(fds)), key=sizes.__getitem__, reverse=True):
         k = loads.index(min(loads))
         groups[k].append(fds[j])
         loads[k] += sizes[j]
-    for k in range(n_threads):
+
+    def finish(k):
+        group = groups[k]
+        # Ownership transfers to this invocation before native close releases
+        # the GIL; the finalizer handles only groups never dispatched.
+        groups[k] = None
         try:
-            threading.Thread(target=close_unlinked_files,
-                             args=(groups[k],)).start()
-        except RuntimeError:
-            # no thread to be had: free the pages here
-            close_unlinked_files(groups[k])
-    return
+            close_unlinked_files(group)
+        except MemoryError:
+            for fd in group:
+                os.close(fd)
+
+    try:
+        map_chromosomes(finish, list(range(n)), loads,
+                        execution_policy=policy)
+    finally:
+        for k in range(n):
+            if groups[k] is not None:
+                finish(k)
 
 
 # how many puts ahead the q-score loops prefetch a slot of the table
@@ -1777,6 +1776,9 @@ class CallerFromAlignments:
     # whether it's in PE mode, will be detected during initiation
     PE_mode: bool
     process_backend: str
+    execution_policy = cython.declare(object, visibility="readonly")
+    execution_threads: cython.int
+    execution_process_workers: cython.int
 
     # temporary data buffer
     # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
@@ -1830,7 +1832,7 @@ class CallerFromAlignments:
                  bedGraph_control_filename: str = "CTRL.bdg",
                  cutoff_analysis_filename: str = "TMP.txt",
                  save_SPMR: bool = False,
-                 process_backend: str = "auto"):
+                 process_backend=UNSET, *, execution_policy=None, threads=None):
         """Initialize.
 
         A calculator is unique to each comparison of treat and
@@ -1839,6 +1841,9 @@ class CallerFromAlignments:
 
         treat and ctrl are either FWTrack or PETrackI objects.
 
+        execution_policy: Immutable invocation settings; alternatively pass
+            threads=N to resolve a new policy. Budget one disables all MACS3
+            parallel paths owned by this caller, including cleanup.
         process_backend: ``auto`` uses fork only in a Linux main thread
             with no other detected Python threads, outside daemon processes.
             Other hosts run serially. ``serial`` disables peak process pools.
@@ -1874,9 +1879,11 @@ class CallerFromAlignments:
         chr2: set
         p: cython.float
 
-        if process_backend not in ("auto", "serial"):
-            raise ValueError("process_backend must be 'auto' or 'serial'")
-        self.process_backend = process_backend
+        self.execution_policy = resolve_execution_policy(
+            threads, process_backend, execution_policy=execution_policy)
+        self.execution_threads = self.execution_policy.threads
+        self.execution_process_workers = self.execution_policy.process_workers
+        self.process_backend = self.execution_policy.process_backend
 
         # decide PE mode
         if isinstance(treat, FWTrack):
@@ -1964,10 +1971,9 @@ class CallerFromAlignments:
         as before. Freeing a file's pages (2.75 GB for a large control)
         is the slow part, and the kernel does it when the last
         reference to the file goes: a descriptor opened before the
-        unlink holds that reference, and threads close the
-        descriptors while the caller goes on to write the peaks. The
-        threads are not daemons, so the interpreter waits for them
-        before it exits.
+        unlink holds that reference. Budgeted threads close the descriptors
+        and are joined here before the next phase can start. At budget one
+        the calling thread closes every descriptor.
         """
         f: bytes
         fds: list = []
@@ -1998,7 +2004,7 @@ class CallerFromAlignments:
             close_unlinked_files(fds)
             raise
         if fds:
-            close_unlinked_files_later(fds, sizes)
+            close_unlinked_files_later(fds, sizes, self.execution_policy)
         if self.pileup_directory is not None:
             os.rmdir(self.pileup_directory)
             self.pileup_directory = None
@@ -2383,9 +2389,12 @@ class CallerFromAlignments:
         macs3_release_free_heap()
         with _worker_pool_lock:
             if not peak_processes_allowed(self.process_backend):
+                execution_info("Peak process backend: serial after safety recheck (%s)",
+                     process_backend_reason(self.process_backend))
                 for i in range(len(self.chromosomes)):
                     self._pscore_stat_a_chromosome(i, True)
                 return self.pscore_cache.take_histogram()
+            execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
                                        mp_context=multiprocessing.get_context("fork"),
                                        initializer=initialize_peak_worker,
@@ -2403,8 +2412,8 @@ class CallerFromAlignments:
                 shutdown_peak_pool(pool)
 
         if all_new:
-            return self.pscore_cache.score_pending(n_workers, True)
-        self.pscore_cache.score_pending(n_workers, False)
+            return self.pscore_cache.score_pending(self.execution_threads, True)
+        self.pscore_cache.score_pending(self.execution_threads, False)
         return self.pscore_cache.take_histogram()
 
     @cython.cfunc
@@ -2443,10 +2452,12 @@ class CallerFromAlignments:
         # pscore_stat, the total length of the segments at each
         # p-score, is first summed per (observed, lambda) slot of the
         # p-score cache, then merged by p-score.
-        n_workers = n_available_workers()
+        n_workers = self.execution_process_workers
         if not peak_processes_allowed(self.process_backend):
-            n_workers = 1
-        if n_workers > 1 and len(self.chromosomes) > 1:
+            execution_info("Peak process backend: serial (%s)",
+                 process_backend_reason(self.process_backend))
+            n_workers = 0
+        if n_workers > 0 and len(self.chromosomes) > 1:
             (pscores, firsts, lengths) = self._pscore_stat_in_workers(n_workers)
             # where the serial loop leaves i, which the last loop
             # below starts from when there are no p-scores at all
@@ -2791,10 +2802,12 @@ class CallerFromAlignments:
                     fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
             info("#3 Call peaks for each chromosome...")
-            n_workers = n_available_workers()
+            n_workers = self.execution_process_workers
             if not peak_processes_allowed(self.process_backend):
-                n_workers = 1
-            if n_workers > 1 and len(self.chromosomes) > 1 and not self.save_bedGraph:
+                execution_info("Peak process backend: serial (%s)",
+                     process_backend_reason(self.process_backend))
+                n_workers = 0
+            if n_workers > 0 and len(self.chromosomes) > 1 and not self.save_bedGraph:
                 # the bedGraph files are written chromosome by chromosome
                 # through one file handle, so -B keeps the serial loop
                 self._call_peaks_in_workers(peaks,
@@ -2897,11 +2910,14 @@ class CallerFromAlignments:
         macs3_release_free_heap()
         with _worker_pool_lock:
             if not peak_processes_allowed(self.process_backend):
+                execution_info("Peak process backend: serial after safety recheck (%s)",
+                     process_backend_reason(self.process_backend))
                 for chrom in self.chromosomes:
                     self.__chrom_call_peak_using_certain_criteria(
                         peaks, chrom, scoring_function_symbols, score_cutoff_s,
                         min_length, max_gap, call_summits, False)
                 return
+            execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
                                        mp_context=multiprocessing.get_context("fork"),
                                        initializer=initialize_peak_worker,

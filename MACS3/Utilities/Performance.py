@@ -13,7 +13,7 @@ from typing import Final
 
 @dataclass(frozen=True, slots=True)
 class _PerformanceDefaults:
-    # Threads include the caller; the process cap counts children.
+    # Default invocation budget, including the caller; explicit requests may exceed it.
     cpu_limit: int = 8
     # Small chromosomes do not pay for handing work to another thread.
     min_parallel_track_elements: int = 1 << 16

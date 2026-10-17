@@ -353,3 +353,9 @@ Then next, we can re-run `macs3 hmmratac` with the same parameters
 plus an extra option for the HMM model file like `macs3 hmmratac
 --model new_model.json`
 
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

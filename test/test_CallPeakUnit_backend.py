@@ -17,6 +17,10 @@ from concurrent.futures import ThreadPoolExecutor
 
 import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
+from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+
+def execution_policy(budget):
+    return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
 
 
 def run(scenario, mode):
@@ -31,8 +35,6 @@ def run(scenario, mode):
         return real_executor(*args, **kwargs)
 
     unit.ProcessPoolExecutor = executor
-    # Small fixtures should use two workers even on single-core CI machines.
-    unit.n_available_workers = lambda: 2
 
     def rows(peaks):
         keys = ['start', 'end', 'length', 'score', 'pileup',
@@ -51,7 +53,9 @@ def run(scenario, mode):
         track.finalize()
         caller = unit.CallerFromAlignments(
             track, None, d=200, ctrl_d_s=[], ctrl_scaling_factor_s=[],
-            lambda_bg=0.5, process_backend=backend)
+            lambda_bg=0.5, process_backend=backend,
+            execution_policy=ExecutionPolicy(3, 3, CPUAvailability(64, (), ()),
+                                             requested_process_backend=backend))
         try:
             if mode == 'broad':
                 peaks = caller.call_broadpeaks(['q'], [3.0], [1.0], min_length=100)
@@ -79,21 +83,16 @@ def run(scenario, mode):
         if scenario != 'linux_fork':
             unit.sys.platform = 'linux'
         if scenario == 'lock_change':
-            real_lock = unit._worker_pool_lock
-
-            class HostChangeLock:
-                def __enter__(self):
-                    real_lock.acquire()
-                    self.stop = threading.Event()
-                    self.thread = threading.Thread(target=self.stop.wait)
-                    self.thread.start()
-
-                def __exit__(self, *args):
-                    self.stop.set()
-                    self.thread.join()
-                    real_lock.release()
-
-            unit._worker_pool_lock = HostChangeLock()
+            real_eligible = unit.peak_processes_allowed
+            checks = 0
+            def change_host_before_recheck(backend):
+                nonlocal checks, background
+                checks += 1
+                if checks == 2:
+                    background = threading.Thread(target=stop.wait)
+                    background.start()
+                return real_eligible(backend)
+            unit.peak_processes_allowed = change_host_before_recheck
         if scenario == 'macos':
             unit.sys.platform = 'darwin'
         elif scenario == 'unsupported':

@@ -8,6 +8,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import gzip
 import logging
 import re
@@ -139,7 +140,8 @@ def is_sub_multiset(sub, full):
 def cmd_messages(caplog):
     return [(r.levelname, MEM_PREFIX.sub("", r.getMessage()))
             for r in caplog.records
-            if r.name == "MACS3.Utilities.OptValidator"]
+            if r.name == "MACS3.Utilities.OptValidator"
+            and not is_execution_message(MEM_PREFIX.sub("", r.getMessage()))]
 
 
 @pytest.fixture(autouse=True)
@@ -235,28 +237,28 @@ def test_cli_p_or_n_required(run_macs3, se_bed, args):
 # opt_validate_randsample and run() checks through the CLI
 # ------------------------------------
 
-def test_cli_percentage_above_100(run_macs3, parse_log, se_bed):
+def test_cli_percentage_above_100(run_macs3, parse_analysis_log, se_bed):
     proc = run_macs3(["randsample", "-i", se_bed, "-p", "100.5"], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "Percentage can't be bigger than 100.0. Please check your "
                   "options and retry!")]
     assert proc.stdout == ""
 
 
-def test_cli_negative_number(run_macs3, parse_log, se_bed):
+def test_cli_negative_number(run_macs3, parse_analysis_log, se_bed):
     proc = run_macs3(["randsample", "-i", se_bed, "-n", "-5"], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "Number of tags can't be smaller than or equal to 0. "
                   "Please check your options and retry!")]
 
 
-def test_cli_number_above_total(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_number_above_total(run_macs3, parse_analysis_log, se_bed, tmp_path):
     proc = run_macs3(["randsample", "-i", se_bed, "-n", "100",
                       "--outdir", tmp_path, "-o", "out.bed"], timeout=60)
     assert proc.returncode == 1
-    log = parse_log(proc.stderr)
+    log = parse_analysis_log(proc.stderr)
     assert log[-2:] == [
         ("CRITICAL", " Number you want is bigger than total number of tags "
                      "in alignment file! Please specify a smaller number and "
@@ -339,13 +341,13 @@ def test_number_of_reads(macs3_argparser, caplog, se_bed, tmp_path, number):
         (float(number) / 23 * 100) in msgs
 
 
-def test_cli_log_of_number_run(run_macs3, parse_log, se_bed, tmp_path):
+def test_cli_log_of_number_run(run_macs3, parse_analysis_log, se_bed, tmp_path):
     """-n 11 of 23 reads: 47.83% per strand gives 4 + 2 + 1 + 1 = 8."""
     proc = run_macs3(["randsample", "-i", se_bed, "-f", "BED", "-n", "11",
                       "--seed", "1", "--outdir", tmp_path, "-o", "out.bed"],
                      timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "read tag files..."),
         ("INFO", "# read treatment tags..."),
         ("INFO", "tag size is determined as 36 bps"),
@@ -513,12 +515,12 @@ def test_paired_end_formats_keep_pairs(macs3_argparser, write_bedpe,
     assert is_sub_multiset(lines, frag_lines(PE_FRAGS))
 
 
-def test_cli_paired_end_log(run_macs3, parse_log, pe_bedpe, tmp_path):
+def test_cli_paired_end_log(run_macs3, parse_analysis_log, pe_bedpe, tmp_path):
     proc = run_macs3(["randsample", "-i", pe_bedpe, "-f", "BEDPE", "-p", "50",
                       "--seed", "1", "--outdir", tmp_path,
                       "-o", "out.bedpe"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read input file in Paired-end mode."),
         ("INFO", "# read treatment fragments..."),
         ("INFO", "# total fragments/pairs in alignment file: 15"),

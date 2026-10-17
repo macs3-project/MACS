@@ -15,6 +15,7 @@ the distribution).
 # own python modules
 # ------------------------------------
 from MACS3.Utilities.Constants import MAX_PAIRNUM
+from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_predictd
 from MACS3.Signal.PeakModel import PeakModel, NotEnoughPairsException
 # from MACS3.Signal.Prob import binomial_cdf_inv
@@ -30,6 +31,10 @@ def run(o_options):
     """
     # Parse options...
     options = opt_validate_predictd(o_options)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
     # end of parsing commandline options
     info = options.info
     warn = options.warn
@@ -62,7 +67,8 @@ def run(o_options):
     try:
         peakmodel = PeakModel(treatment=treat,
                               max_pairnum=MAX_PAIRNUM,
-                              opt=options
+                              opt=options,
+                              execution_policy=options.execution_policy
                               )
         peakmodel.build()
         info("# finished!")
@@ -83,8 +89,10 @@ def load_tag_files_options(options):
     """From the options, load alignment tags.
 
     """
+    validate_execution_options(options)
     options.info("# read treatment tags...")
-    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     if not options.tsize:           # override tsize if user specified --tsize
         ttsize = tp.tsize()
         options.tsize = ttsize
@@ -93,7 +101,8 @@ def load_tag_files_options(options):
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(tfile, buffer_size=options.buffer_size)
+            tp = options.parser(tfile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             treat = tp.append_fwtrack(treat)
             # treat.sort()
     treat.finalize()
@@ -106,14 +115,17 @@ def load_frag_files_options(options):
     """From the options, load treatment fragments and control fragments (if available).
 
     """
+    validate_execution_options(options)
     options.info("# read treatment fragments...")
 
-    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size)
+    tp = options.parser(options.ifile[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     treat = tp.build_petrack()
     if len(options.ifile) > 1:
         # multiple input
         for tfile in options.ifile[1:]:
-            tp = options.parser(tfile, buffer_size=options.buffer_size)
+            tp = options.parser(tfile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             treat = tp.append_petrack(treat)
     treat.finalize()
     return treat

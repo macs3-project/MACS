@@ -16,6 +16,10 @@ from MACS3.Commands.pileup_cmd import load_tag_files_options, load_frag_files_op
 def run(o_options):
     """Main entry for the pileup_v2 command."""
     options = opt_validate_pileup(o_options)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
     info = options.info
 
     options.PE_MODE = options.format in ("BAMPE", "BEDPE", "FRAG")

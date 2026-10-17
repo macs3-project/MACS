@@ -52,6 +52,10 @@ def run(args):
 
     """
     options = opt_validate_hmmratac(args)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
 
     #############################################
     # 0. Names of output files
@@ -114,7 +118,8 @@ def run(args):
             for ltxt in bfhd:
                 barcodes_set.add(ltxt.rstrip().encode())
 
-    alignment = parser(options.input_file[0], buffer_size=options.buffer_size)
+    alignment = parser(options.input_file[0], buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
     if options.format == "FRAG" and options.maxcount:
         petrack = alignment.build_petrack(max_count=options.maxcount)
     else:
@@ -123,7 +128,8 @@ def run(args):
     if len(options.input_file) > 1:
         # multiple input
         for inputfile in options.input_file[1:]:
-            alignment = parser(inputfile, buffer_size=options.buffer_size)
+            alignment = parser(inputfile, buffer_size=options.buffer_size,
+                        execution_policy=options.execution_policy)
             if options.format == "FRAG" and options.maxcount:
                 petrack = alignment.append_petrack(petrack, max_count=options.maxcount)
             else:

@@ -344,3 +344,19 @@ def log_messages(stderr):
 def parse_log():
     """``parse_log(stderr)`` -> list of (LEVEL, message) without timestamps."""
     return log_messages
+
+
+def is_execution_message(message):
+    """Resource diagnostics have dedicated assertions in test_Execution_paths."""
+    return message.startswith(('Execution:', 'Peak process backend:',
+                               'Variant process backend:', 'CPU limits:',
+                               'CPU detection:'))
+
+
+@pytest.fixture
+def parse_analysis_log():
+    """Scientific command messages, excluding separately tested resource logs."""
+    def parse(stderr):
+        return [(level, message) for level, message in log_messages(stderr)
+                if not is_execution_message(message)]
+    return parse

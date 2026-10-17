@@ -20,6 +20,12 @@ from MACS3.Utilities import Threads
 from MACS3.Signal.FixWidthTrack import FWTrack
 import MACS3.Signal.PeakModel as model_module
 from test_PeakModel import model_opt, site_track
+from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+
+def execution_policy(budget):
+    return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
+
+policy = execution_policy(4)
 
 workflow, failure_kind, fail_at = sys.argv[1], sys.argv[2], int(sys.argv[3])
 original_thread = threading.Thread
@@ -76,7 +82,8 @@ def run():
             if failure_kind == 'task':
                 raise failure
             return chrom * 2
-        return Threads.map_chromosomes(task, [1, 2, 3, 4], [1, 4, 2, 3])
+        return Threads.map_chromosomes(task, [1, 2, 3, 4], [1, 4, 2, 3],
+                                      execution_policy=policy)
     if workflow == 'scoring':
         # Supply a process-boundary histogram large enough to require four
         # scoring threads, without forking a host that has a timer thread.
@@ -98,18 +105,17 @@ def run():
                 return future
             def shutdown(self, **kwargs):
                 pass
-        track = FWTrack(fw=36)
+        track = FWTrack(fw=36, execution_policy=policy)
         for chrom in (b'a', b'b', b'c', b'd'):
             for pos in [1000] * 20 + [9000]:
                 track.add_loc(chrom, pos, 0)
         track.finalize()
         caller = unit.CallerFromAlignments(
             track, None, d=200, ctrl_d_s=[], ctrl_scaling_factor_s=[],
-            lambda_bg=0.5, process_backend='auto')
+            lambda_bg=0.5, execution_policy=policy)
         eligibility = iter([True, True, False])
         try:
             with patch.object(unit, 'peak_processes_allowed', lambda mode: next(eligibility)), \
-                 patch.object(unit, 'n_available_workers', lambda: 4), \
                  patch.object(unit, 'ProcessPoolExecutor', HistogramPool):
                 caller.call_peaks(['q'], [3.0], min_length=100)
                 from MACS3.Signal.Prob import poisson_cdf
@@ -124,7 +130,7 @@ def run():
             caller.destroy()
         return
     if workflow == 'track':
-        track = FWTrack(fw=36)
+        track = FWTrack(fw=36, execution_policy=policy)
         for chrom in (b'a', b'b', b'c', b'd'):
             for pos in range(65536, 0, -1):
                 track.add_loc(chrom, pos, 0)
@@ -137,7 +143,7 @@ def run():
     opt, _ = model_opt(lmfold=5, umfold=200)
     track, _ = site_track([(100, 5, 5)] * 120,
                           chroms=(b'a', b'b', b'c', b'd'))
-    model = model_module.PeakModel(opt, track)
+    model = model_module.PeakModel(opt, track, execution_policy=policy)
     if failure_kind in ('initializer', 'task'):
         allocation = 'zeros_like' if failure_kind == 'initializer' else 'empty'
         real_zeros = getattr(np, allocation)
@@ -156,14 +162,12 @@ if workflow == 'model':
     opt, _ = model_opt(lmfold=5, umfold=200)
     track, _ = site_track([(100, 5, 5)] * 120,
                           chroms=(b'a', b'b', b'c', b'd'))
-    baseline = model_module.PeakModel(opt, track)
+    baseline = model_module.PeakModel(opt, track, execution_policy=policy)
     baseline.build()
     expected_d = baseline.d
 
 try:
-    with patch.object(Threads, 'n_threads', lambda: 4), \
-         patch.object(model_module, '_model_threads', lambda: 4), \
-         patch.object(threading, 'Thread', thread_factory), \
+    with patch.object(threading, 'Thread', thread_factory), \
          patch.object(original_thread, 'start', start):
         try:
             result = run()

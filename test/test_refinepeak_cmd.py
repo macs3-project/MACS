@@ -8,6 +8,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import logging
 import re
 
@@ -104,7 +105,8 @@ def read_text(path):
 def cmd_messages(caplog):
     return [(r.levelname, MEM_PREFIX.sub("", r.getMessage()))
             for r in caplog.records
-            if r.name == "MACS3.Utilities.OptValidator"]
+            if r.name == "MACS3.Utilities.OptValidator"
+            and not is_execution_message(MEM_PREFIX.sub("", r.getMessage()))]
 
 
 @pytest.fixture(autouse=True)
@@ -284,7 +286,7 @@ def test_cutoff(macs3_argparser, ref_bed, peak1, tmp_path, cutoff, line):
     assert read_text(tmp_path / "out.bed").splitlines() == [line]
 
 
-def test_cli_ofile(run_macs3, parse_log, ref_bed, peak1, tmp_path):
+def test_cli_ofile(run_macs3, parse_analysis_log, ref_bed, peak1, tmp_path):
     proc = run_macs3(["refinepeak", "-b", peak1, "-i", ref_bed, "-f", "BED",
                       "--outdir", tmp_path / "res", "-o", "refined.bed"],
                      timeout=60)
@@ -292,7 +294,7 @@ def test_cli_ofile(run_macs3, parse_log, ref_bed, peak1, tmp_path):
     assert [f.name for f in (tmp_path / "res").iterdir()] == ["refined.bed"]
     assert read_text(tmp_path / "res" / "refined.bed").splitlines() == \
         ["chr1\t1011\t1012\tpeak1_R\t10.00"]
-    assert parse_log(proc.stderr) == [("INFO", "read tag files..."),
+    assert parse_analysis_log(proc.stderr) == [("INFO", "read tag files..."),
                                       ("INFO", "# read treatment tags..."),
                                       ("INFO", "Done!")]
 
@@ -382,12 +384,12 @@ def test_formats_auto(macs3_argparser, write_bed, make_alignments, peak1,
         ["chr1\t1011\t1012\tpeak1_R\t10.00"]
 
 
-def test_cli_auto_log(run_macs3, parse_log, write_bed, peak1, tmp_path):
+def test_cli_auto_log(run_macs3, parse_analysis_log, write_bed, peak1, tmp_path):
     path = write_bed(bed_lines(REF_READS), name="reads.bed.gz")
     proc = run_macs3(["refinepeak", "-b", peak1, "-i", path,
                       "--outdir", tmp_path, "-o", "out.bed"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [("INFO", "read tag files..."),
+    assert parse_analysis_log(proc.stderr) == [("INFO", "read tag files..."),
                                       ("INFO", "# read treatment tags..."),
                                       ("INFO", "Detected format is: BED"),
                                       ("INFO", "* Input file is gzipped."),

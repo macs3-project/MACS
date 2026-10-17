@@ -8,6 +8,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import logging
 import re
 
@@ -107,7 +108,8 @@ def write_se(fmt, reads, write_bed, make_alignments, refs=REFS,
 def cmd_messages(caplog):
     return [(r.levelname, MEM_PREFIX.sub("", r.getMessage()))
             for r in caplog.records
-            if r.name == "MACS3.Utilities.OptValidator"]
+            if r.name == "MACS3.Utilities.OptValidator"
+            and not is_execution_message(MEM_PREFIX.sub("", r.getMessage()))]
 
 
 def predicted_d(messages):
@@ -208,24 +210,24 @@ def test_cli_argparse_error(run_macs3):
 # opt_validate_predictd reached through the CLI
 # ------------------------------------
 
-def test_cli_invalid_gsize(run_macs3, parse_log, model_bed, tmp_path):
+def test_cli_invalid_gsize(run_macs3, parse_analysis_log, model_bed, tmp_path):
     proc = run_macs3(["predictd", "-i", model_bed, "-g", "human",
                       "--outdir", tmp_path], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "Error when interpreting --gsize option: human"),
         ("ERROR", "Available shortcuts of effective genome sizes are "
                   "hs,mm,ce,dm")]
 
 
-def test_cli_mfold_lower_above_upper(run_macs3, parse_log, model_bed,
+def test_cli_mfold_lower_above_upper(run_macs3, parse_analysis_log, model_bed,
                                      tmp_path):
     """The message is %-formatted with the mfold list, which Python
     treats as a mapping, so it prints unchanged."""
     proc = run_macs3(["predictd", "-i", model_bed, "-m", "50", "5",
                       "--outdir", tmp_path], timeout=60)
     assert proc.returncode == 1
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("ERROR", "Upper limit of mfold should be greater than lower "
                   "limit!")]
 
@@ -244,11 +246,11 @@ def test_cli_invalid_d_min_or_mfold_exit_code(run_macs3, model_bed, tmp_path,
 # the predicted d on reads with a known strand shift
 # ------------------------------------
 
-def test_cli_predicted_d_log(run_macs3, parse_log, model_bed, tmp_path):
+def test_cli_predicted_d_log(run_macs3, parse_analysis_log, model_bed, tmp_path):
     proc = run_macs3(["predictd", "-i", model_bed, "-f", "BED", "-g", GSIZE,
                       "--outdir", tmp_path, "--rfile", "r.R"], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    log = parse_log(proc.stderr)
+    log = parse_analysis_log(proc.stderr)
     assert log[:9] == [
         ("INFO", "# read alignment files..."),
         ("INFO", "# read treatment tags..."),
@@ -358,13 +360,13 @@ def test_at_least_100_paired_peaks(macs3_argparser, caplog, write_bed,
         assert msgs[-4:] == not_enough_pairs(99)
 
 
-def test_cli_not_enough_pairs_exit_code(run_macs3, parse_log, write_bed,
+def test_cli_not_enough_pairs_exit_code(run_macs3, parse_analysis_log, write_bed,
                                         tmp_path):
     path = write_bed(bed_lines(model_reads(n_sites=99)), name="m.bed")
     proc = run_macs3(["predictd", "-i", path, "-g", GSIZE,
                       "--outdir", tmp_path], timeout=60)
     assert proc.returncode == 0
-    assert parse_log(proc.stderr)[-4:] == not_enough_pairs(99)
+    assert parse_analysis_log(proc.stderr)[-4:] == not_enough_pairs(99)
     assert not (tmp_path / "predictd_model.R").exists()
 
 
@@ -579,13 +581,13 @@ def test_paired_end_average_length(macs3_argparser, caplog, write_bedpe,
     assert not (tmp_path / "x.R").exists()
 
 
-def test_cli_paired_end_log(run_macs3, parse_log, make_alignments,
+def test_cli_paired_end_log(run_macs3, parse_analysis_log, make_alignments,
                             make_pe_pair, tmp_path):
     path = write_bampe(PE_FRAGS, make_alignments, make_pe_pair)
     proc = run_macs3(["predictd", "-i", path, "-f", "BAMPE",
                       "--outdir", tmp_path], timeout=60)
     assert proc.returncode == 0, proc.stderr
-    assert parse_log(proc.stderr) == [
+    assert parse_analysis_log(proc.stderr) == [
         ("INFO", "# read input file in Paired-end mode."),
         ("INFO", "# read treatment fragments..."),
         ("INFO", "3 fragments have been read."),

@@ -500,7 +500,8 @@ def test_callvar_default_output(snv_data, tmp_path, run_macs3, parse_log):
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks)
     assert res.returncode == 0, res.stderr
     assert records(out) == [het_expected(), hom_expected()]
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log == ["Peak: chr1 200 400", " Call variants w/o assembly",
                    "Peak: chr1 600 800", " Call variants w/o assembly"]
 
@@ -562,7 +563,8 @@ def test_callvar_peaks_order_and_empty_peaks(tmp_path, make_alignments, run_macs
     recs = records(out)
     assert [(r[0], r[1]) for r in recs] == [("chr1", "301"), ("chr2", "801")]
     assert recs == [het_expected(), exp2]
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log == ["Peak: chr1 200 400", " Call variants w/o assembly",
                    "Peak: chr1 1500 1600", "No reads found in this peak. Skipped",
                    "Peak: chr2 700 900", " Call variants w/o assembly"]
@@ -660,8 +662,13 @@ def test_callvar_verbose(snv_data, tmp_path, run_macs3, parse_log, verbose,
                              "--verbose", verbose)
     assert res.returncode == 0, res.stderr
     log = parse_log(res.stderr)
-    assert sum(1 for lvl, m in log if lvl == "INFO") == n_info
-    assert all(lvl in ("INFO", "") for lvl, m in log)
+    messages = [m for lvl, m in log if lvl == "INFO"]
+    resources = [m for m in messages if m.startswith(
+        ("Execution:", "Variant process backend:"))]
+    assert len(messages) - len(resources) == n_info
+    assert len(resources) == (3 if n_info else 0)
+    assert all(lvl in (("INFO", "DEBUG", "") if verbose == 3 else ("INFO", ""))
+               for lvl, m in log)
     assert records(out) == [het_expected(), hom_expected()]
 
 
@@ -808,13 +815,13 @@ def test_callvar_max_ar_drops_minor_allele(tmp_path, make_alignments, run_macs3)
 # ------------------------------------
 
 @pytest.mark.parametrize("np_", [0, -2])
-def test_callvar_np_below_one_runs_single_process(snv_data, tmp_path, run_macs3,
+def test_callvar_np_below_one_is_rejected(snv_data, tmp_path, run_macs3,
                                                   np_):
-    # opt_validate_callvar turns -m <= 0 into 1
+    # Shared budgets reject nonpositive legacy counts too.
     treat, ctrl, peaks = snv_data
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks, "-m", np_)
-    assert res.returncode == 0, res.stderr
-    assert records(out) == [het_expected(), hom_expected()]
+    assert res.returncode != 0
+    assert "positive integer" in res.stderr
 
 
 def test_callvar_two_processes(snv_data, tmp_path, run_macs3):
@@ -856,7 +863,8 @@ def test_callvar_fermi_off_deletion(tmp_path, make_alignments, run_macs3,
     assert len(recs) == 1
     assert deletion_record_without_alleles(recs[0]) == expected_deletion_record()
     assert info(recs[0])["MT"] == "Deletion"
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log == ["Peak: chr1 1000 1200", " Call variants w/o assembly"]
 
 
@@ -865,7 +873,8 @@ def test_callvar_fermi_auto_skips_assembly_without_indel(snv_data, tmp_path,
     treat, ctrl, peaks = snv_data
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks, "--fermi", "auto")
     assert res.returncode == 0, res.stderr
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert " Try to call variants w/ fermi-lite assembly" not in log
     assert records(out) == [het_expected(), hom_expected()]
 
@@ -874,7 +883,8 @@ def test_callvar_fermi_on_assembles(snv_data, tmp_path, run_macs3, parse_log):
     treat, ctrl, peaks = snv_data
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks, "-F", "on")
     assert res.returncode == 0, res.stderr
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log.count(" Try to call variants w/ fermi-lite assembly") == 2
     assert " Call variants w/o assembly" not in log
     assert "--fermi on --fermi-overlap 30" in header(out)[3]
@@ -889,7 +899,8 @@ def test_callvar_fermi_auto_assembles_with_indel(tmp_path, make_alignments,
     peaks = write_peaks(tmp_path, [("chr1", 1000, 1200)])
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks)
     assert res.returncode == 0, res.stderr
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log == ["Peak: chr1 1000 1200", " Call variants w/o assembly",
                    " Try to call variants w/ fermi-lite assembly"]
     # every read spans the deletion, so the unitig-based call is the same
@@ -939,7 +950,8 @@ def test_callvar_fermi_unknown_value_calls_nothing(snv_data, tmp_path,
     assert res.returncode == 0, res.stderr
     assert records(out) == []
     assert header(out)[3].endswith(" --fermi maybe --fermi-overlap 30")
-    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"]
+    log = [m for lvl, m in parse_log(res.stderr) if lvl == "INFO"
+           and not m.startswith(("Execution:", "Variant process backend:"))]
     assert log == ["Peak: chr1 200 400", "Peak: chr1 600 800"]
 
 
@@ -988,7 +1000,7 @@ def test_callvar_parser_defaults(macs3_argparser):
     assert (a.verbose, a.GQCutoffHetero, a.GQCutoffHomo, a.Q, a.maxDuplicate) == (
         2, 0, 0, 20, 1)
     assert (a.fermi, a.fermiMinOverlap, a.top2allelesMinRatio,
-            a.altalleleMinCount, a.maxAR, a.np) == ("auto", 30, 0.8, 2, 0.95, 1)
+            a.altalleleMinCount, a.maxAR, a.np) == ("auto", 30, 0.8, 2, 0.95, None)
 
 
 # ------------------------------------

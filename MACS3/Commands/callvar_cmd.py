@@ -22,6 +22,8 @@ import datetime
 import sys
 from functools import partial
 import multiprocessing as mp
+from MACS3.Utilities.Execution import (resolve_execution_policy,
+                                      process_backend_reason)
 
 # from time import time
 from math import ceil
@@ -111,6 +113,10 @@ def run(args):
 
     """
     options = opt_validate_callvar(args)
+    options.info(options.execution_policy.describe())
+    options.debug("CPU limits: %s; detection notes: %s",
+                  options.execution_policy.availability.limits,
+                  options.execution_policy.availability.notes)
 
     info = options.info
     # warn = options.warn
@@ -123,9 +129,7 @@ def run(args):
     top2allelesminr = options.top2allelesMinRatio
     min_altallele_count = options.altalleleMinCount
     max_allowed_ar = options.maxAR
-    NP = options.np
-    if NP <= 0:
-        NP = 1
+    NP = max(1, options.execution_policy.process_workers)
     min_homo_GQ = options.GQCutoffHomo
     min_heter_GQ = options.GQCutoffHetero
     minQ = options.Q
@@ -221,7 +225,6 @@ def run(args):
                 # divide right-left into NP parts
                 window_size = ceil((ra_collection["right"] - ra_collection["left"]) / NP)
 
-                P = mp.Pool(NP)
                 # this partial function will only be used in multiprocessing
                 p_call_variants_at_range = partial(call_variants_at_range, s=s, collection=ra_collection, top2allelesminr=top2allelesminr, max_allowed_ar=max_allowed_ar, min_altallele_count=min_altallele_count, min_homo_GQ=min_homo_GQ, min_heter_GQ=min_heter_GQ, minQ=minQ)
 
@@ -231,10 +234,10 @@ def run(args):
                     r_d = min((i + 1) * window_size + ra_collection["left"], ra_collection["right"])
                     ranges.append((l_d, r_d))
 
-                mapresults = P.map_async(p_call_variants_at_range, ranges)
-                P.close()
-                P.join()
-                results = mapresults.get(timeout=window_size*300)
+                results = map_variant_ranges(p_call_variants_at_range, ranges,
+                                             options.execution_policy,
+                                             timeout=window_size * 300,
+                                             info=info)
                 for i in range(NP):
                     for result in results[i]:
                         peak_variants.add_variant(result[0], result[1])
@@ -306,7 +309,6 @@ def run(args):
                 # --- make multi processes
                 # divide right-left into NP parts
                 window_size = ceil((ra_collection["right"] - ra_collection["left"]) / NP)
-                P = mp.Pool(NP)
                 # this partial function will only be used in multiprocessing
                 p_call_variants_at_range = partial(call_variants_at_range, s=s, collection=unitig_collection, top2allelesminr=top2allelesminr, max_allowed_ar=max_allowed_ar, min_altallele_count=min_altallele_count, min_homo_GQ=min_homo_GQ, min_heter_GQ=min_heter_GQ, minQ=minQ)
                 ranges = []
@@ -315,10 +317,10 @@ def run(args):
                     r_d = min((i + 1) * window_size + ra_collection["left"], ra_collection["right"])
                     ranges.append((l_d, r_d))
 
-                mapresults = P.map_async(p_call_variants_at_range, ranges)
-                P.close()
-                P.join()
-                results = mapresults.get(timeout=window_size*300)
+                results = map_variant_ranges(p_call_variants_at_range, ranges,
+                                             options.execution_policy,
+                                             timeout=window_size * 300,
+                                             info=info)
                 for i in range(NP):
                     for result in results[i]:
                         peak_variants.add_variant(result[0], result[1])
@@ -328,6 +330,26 @@ def run(args):
 
     # print ("time to retrieve read alignment information from BAM:",t_prepare_ra,"(",round( 100 * t_prepare_ra/t_total, 2),"% )")
     return
+
+
+def map_variant_ranges(function, ranges, execution_policy=None, *, timeout=None,
+                       info=lambda *args: None):
+    """Map variant ranges within the CPU budget, joining every child."""
+    policy = resolve_execution_policy(execution_policy=execution_policy,
+                                      default_threads=1)
+    reason = process_backend_reason(policy.process_backend)
+    if not ranges:
+        return []
+    if reason is not None or not policy.process_workers:
+        info('Variant process backend: serial (%s)', reason or 'budget one')
+        return [function(interval) for interval in ranges]
+    workers = min(policy.process_workers, len(ranges))
+    info('Variant process backend: fork, workers=%d', workers)
+    with mp.get_context('fork').Pool(workers) as pool:
+        result = pool.map_async(function, ranges).get(timeout=timeout)
+        pool.close()
+        pool.join()
+        return result
 
 
 def call_variants_at_range(lr, s, collection, top2allelesminr, max_allowed_ar, min_altallele_count, min_homo_GQ, min_heter_GQ, minQ):

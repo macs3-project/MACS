@@ -10,10 +10,10 @@ the distribution).
 # ------------------------------------
 # Python modules
 # ------------------------------------
-import os
 import threading
 from MACS3.Utilities.Threads import run_on_threads
 from MACS3.Utilities.Performance import DEFAULTS
+from MACS3.Utilities.Execution import resolve_execution_policy
 
 # ------------------------------------
 # MACS3 modules
@@ -46,9 +46,6 @@ from cython.cimports.libc.string import memcpy
 # peaks are the same; it runs without the GIL, so strands can run on
 # threads.
 
-# at most this many threads find the peaks, and no more than the cores
-# this process may run on
-_MODEL_MAX_THREADS = cython.declare(cython.int, DEFAULTS.cpu_limit)
 _MODEL_MIDPOINTS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_midpoints)
 _MODEL_PEAKS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_peaks)
 _MODEL_PAIRS = cython.declare(cython.Py_ssize_t, DEFAULTS.model_initial_pairs)
@@ -577,20 +574,13 @@ def _add_line_arrays(pos1_a: cnp.ndarray, pos2_a: cnp.ndarray,
                     max_index, psize_adjusted1, half_expansion)
 
 
-def _model_threads() -> int:
-    """min(_MODEL_MAX_THREADS, the cores this process may run on)."""
-    if hasattr(os, "sched_getaffinity"):
-        return min(_MODEL_MAX_THREADS, len(os.sched_getaffinity(0)))
-    return min(_MODEL_MAX_THREADS, os.cpu_count() or 1)
-
-
-def _run_on_threads(order: list, func, make_state=None) -> list:
+def _run_on_threads(order: list, func, n_threads, make_state=None) -> list:
     """func(task, state) for each task in order, taken in that order by
-    up to _model_threads() threads (the calling one included), all
+    up to the supplied number of threads (the calling one included), all
     joined before returning. Each thread's state is make_state() (None
     without it); returns the states of the threads that ran. func is
     expected to release the GIL for its work."""
-    n_threads = min(_model_threads(), len(order))
+    n_threads = max(1, min(n_threads, len(order)))
     lock = threading.Lock()
     next_task = iter(order)
     errors = []
@@ -630,21 +620,21 @@ def _run_on_threads(order: list, func, make_state=None) -> list:
 
 
 def _find_peaks_on_threads(tasks: list, found: list, extension,
-                           min_v, max_v):
+                           min_v, max_v, n_threads):
     """found[k] = _find_peaks_np(tags, ...) for each (k, tags) in
-    tasks, the largest first, on up to _model_threads() threads."""
+    tasks, the largest first, on up to the supplied number of threads."""
     def scan(task, state):
         found[task[0]] = _find_peaks_np(task[1], extension, min_v, max_v)
 
-    _run_on_threads(sorted(tasks, key=lambda t: -t[1].shape[0]), scan)
+    _run_on_threads(sorted(tasks, key=lambda t: -t[1].shape[0]), scan, n_threads)
 
 
 def _add_lines_on_threads(tasks: list, lines: list, psize_adjusted1,
-                          half_expansion):
+                          half_expansion, n_threads):
     """For each (centers, tags, k) in tasks, _add_line_c's
     projection of the tags around the centers onto the (start, end)
     arrays lines[k], the largest tag arrays first, on up to
-    _model_threads() threads. Each thread projects onto zeroed arrays
+    the supplied number of threads. Each thread projects onto zeroed arrays
     of its own, which are added to lines once all are joined: every
     projection adds 1 to a start and -1 to an end entry, so the sums
     are those of the serial loop, in any order."""
@@ -658,7 +648,7 @@ def _add_lines_on_threads(tasks: list, lines: list, psize_adjusted1,
                          half_expansion)
 
     states = _run_on_threads(sorted(tasks, key=lambda t: -t[1].shape[0]),
-                             project, make_state)
+                             project, n_threads, make_state)
     for state in states:
         for k in range(len(lines)):
             np.add(lines[k][0], state[k][0], out=lines[k][0])
@@ -708,9 +698,16 @@ class PeakModel:
     min_tags = cython.declare(cython.int, visibility="public")
     alternative_d = cython.declare(list, visibility="public")
 
-    def __init__(self, opt, treatment, max_pairnum: cython.int = 500):
+    execution_policy = cython.declare(object, visibility="readonly")
+    execution_threads: cython.int
+
+    def __init__(self, opt, treatment, max_pairnum: cython.int = 500, *,
+                 execution_policy=None, threads=None):
         # , double gz = 0, int umfold=30, int lmfold=10, int bw=200,
         # int ts = 25, int bg=0, bool quiet=False):
+        self.execution_policy = resolve_execution_policy(
+            threads, execution_policy=execution_policy)
+        self.execution_threads = self.execution_policy.threads
         self.treatment = treatment
         self.gz = opt.gsize
         self.umfold = opt.umfold
@@ -854,7 +851,7 @@ Summary of Peak Model:
     def __find_peaks_c(self, chrs: list) -> list:
         """__naive_find_peaks of both strands of every chromosome in
         chrs, at [2*i] (+) and [2*i+1] (-) for chrs[i], for the tag
-        lists the C scan takes, on up to min(8, cores) threads, as the
+        lists the C scan takes, within the invocation thread budget, as the
         arrays of _find_peaks_np; None for the others.
         """
         i: cython.int
@@ -872,7 +869,7 @@ Summary of Peak Model:
                 tasks.append((2*i+1, minus_tags))
         if tasks:
             _find_peaks_on_threads(tasks, found, extension,
-                                   self.min_tags, self.max_tags)
+                                   self.min_tags, self.max_tags, self.execution_threads)
         return found
 
     @cython.cfunc
@@ -959,7 +956,7 @@ Summary of Peak Model:
         _add_lines_on_threads(tasks,
                               [(plus_start, plus_end), (minus_start, minus_end)],
                               self.peaksize + self.tag_expansion_size // 2,
-                              self.tag_expansion_size / 2)
+                              self.tag_expansion_size / 2, self.execution_threads)
 
         self.__count(plus_start, plus_end, self.plus_line)
         self.__count(minus_start, minus_end, self.minus_line)

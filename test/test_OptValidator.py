@@ -999,10 +999,18 @@ def test_bdgopt_default_method_p2q(parse):
 # callvar
 # ------------------------------------
 
-@pytest.mark.parametrize("value, expected", [(0, 1), (-2, 1), (1, 1),
-                                             (4, 4)])
+@pytest.mark.parametrize("value, expected", [(1, 1), (4, 4)])
 def test_callvar_np_at_least_1(parse, value, expected):
-    assert opt_validate_callvar(parse("callvar", "-m", value)).np == expected
+    options = opt_validate_callvar(parse("callvar", "-m", value))
+    assert options.np == expected
+    assert options.execution_policy.threads == min(
+        expected, options.execution_policy.availability.count)
+
+
+@pytest.mark.parametrize("value", [0, -2])
+def test_callvar_invalid_budget(parse, value):
+    with pytest.raises(ValueError, match='positive integer'):
+        opt_validate_callvar(parse("callvar", "-m", value))
 
 
 def test_callvar_np_default_1(parse):
@@ -1134,5 +1142,4 @@ def test_hmmratac_means_checked_before_stddevs(parse, caplog):
                     "--stddevs", "-1", "1", "1", "1")
     assert exit_messages(opt_validate_hmmratac, options, caplog) == [
         ("ERROR", " `--means` should not be negative! ")]
-
 

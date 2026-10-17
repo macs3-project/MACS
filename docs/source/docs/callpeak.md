@@ -595,3 +595,9 @@ few suggestions:
    example, the number of peaks should be thousands/ or the avelpeak
    should be around 500bps. Of course, it's arbitrary but the table
    will give you some insight.
+
+## CPU resources
+
+Use `--threads N` to set the invocation CPU budget, or `--threads 1` for serial
+MACS3 execution. See [CPU budgets and process backends](execution.md) for
+defaults, API settings, quota detection and third-party thread pools.

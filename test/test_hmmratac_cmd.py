@@ -18,6 +18,7 @@ under the terms of the BSD License (see the file LICENSE included with
 the distribution).
 """
 
+from conftest import is_execution_message
 import gzip
 import io
 import json
@@ -315,13 +316,15 @@ class _Collect(logging.Handler):
 
 def split_messages(records):
     """(LEVEL, message) pairs of MACS3's log records, like conftest's
-    parse_log: the memory prefix is removed and multi-line messages are
+    parse_analysis_log: the memory prefix is removed and multi-line messages are
     split, continuation lines getting level ''."""
     out = []
     for r in records:
         if not r.name.startswith("MACS3"):
             continue            # e.g. hmmlearn's convergence messages
         msg = re.sub(r"^\[\d+ MB\] ", "", r.getMessage())
+        if is_execution_message(msg):
+            continue
         lines = msg.split("\n")
         out.append((r.levelname, lines[0]))
         out.extend(("", x) for x in lines[1:])
@@ -1703,14 +1706,14 @@ def test_buffer_size(quick, atac, base, model_file):
 # macs3 hmmratac: through bin/macs3
 # ------------------------------------
 
-def test_cli_run_end_to_end(run_macs3, parse_log, atac, tmp_path, full):
+def test_cli_run_end_to_end(run_macs3, parse_analysis_log, atac, tmp_path, full):
     out = tmp_path / "new" / "dir"
     p = run_macs3(["hmmratac", "-i", atac.bedpe, "-f", "BEDPE", "-n", "cli",
                    "--outdir", out, "--save-states"] + TUNE, timeout=60)
     assert p.returncode == 0, p.stderr
     assert sorted(os.listdir(out)) == expected_files(
         "cli", ["narrowpeak", "cutoff", "states", "model"])
-    log = parse_log(p.stderr)
+    log = parse_analysis_log(p.stderr)
     assert log[-1] == ("INFO", "# Finished")
     assert ("", "# Command line: hmmratac -i %s -f BEDPE -n cli --outdir %s "
             "--save-states %s" % (atac.bedpe, out, " ".join(TUNE))) in log
@@ -1803,13 +1806,13 @@ VALIDATION = [
 
 
 @pytest.mark.parametrize("args, message", VALIDATION)
-def test_cli_option_validation(run_macs3, parse_log, atac, tmp_path, args,
+def test_cli_option_validation(run_macs3, parse_analysis_log, atac, tmp_path, args,
                                message):
     out = tmp_path / "o"
     p = run_macs3(["hmmratac", "-i", atac.bedpe, "-f", "BEDPE", "--outdir",
                    out] + args, timeout=60)
     assert p.returncode == 1
-    log = parse_log(p.stderr)
+    log = parse_analysis_log(p.stderr)
     if message is None:
         assert [level for level, _ in log] == ["ERROR"]
     else:
@@ -1968,7 +1971,7 @@ def test_yeast_frag_with_barcodes(run_macs3, test_dir, tmp_path):
 
 
 @pytest.mark.slow
-def test_yeast_frag_file(run_macs3, parse_log, test_dir, tmp_path):
+def test_yeast_frag_file(run_macs3, parse_analysis_log, test_dir, tmp_path):
     # the yeast fragments in FRAG format (barcodes AAAA... and BBBB...),
     # keeping barcode BBBB... with --barcodes and capping counts at 1
     frag = test_dir / "yeast_500k_SRR1822137.frag.gz"
@@ -1980,7 +1983,7 @@ def test_yeast_frag_file(run_macs3, parse_log, test_dir, tmp_path):
                    "--max-count", "1", "-n", "yf", "--outdir", tmp_path],
                   timeout=300)
     assert p.returncode == 0, p.stderr
-    log = parse_log(p.stderr)
+    log = parse_analysis_log(p.stderr)
     assert ("INFO", "#   extracted %d fragments in treatment" % n) in log
     assert ("INFO", "#  Read %d fragments." % n) in log
     lines = read_lines(tmp_path / "yf_accessible_regions.narrowPeak")

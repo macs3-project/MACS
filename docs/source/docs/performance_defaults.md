@@ -10,10 +10,11 @@ module attribute cannot consistently configure already imported consumers.
 `Threads.MAX_THREADS` and `Threads.MIN_THREADED_SIZE` remain derived
 compatibility aliases, as do `CallPeakUnit.MAX_WORKERS` and
 `CallPeakUnit.PSCORE_CACHE_INIT_SIZE`. Compiled consumers use typed copies.
-CPU detection and backend eligibility are unchanged.
-The thread caps include the calling thread; the process cap counts child
-processes. A shared configurable CPU budget is tracked in #768, and the
-positive scheduling target/minimum-work policy in #769.
+Runtime CPU settings are resolved per invocation by
+`MACS3.Utilities.Execution`, with `cpu_limit` supplying the default request.
+See [CPU budgets and process backends](execution.md). The budget includes the
+caller; process phases reserve a slot for the parent. Positive scheduling
+target/minimum-work policy remains tracked in #769.
 
 ## Python policy inventory
 
@@ -26,7 +27,7 @@ factors remain algorithm-owned and unchanged.
 
 | DEFAULTS field | Existing value and units | Current definition / consumers | Rationale / constraint |
 | --- | --- | --- | --- |
-| cpu_limit | 8 execution participants | Threads.MAX_THREADS, Parser._BAM_MAX_THREADS, PeakModel._MODEL_MAX_THREADS, CallPeakUnit.MAX_WORKERS | Preserve each resolver's accounting: threads include caller; process limit counts children. Shared request/accounting belongs to #768. |
+| cpu_limit | 8 execution participants | Execution.resolve_execution_policy; informational Threads.MAX_THREADS and CallPeakUnit.MAX_WORKERS | Default request only; explicit larger requests are allowed, clamped to availability. |
 | min_parallel_track_elements | 65,536 elements per chromosome | Threads.MIN_THREADED_SIZE; typed copies in FixWidthTrack and PairedEndTrack | Avoid thread handoff on small chromosomes; preserve >= comparison. |
 | bam_serial_input_bytes | 1,048,576 compressed bytes | Parser._BAM_IN_SIZE / shared BAM/FRAG stream | Positive initial read buffer; retain stream growth/fallback. |
 | bam_serial_output_bytes | 4,194,304 decompressed bytes | Parser._BAM_OUT_SIZE / shared BAM/FRAG stream | Initial window, not a record-size limit. |
@@ -49,7 +50,7 @@ factors remain algorithm-owned and unchanged.
 | qscore_min_slots | 16 hash slots | CallPeakUnit.QScoreTable.__cinit__ | Positive power of two; retain hint-based growth and half-full policy. |
 | qtable_prefetch_ahead_slots | 16 upcoming slots | CallPeakUnit.QTABLE_PREFETCH_AHEAD / q-table loops | Independent from qscore_min_slots despite equal value. |
 | chromosome_tasks_per_worker | 32 tasks per worker target | CallPeakUnit._chromosome_batches denominator | Name existing multiplier only; positive-target fix belongs to #769. |
-| deferred_close_max_files | 256 descriptors per destroy operation | CallPeakUnit.CLOSE_LATER_MAX_FILES / destroy | Preserve current asynchronous cleanup selection and fallback. |
+| deferred_close_max_files | 256 descriptors per destroy operation | CallPeakUnit.CLOSE_LATER_MAX_FILES / destroy | Bound descriptor retention during budgeted, joined cleanup. |
 | deferred_close_min_bytes | 1,048,576 bytes per eligible file | CallPeakUnit.CLOSE_LATER_MIN_BYTES / destroy | Independent from serial compressed read capacity. |
 | peak_writer_min_bytes | 65,536 UTF-8 bytes | PeakIO._TextBuf.reserve | Initial buffer floor; preserve doubling and chromosome flush behavior. |
 | poisson_log_cache_max_entries | 4,194,304 entries per float64 table | Prob.LN_SUM_MAX / acquire_log_tables and scoring wrappers | Positive int32-safe bound; two current tables use up to 64 MiB, with temporary overlap possible. |
