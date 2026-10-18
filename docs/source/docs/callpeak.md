@@ -283,6 +283,13 @@ serializing the tracks and preserves copy-on-write sharing.
   The p-value cutoff. If `-p` is specified, MACS3 will use p-value
   instead of q-value.
 
+  The Poisson p-value for a pileup of n reads with expected count λ
+  (the local lambda) is P(X > n), computed as R's
+  `ppois(n, λ, lower.tail = FALSE)`; the standard "at least n" tail
+  P(X ≥ n) is `ppois(n - 1, λ, lower.tail = FALSE)`. The two differ by the
+  probability of exactly n reads, so at a given cutoff P(X > n) admits
+  more positions, most noticeably where λ is small.
+
 - `--min-length`, `--max-gap`
 
   These two options can be used to fine-tune the peak calling behavior

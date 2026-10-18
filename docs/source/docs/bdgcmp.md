@@ -22,7 +22,10 @@ you use the bedGraph files from MACS3. We provide the following
 function to 'compare two tracks':
 
 - `ppois` Poisson p-value (-log10(pvalue) form) using the second file
-  (-c) as lambda and treatment (-t) as observation
+  (-c) as lambda and treatment (-t) as observation. For an observed
+  value n and lambda λ the p-value is P(X > n), computed as R's
+  `ppois(n, λ, lower.tail = FALSE)`; the standard "at least n" tail
+  P(X ≥ n) is `ppois(n - 1, λ, lower.tail = FALSE)`.
 - `qpoi`s The q-value through a BH process for poisson pvalues
 - `subtract` Subtraction from treatment
 - `FE` linear scale fold enrichment, or the score from file A divided
