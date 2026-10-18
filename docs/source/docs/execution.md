@@ -130,3 +130,34 @@ MACS3's budget controls MACS3 pools. BLAS, OpenMP, scikit-learn and HMM librarie
 have their own resource settings, such as `OMP_NUM_THREADS`,
 `OPENBLAS_NUM_THREADS` and `MKL_NUM_THREADS`. MACS3 does not rewrite those
 environment variables or promise to control third-party pool sizes.
+
+## Chromosome work and process startup
+
+Peak calling uses stored treatment locations plus stored control locations
+when the control is a distinct track. A paired-end fragment is one location;
+a FRAG record is one location regardless of its count. Only chromosomes common
+to treatment and control participate, as before. Chromosomes empty in both
+inputs contribute no work, histogram segments, peaks or bedGraph rows. An
+empty comparison returns an empty peak collection; requested bedGraph files
+are empty (apart from requested track lines), and empty cutoff analysis writes
+its column header. A chromosome empty in only one input remains in the
+comparison: treatment coverage is zero or control uses the background baseline.
+
+Both the p-score histogram phase and narrow/summit process phase require at
+least **262,144 stored locations** across at least two nonempty chromosomes.
+Smaller workloads run serially even when the invocation permits processes.
+This internal minimum is a conservative startup heuristic, not a measured
+Linux break-even point or a promise of speedup above the threshold. Local
+macOS observations found three-chromosome serial call/cleanup workloads up to
+196,608 stored locations took roughly 3–7 ms. Linux startup costs, local-control
+windows, data distribution, hardware and filesystem costs vary. Budgets and
+host-safety checks remain upper limits; they do not force pool creation.
+
+For `W` eligible workers, the scheduler targets at most `32 * W` tasks. It
+uses a positive ceiling of total locations divided by that task limit, sends
+large chromosomes individually, and groups smaller chromosomes until they
+reach the target. Only the final batch may fall short. Empty chromosomes
+never become tasks. Chromosomes are not split, so a dominant chromosome can
+still limit parallelism. Task submission is largest first; histogram ties and
+returned peaks retain serial chromosome/position order regardless of completion
+order. Each phase joins its workers before the next phase begins.

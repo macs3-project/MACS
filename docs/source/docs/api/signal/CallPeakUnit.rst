@@ -1,6 +1,18 @@
 MACS3.Signal.CallPeakUnit module
 ================================
 
+``CallerFromAlignments`` uses the shared invocation execution policy. Process
+phases also require at least 262,144 stored treatment and distinct control
+locations across two nonempty chromosomes. FRAG counts do not multiply the
+stored-location cost. This minimum is an internal startup heuristic.
+
+Chromosomes empty in both inputs are ignored; an empty comparison returns an
+empty peak collection. One-sided empty chromosomes retain zero treatment or
+background control coverage. Large chromosomes remain individual tasks and
+small ones are batched, with at most 32 tasks per eligible worker. Results
+retain serial chromosome and peak order. See :doc:`../../execution` for
+resource limits and empty output artifacts.
+
 .. automodule:: MACS3.Signal.CallPeakUnit
    :members:
    :undoc-members:

@@ -47,6 +47,9 @@ class _PerformanceDefaults:
     # A prefetch hint in the q-table insertion loops, independent of capacity.
     qtable_prefetch_ahead_slots: int = 16
     chromosome_tasks_per_worker: int = 32
+    # Stored treatment + distinct control records, not FRAG multiplicities.
+    # Conservative startup heuristic; not a measured Linux break-even point.
+    min_parallel_peak_locations: int = 1 << 18
 
     # Defer closing at most this many sufficiently large unlinked files.
     deferred_close_max_files: int = 256

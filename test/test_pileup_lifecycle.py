@@ -25,6 +25,7 @@ import numpy as np
 import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+from MACS3.Utilities.Performance import DEFAULTS
 
 def execution_policy(budget):
     return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
@@ -49,6 +50,11 @@ def make(background=0.5, selected_backend=None):
     for chrom in [b'chr1', b'chr2']:
         for pos in [1000] * 20 + [9000]:
             track.add_loc(chrom, pos, 0)
+    # Exercise actual pool lifecycle boundaries with sufficient stored work.
+    for chrom in (b'chr1', b'chr2'):
+        track.add_loc_arrays(chrom,
+            np.arange(DEFAULTS.min_parallel_peak_locations // 2 + 1,
+                      dtype='i4') * 300 + 10000, np.array([], dtype='i4'))
     track.finalize()
     return unit.CallerFromAlignments(
         track, None, d=200, ctrl_d_s=[], ctrl_scaling_factor_s=[],

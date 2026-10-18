@@ -10,6 +10,7 @@ import pytest
 
 
 SCRIPT = r'''
+import numpy as np
 import multiprocessing
 import sys
 import threading
@@ -18,6 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 import MACS3.Signal.CallPeakUnit as unit
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
+from MACS3.Utilities.Performance import DEFAULTS
 
 def execution_policy(budget):
     return ExecutionPolicy(budget, budget, CPUAvailability(64, (("test host", 64),), ()))
@@ -50,6 +52,11 @@ def run(scenario, mode):
         for index in range(3):
             for pos in [1000 + index * 200] * (20 + index * 7) + [9000]:
                 track.add_loc(('chr%d' % index).encode(), pos, 0)
+        # Enough real work to reach pool/safety boundaries under the minimum.
+        for index in range(3):
+            track.add_loc_arrays(('chr%d' % index).encode(),
+                np.arange(DEFAULTS.min_parallel_peak_locations // 3 + 1,
+                          dtype='i4') * 300 + 10000, np.array([], dtype='i4'))
         track.finalize()
         caller = unit.CallerFromAlignments(
             track, None, d=200, ctrl_d_s=[], ctrl_scaling_factor_s=[],
