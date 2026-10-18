@@ -28,6 +28,7 @@ def test_defaults_are_immutable_and_capacities_are_valid():
 
 @pytest.mark.parametrize("changes,diagnostic", [
     ({"cpu_limit": 0}, "cpu_limit"),
+    ({"min_parallel_peak_locations": 0}, "min_parallel_peak_locations"),
     ({"frag_tasks_per_thread": True}, "frag_tasks_per_thread"),
     ({"bgzf_batch_input_bytes": 1.5}, "bgzf_batch_input_bytes"),
     ({"pscore_initial_slots": 1000}, "power of two"),

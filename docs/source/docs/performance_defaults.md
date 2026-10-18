@@ -1,8 +1,8 @@
 # Performance defaults (developer reference)
 
 `MACS3.Utilities.Performance.DEFAULTS` is an immutable, slotted record of
-internal policy defaults. These values retain the tuning introduced in
-PR #756. They are not CLI options or per-invocation settings. Every
+internal policy defaults, including buffer tuning and process-startup
+heuristics. They are not CLI options or per-invocation settings. Every
 compiled consumer copies the relevant field into an explicitly typed
 module value at import, outside native and `nogil` loops. Changing a
 module attribute cannot consistently configure already imported consumers.
@@ -13,8 +13,8 @@ compatibility aliases, as do `CallPeakUnit.MAX_WORKERS` and
 Runtime CPU settings are resolved per invocation by
 `MACS3.Utilities.Execution`, with `cpu_limit` supplying the default request.
 See [CPU budgets and process backends](execution.md). The budget includes the
-caller; process phases reserve a slot for the parent. Positive scheduling
-target/minimum-work policy remains tracked in #769.
+caller; process phases reserve a slot for the parent. The positive scheduling
+target and minimum-work policy are described below and in the execution guide.
 
 ## Python policy inventory
 
@@ -49,7 +49,8 @@ factors remain algorithm-owned and unchanged.
 | pscore_pending_chunk_keys | 8,192 keys per scheduling claim | CallPeakUnit.PENDING_CHUNK / score_pending | Positive chunk; preserve serial threshold and chunk boundaries. |
 | qscore_min_slots | 16 hash slots | CallPeakUnit.QScoreTable.__cinit__ | Positive power of two; retain hint-based growth and half-full policy. |
 | qtable_prefetch_ahead_slots | 16 upcoming slots | CallPeakUnit.QTABLE_PREFETCH_AHEAD / q-table loops | Independent from qscore_min_slots despite equal value. |
-| chromosome_tasks_per_worker | 32 tasks per worker target | CallPeakUnit._chromosome_batches denominator | Name existing multiplier only; positive-target fix belongs to #769. |
+| chromosome_tasks_per_worker | 32 tasks per worker maximum | CallPeakUnit chromosome batching | Positive ceiling target; no empty-only tasks; large chromosomes stay indivisible. |
+| min_parallel_peak_locations | 262,144 stored treatment + distinct control locations | Both CallPeakUnit process phases | Conservative startup heuristic, with at least two nonempty chromosomes. FRAG multiplicities do not increase stored work. See [execution policy](execution.md#chromosome-work-and-process-startup). |
 | deferred_close_max_files | 256 descriptors per destroy operation | CallPeakUnit.CLOSE_LATER_MAX_FILES / destroy | Bound descriptor retention during budgeted, joined cleanup. |
 | deferred_close_min_bytes | 1,048,576 bytes per eligible file | CallPeakUnit.CLOSE_LATER_MIN_BYTES / destroy | Independent from serial compressed read capacity. |
 | peak_writer_min_bytes | 65,536 UTF-8 bytes | PeakIO._TextBuf.reserve | Initial buffer floor; preserve doubling and chromosome flush behavior. |

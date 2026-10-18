@@ -97,6 +97,8 @@ _PSCORE_PENDING_RESERVE = cython.declare(
 _QSCORE_MIN_SLOTS = cython.declare(cython.Py_ssize_t, DEFAULTS.qscore_min_slots)
 _CHROMOSOME_TASKS_PER_WORKER = cython.declare(
     cython.long, DEFAULTS.chromosome_tasks_per_worker)
+_MIN_PARALLEL_PEAK_LOCATIONS = cython.declare(
+    cython.long, DEFAULTS.min_parallel_peak_locations)
 
 # score_pending hands out the pending keys to its threads this many at
 # a time.
@@ -1758,6 +1760,11 @@ class CallerFromAlignments:
     lambda_bg: cython.float
     # name of common chromosomes in ChIP and Control data
     chromosomes: list
+    # Refreshed once per public call; indices retain serial histogram order.
+    chromosome_indices: list
+    active_chromosomes: list
+    chromosome_work: list
+    chromosome_work_total: cython.long
     # the pseudocount used to calcuate logLR, FE or logFE
     pseudocount: cython.double
     # prefix will be added to _pileup.bdg for treatment and
@@ -1847,6 +1854,8 @@ class CallerFromAlignments:
         process_backend: ``auto`` uses fork only in a Linux main thread
             with no other detected Python threads, outside daemon processes.
             Other hosts run serially. ``serial`` disables peak process pools.
+            Pools also require the internal minimum stored-location work across
+            at least two nonempty chromosomes; empty comparisons return no peaks.
             Native threads and concurrent thread creation cannot be detected
             reliably; embedded hosts should use ``serial`` when uncertain.
 
@@ -1926,6 +1935,10 @@ class CallerFromAlignments:
         chr1 = set(self.treat.get_chr_names())
         chr2 = set(self.ctrl.get_chr_names())
         self.chromosomes = sorted(list(chr1.intersection(chr2)))
+        self.chromosome_indices = []
+        self.active_chromosomes = []
+        self.chromosome_work = []
+        self.chromosome_work_total = 0
 
         self.pileup_data_files = {}
         self.pileup_directory = None
@@ -2050,7 +2063,9 @@ class CallerFromAlignments:
             clean_up_ndarray(self.chr_pos_treat_ctrl[1])
             clean_up_ndarray(self.chr_pos_treat_ctrl[2])
 
-        if self.PE_mode:
+        if n_locations(self.treat, chrom) == 0:
+            treat_pv = [np.empty(0, dtype="i4"), np.empty(0, dtype="f4")]
+        elif self.PE_mode:
             treat_pv = self.treat.pileup_a_chromosome(chrom,
                                                       self.treat_scaling_factor,
                                                       baseline_value=0.0)
@@ -2062,7 +2077,7 @@ class CallerFromAlignments:
                                                       directional=True,
                                                       end_shift=self.end_shift)
 
-        if not self.no_lambda_flag:
+        if not self.no_lambda_flag and n_locations(self.ctrl, chrom) > 0:
             if self.PE_mode:
                 # note, we pileup up PE control as SE control because
                 # we assume the bias only can be captured at the
@@ -2079,8 +2094,12 @@ class CallerFromAlignments:
                                                           directional=False)
         else:
             # a: set global lambda
-            ctrl_pv = [treat_pv[0][-1:], np.array([self.lambda_bg,],
-                                                  dtype="f4")]
+            ctrl_pv = [treat_pv[0][-1:], np.full(treat_pv[0][-1:].size,
+                                                 self.lambda_bg, dtype="f4")]
+
+        if treat_pv[0].size == 0 and ctrl_pv[0].size > 0:
+            # A control-only span has zero observed coverage.
+            treat_pv = [ctrl_pv[0][-1:], np.zeros(1, dtype="f4")]
 
         self.chr_pos_treat_ctrl = self.__chrom_pair_treat_ctrl(treat_pv,
                                                                ctrl_pv)
@@ -2307,40 +2326,63 @@ class CallerFromAlignments:
         return
 
     @cython.cfunc
-    def _chromosome_batches(self, n_workers: cython.int) -> list:
-        """Group the chromosome indices into tasks for the worker
-        processes, largest first.
-
-        A chromosome's cost is taken as its number of reads or
-        fragments in treatment and control. A chromosome at least
-        1/(32 n_workers) of the total is a task of its own; smaller
-        ones are grouped until a task reaches that size, so that 50,000
-        contigs do not become 50,000 tasks.
-        """
+    def _prepare_chromosome_work(self):
+        """Snapshot stored-location counts without changing serial indices."""
         i: cython.long
         w: cython.long
-        total: cython.long
-        target: cython.long
-        batch_weight: cython.long
-        order: list
-        batches: list
-        batch: list
 
-        order = []
-        total = 0
+        self.chromosome_indices = []
+        self.active_chromosomes = []
+        self.chromosome_work = []
+        self.chromosome_work_total = 0
         for i in range(len(self.chromosomes)):
             w = n_locations(self.treat, self.chromosomes[i])
             if self.ctrl is not self.treat:
                 w += n_locations(self.ctrl, self.chromosomes[i])
-            order.append((-w, i))
-            total += w
-        order.sort()
+            if w == 0:
+                continue
+            self.chromosome_indices.append(i)
+            self.active_chromosomes.append(self.chromosomes[i])
+            self.chromosome_work.append((-w, i))
+            self.chromosome_work_total += w
+        self.chromosome_work.sort()
 
-        target = total // (_CHROMOSOME_TASKS_PER_WORKER * n_workers)
-        batches = []
-        batch = []
+    @cython.cfunc
+    def _peak_process_workers(self) -> cython.int:
+        """Apply the same budget, host and minimum-work gate in both phases."""
+        if not peak_processes_allowed(self.process_backend):
+            execution_info("Peak process backend: serial (%s)",
+                           process_backend_reason(self.process_backend))
+            return 0
+        if (len(self.chromosome_indices) < 2 or
+                self.chromosome_work_total < _MIN_PARALLEL_PEAK_LOCATIONS):
+            execution_info(
+                "Peak process backend: serial (workload: %d locations, %d nonempty chromosomes; minimum %d locations)",
+                self.chromosome_work_total, len(self.chromosome_indices),
+                _MIN_PARALLEL_PEAK_LOCATIONS)
+            return 0
+        return min(self.execution_process_workers, len(self.chromosome_indices))
+
+    @cython.cfunc
+    def _chromosome_batches(self, n_workers: cython.int) -> list:
+        """Largest first, at most tasks-per-worker * workers nonempty tasks.
+
+        Every task except a possible trailing batch weighs at least the
+        positive ceiling target. Zero-weight chromosomes never enter tasks.
+        """
+        i: cython.long
+        w: cython.long
+        target: cython.long
+        task_limit: cython.long
+        batch_weight: cython.long
+        batches: list = []
+        batch: list = []
+
+        task_limit = _CHROMOSOME_TASKS_PER_WORKER * n_workers
+        target = max(1, self.chromosome_work_total // task_limit +
+                     (self.chromosome_work_total % task_limit != 0))
         batch_weight = 0
-        for (w, i) in order:
+        for (w, i) in self.chromosome_work:
             batch.append(i)
             batch_weight -= w
             if batch_weight >= target:
@@ -2391,7 +2433,7 @@ class CallerFromAlignments:
             if not peak_processes_allowed(self.process_backend):
                 execution_info("Peak process backend: serial after safety recheck (%s)",
                      process_backend_reason(self.process_backend))
-                for i in range(len(self.chromosomes)):
+                for i in self.chromosome_indices:
                     self._pscore_stat_a_chromosome(i, True)
                 return self.pscore_cache.take_histogram()
             execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
@@ -2452,24 +2494,20 @@ class CallerFromAlignments:
         # pscore_stat, the total length of the segments at each
         # p-score, is first summed per (observed, lambda) slot of the
         # p-score cache, then merged by p-score.
-        n_workers = self.execution_process_workers
-        if not peak_processes_allowed(self.process_backend):
-            execution_info("Peak process backend: serial (%s)",
-                 process_backend_reason(self.process_backend))
-            n_workers = 0
-        if n_workers > 0 and len(self.chromosomes) > 1:
+        n_workers = self._peak_process_workers()
+        if n_workers > 0:
             (pscores, firsts, lengths) = self._pscore_stat_in_workers(n_workers)
-            # where the serial loop leaves i, which the last loop
-            # below starts from when there are no p-scores at all
-            i = len(self.chromosomes) - 1
         else:
             self.pscore_cache.reset_histogram()
-            for i in range(len(self.chromosomes)):
+            for i in self.chromosome_indices:
                 self._pscore_stat_a_chromosome(i, True)
             (pscores, firsts, lengths) = self.pscore_cache.take_histogram()
 
         # the slots used in this pass: p-score, first segment, length
         n_used = pscores.shape[0]
+        if n_used == 0:
+            self.qtable = QScoreTable()
+            return
         ps_ptr = cython.cast(cython.pointer(cython.float), pscores.data)
         ln_ptr = cython.cast(cython.pointer(cython.longlong), lengths.data)
 
@@ -2497,10 +2535,10 @@ class CallerFromAlignments:
         for s in range(n_unique):
             N += ul_ptr[s]     # total length
         k = 1                          # rank
-        f = -log10(N)
+        f = -log10(N) if N > 0 else 0
         # pre_v = -2147483647
         # pre_l = 0
-        pre_q = 2147483647      # save the previous q-value
+        pre_q = 2147483647 if N > 0 else 0  # previous q-value
 
         # Only the C table is filled: pqtable, a Python-level map, is
         # read only by --cutoff-analysis, whose __pre_computes fills
@@ -2592,7 +2630,7 @@ class CallerFromAlignments:
         # print (list(pscore_stat.keys()))
         # print (list(self.pvalue_length.keys()))
         # print (list(self.pvalue_npeaks.keys()))
-        for i in range(len(self.chromosomes)):
+        for i in self.chromosome_indices:
             chrom = self.chromosomes[i]
             self.pileup_treat_ctrl_a_chromosome(chrom)
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
@@ -2679,8 +2717,8 @@ class CallerFromAlignments:
 
         N = sum(pscore_stat.values())  # total length
         k = 1                           # rank
-        f = -log10(N)
-        pre_q = 2147483647              # save the previous q-value
+        f = -log10(N) if N > 0 else 0
+        pre_q = 2147483647 if N > 0 else 0  # previous q-value
 
         self.pqtable = {}
         # sorted(unique_values,reverse=True)
@@ -2765,6 +2803,7 @@ class CallerFromAlignments:
         if self.pileup_directory is None:
             self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
         try:
+            self._prepare_chromosome_work()
             peaks = PeakIO()
 
             # prepare p-q table
@@ -2802,12 +2841,8 @@ class CallerFromAlignments:
                     fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
             info("#3 Call peaks for each chromosome...")
-            n_workers = self.execution_process_workers
-            if not peak_processes_allowed(self.process_backend):
-                execution_info("Peak process backend: serial (%s)",
-                     process_backend_reason(self.process_backend))
-                n_workers = 0
-            if n_workers > 0 and len(self.chromosomes) > 1 and not self.save_bedGraph:
+            n_workers = self._peak_process_workers()
+            if n_workers > 0 and not self.save_bedGraph:
                 # the bedGraph files are written chromosome by chromosome
                 # through one file handle, so -B keeps the serial loop
                 self._call_peaks_in_workers(peaks,
@@ -2818,7 +2853,7 @@ class CallerFromAlignments:
                                             max_gap,
                                             call_summits)
             else:
-                for chrom in self.chromosomes:
+                for chrom in self.active_chromosomes:
                     # treat/control bedGraph will be saved if requested by user.
                     self.__chrom_call_peak_using_certain_criteria(peaks,
                                                                   chrom,
@@ -2912,7 +2947,7 @@ class CallerFromAlignments:
             if not peak_processes_allowed(self.process_backend):
                 execution_info("Peak process backend: serial after safety recheck (%s)",
                      process_backend_reason(self.process_backend))
-                for chrom in self.chromosomes:
+                for chrom in self.active_chromosomes:
                     self.__chrom_call_peak_using_certain_criteria(
                         peaks, chrom, scoring_function_symbols, score_cutoff_s,
                         min_length, max_gap, call_summits, False)
@@ -2933,7 +2968,7 @@ class CallerFromAlignments:
             finally:
                 shutdown_peak_pool(pool)
 
-        for chrom in self.chromosomes:
+        for chrom in self.active_chromosomes:
             (temp_filename, chrom_peaks) = results[chrom]
             for t in chrom_peaks:
                 peaks.add(chrom, t[0], t[1],
@@ -3746,6 +3781,7 @@ class CallerFromAlignments:
         if self.pileup_directory is None:
             self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
         try:
+            self._prepare_chromosome_work()
             lvl1peaks = PeakIO()
             lvl2peaks = PeakIO()
 
@@ -3775,7 +3811,7 @@ class CallerFromAlignments:
                     fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
             info("#3 Call peaks for each chromosome...")
-            for chrom in self.chromosomes:
+            for chrom in self.active_chromosomes:
                 self.__chrom_call_broadpeak_using_certain_criteria(lvl1peaks,
                                                                    lvl2peaks,
                                                                    chrom,

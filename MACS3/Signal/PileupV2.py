@@ -1097,7 +1097,9 @@ def pileup_from_LRC_as_list(LRC_array: cnp.ndarray,
     start_indices: cnp.ndarray
 
     if left_sorted:
-        start_poss = np.ascontiguousarray(LRC_array['l'])
+        # A single strided field is already 'contiguous' to NumPy. Own
+        # the buffer: cleanup must never resize a view into the input track.
+        start_poss = LRC_array['l'].copy()
         start_weights = np.ascontiguousarray(LRC_array['c'],
                                              dtype="f4")
     else:

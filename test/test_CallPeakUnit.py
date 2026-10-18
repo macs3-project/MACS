@@ -1335,6 +1335,8 @@ def test_call_peaks_log_messages(tmp_path, caller_tmp, caplog, spmr,
 def test_call_peaks_log_messages_cached_table(tmp_path, caller_tmp, caplog):
     calc = se_caller(tmp_path)
     calc.call_peaks(["p"], [3.0])
+    # Check only the cached call, regardless of the logger's initial level.
+    caplog.clear()
     caplog.set_level(logging.INFO, logger="MACS3.Signal.CallPeakUnit")
     calc.call_peaks(["p"], [3.0])
     assert _messages(caplog) == ["#3 Call peaks for each chromosome..."]
