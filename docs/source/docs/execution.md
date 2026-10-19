@@ -161,3 +161,30 @@ never become tasks. Chromosomes are not split, so a dominant chromosome can
 still limit parallelism. Task submission is largest first; histogram ties and
 returned peaks retain serial chromosome/position order regardless of completion
 order. Each phase joins its workers before the next phase begins.
+
+
+## Internal caller ownership
+
+Each `CallerFromAlignments` owns a `PeakExecution` and a `PileupStorage`.
+These internal helpers reuse its immutable execution policy and do not retain
+references to the caller or import scoring types. The caller keeps the typed
+p/q-score caches, scoring loops, histogram merging, and serial result order.
+Helper calls happen at chromosome or task boundaries, outside scoring loops.
+
+`PeakExecution` snapshots chromosome work once per public call. Each pool scope
+owns its process handles, checks fork eligibility again under the shared fork
+lock, and joins every started worker before releasing that lock, including on
+submission failure, worker failure, or interruption. The lock carries no caller
+state. Worker initialization binds a caller only in the forked child; the parent
+has no process-global active caller. Result collection stays inside the pool
+scope so failure cleanup cannot race workers still writing files.
+
+`PileupStorage` owns its directory and chromosome-file mapping. Children inherit
+the directory path and return file names to register in the parent's mapping.
+Cleanup scans the entire owned directory, including files from workers that
+failed before returning their names, and joins budgeted descriptor-close threads.
+`destroy()` is idempotent; a later call allocates a fresh directory. Ordinary
+cache-write failures remain best effort, while interruptions propagate after
+partial-file cleanup. Failed calls clear their storage and reset the caller's
+partial scoring state only after worker scopes finish. Independent callers can
+overlap; concurrent calls on the same instance are unsupported.

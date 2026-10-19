@@ -12,19 +12,16 @@ the distribution).
 # python modules
 # ------------------------------------
 
-import struct
-import signal
-from tempfile import mkdtemp, mkstemp
-import os
-import sys
-from stat import S_ISREG
 import threading
-from MACS3.Utilities.Threads import run_on_threads, map_chromosomes
+from MACS3.Utilities.Threads import run_on_threads
 from MACS3.Utilities.Performance import DEFAULTS
-from MACS3.Utilities.Execution import (UNSET, resolve_execution_policy,
-                                      process_backend_reason)
-import multiprocessing
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from MACS3.Utilities.Execution import UNSET, resolve_execution_policy
+from MACS3.Signal.CallerExecution import (
+    PeakExecution, peak_processes_allowed, n_available_workers, n_locations,
+    shutdown_peak_pool)
+from MACS3.Signal.CallerStorage import (
+    PileupStorage, read_pileup_file, write_pileup_file,
+    close_unlinked_files, close_unlinked_files_later)
 
 # ------------------------------------
 # Other modules
@@ -42,7 +39,6 @@ from cython.cimports.libc.stdio import FILE, fopen, fprintf, fclose
 from cython.cimports.libc.math import exp, log10, log1p, erf, sqrt
 from cython.cimports.libc.stdlib import calloc, free, realloc
 from cython.cimports.libc.string import memcpy
-from cython.cimports.posix.unistd import close
 from cython.cimports.MACS3.Signal.cmalloc import (macs3_release_free_heap,
                                                   macs3_advise_huge_pages)
 from cython.cimports.MACS3.Signal.cprefetch import macs3_prefetch_w
@@ -62,7 +58,6 @@ from MACS3.Utilities.Logger import logging
 logger = logging.getLogger(__name__)
 debug = logger.debug
 info = logger.info
-execution_info = logging.getLogger("MACS3.Utilities.Execution").info
 # --------------------------------------------
 # cached pscore function and LR_asym functions
 # --------------------------------------------
@@ -95,10 +90,6 @@ _PSCORE_CACHE_INIT_SIZE = cython.declare(
 _PSCORE_PENDING_RESERVE = cython.declare(
     cython.Py_ssize_t, DEFAULTS.pscore_initial_pending_keys)
 _QSCORE_MIN_SLOTS = cython.declare(cython.Py_ssize_t, DEFAULTS.qscore_min_slots)
-_CHROMOSOME_TASKS_PER_WORKER = cython.declare(
-    cython.long, DEFAULTS.chromosome_tasks_per_worker)
-_MIN_PARALLEL_PEAK_LOCATIONS = cython.declare(
-    cython.long, DEFAULTS.min_parallel_peak_locations)
 
 # score_pending hands out the pending keys to its threads this many at
 # a time.
@@ -1323,76 +1314,12 @@ def find_optimal_cutoff(x: list, y: list) -> tuple:
 MAX_WORKERS = DEFAULTS.cpu_limit
 # Set only in child processes by the pool initializer; never in the parent.
 _caller_for_workers = None
-# Forked pools must not inherit descriptors from another live caller pool.
-_worker_pool_lock = threading.Lock()
 
 
 def initialize_peak_worker(caller):
     """Bind a forked worker to this pool's caller."""
     global _caller_for_workers
     _caller_for_workers = caller
-
-
-def peak_processes_allowed(process_backend: str) -> bool:
-    """Whether the current host supports the automatic Linux fork policy.
-
-    Python thread detection cannot detect native library threads or prevent
-    a host from starting a thread after this check. Embedded callers should
-    select ``serial`` when they cannot establish fork safety themselves.
-    """
-    return process_backend_reason(process_backend) is None
-
-
-def n_available_workers(execution_policy=None) -> int:
-    """Allowed child processes, reserving one budget slot for the parent."""
-    policy = resolve_execution_policy(execution_policy=execution_policy)
-    return (policy.process_workers
-            if peak_processes_allowed(policy.process_backend) else 0)
-
-
-def n_locations(track, chrom: bytes) -> int:
-    """Return the number of reads or fragments of a track on a chromosome."""
-    locs = track.get_locations_by_chr(chrom)
-    if isinstance(locs, (list, tuple)):
-        return sum([x.shape[0] for x in locs])
-    return locs.shape[0]
-
-
-# header of a pileup file: the dtype and length of each of the three
-# arrays [pos, treat, ctrl], which follow it as raw bytes
-PILEUP_FILE_HEADER = struct.Struct("<8sq8sq8sq")
-
-
-def write_pileup_file(fd: int, arrays: list):
-    """Write a chromosome's [pos, treat, ctrl] arrays to the open file
-    descriptor ``fd`` and close it."""
-    header: list = []
-
-    with open(fd, "wb") as f:
-        for a in arrays:
-            if a.ndim != 1 or a.dtype.hasobject:
-                raise TypeError("pileup arrays must be 1-D and numeric")
-            header += [a.dtype.str.encode(), a.shape[0]]
-        f.write(PILEUP_FILE_HEADER.pack(*header))
-        for a in arrays:
-            f.write(a)
-    return
-
-
-def read_pileup_file(filename) -> list:
-    """Read back the [pos, treat, ctrl] arrays written by
-    write_pileup_file."""
-    arrays: list = []
-    i: cython.int
-
-    with open(filename, "rb") as f:
-        header = PILEUP_FILE_HEADER.unpack(f.read(PILEUP_FILE_HEADER.size))
-        for i in range(0, 6, 2):
-            a = np.empty(header[i + 1], dtype=header[i].rstrip(b"\0").decode())
-            if f.readinto(a) != a.nbytes:
-                raise EOFError("pileup file %s is truncated" % filename)
-            arrays.append(a)
-    return arrays
 
 
 @cython.final
@@ -1596,136 +1523,6 @@ def mask_indices(mask: cnp.ndarray) -> cnp.ndarray:
     return out
 
 
-class _PeakProcessContext:
-    """Own process handles even if executor startup stops before its manager.
-
-    ProcessPoolExecutor.shutdown cannot join a partially launched fork pool
-    before its manager thread exists. Record handles at the context boundary
-    so failure cleanup does not depend on executor implementation attributes.
-    """
-
-    def __init__(self):
-        self.context = multiprocessing.get_context('fork')
-        self.processes = []
-
-    def __getattr__(self, name):
-        return getattr(self.context, name)
-
-    def Process(self, *args, **kwargs):
-        process = self.context.Process(*args, **kwargs)
-        self.processes.append(process)
-        return process
-
-
-def shutdown_peak_pool(pool, processes=()):
-    """Defer SIGINT until joining finishes, then restore the host's handler.
-
-    On Python 3.12 an interrupted Thread.join can mark a live executor manager
-    thread stopped. Retrying shutdown then returns before its workers finish.
-    Record SIGINT without raising inside join, and deliver it after shutdown.
-    """
-    interrupted = None
-    pending = []
-    handler = signal.getsignal(signal.SIGINT)
-    defer_signal = (threading.current_thread() is threading.main_thread() and
-                    callable(handler))
-
-    def defer(signum, frame):
-        pending.append((signum, frame))
-
-    if defer_signal:
-        signal.signal(signal.SIGINT, defer)
-    try:
-        try:
-            while True:
-                try:
-                    pool.shutdown(wait=True, cancel_futures=True)
-                    break
-                except KeyboardInterrupt as exc:
-                    interrupted = exc
-        finally:
-            for process in processes:
-                if process.pid is not None:
-                    if process.is_alive():
-                        process.terminate()
-                    process.join()
-    finally:
-        if defer_signal:
-            signal.signal(signal.SIGINT, handler)
-    if pending:
-        handler(*pending[-1])
-    if interrupted is not None:
-        raise interrupted
-
-
-# CallerFromAlignments.destroy keeps a descriptor on at most this many
-# unlinked pileup files, those of at least this many bytes, for a
-# thread to close
-CLOSE_LATER_MAX_FILES = cython.declare(
-    cython.Py_ssize_t, DEFAULTS.deferred_close_max_files)
-CLOSE_LATER_MIN_BYTES = cython.declare(
-    cython.longlong, DEFAULTS.deferred_close_min_bytes)
-
-
-def close_unlinked_files(fds: list):
-    """Close ``fds``, the last references to pileup files that are
-    already unlinked; the kernel frees each file's pages in this
-    close. The closes run without the GIL, so that a thread running
-    this one waits for the GIL once, not once per file."""
-    n: cython.Py_ssize_t = len(fds)
-    i: cython.Py_ssize_t
-    c_fds: cython.pointer(cython.int)
-
-    c_fds = cython.cast(cython.pointer(cython.int),
-                        calloc(n + 1, cython.sizeof(cython.int)))
-    if c_fds == cython.NULL:
-        raise MemoryError()
-    for i in range(n):
-        c_fds[i] = fds[i]
-    with cython.nogil:
-        for i in range(n):
-            close(c_fds[i])
-    free(c_fds)
-    return
-
-
-def close_unlinked_files_later(fds: list, sizes: list, execution_policy=None):
-    """Close unlinked files within the budget, joining before returning.
-
-    The compatibility name is retained. At budget one no thread starts.
-    Unclaimed descriptors are closed here even if worker startup fails.
-    """
-    policy = resolve_execution_policy(execution_policy=execution_policy)
-    if not fds:
-        return
-    n = min(policy.threads, len(fds))
-    groups = [[] for _ in range(n)]
-    loads = [0] * n
-    for j in sorted(range(len(fds)), key=sizes.__getitem__, reverse=True):
-        k = loads.index(min(loads))
-        groups[k].append(fds[j])
-        loads[k] += sizes[j]
-
-    def finish(k):
-        group = groups[k]
-        # Ownership transfers to this invocation before native close releases
-        # the GIL; the finalizer handles only groups never dispatched.
-        groups[k] = None
-        try:
-            close_unlinked_files(group)
-        except MemoryError:
-            for fd in group:
-                os.close(fd)
-
-    try:
-        map_chromosomes(finish, list(range(n)), loads,
-                        execution_policy=policy)
-    finally:
-        for k in range(n):
-            if groups[k] is not None:
-                finish(k)
-
-
 # how many puts ahead the q-score loops prefetch a slot of the table
 QTABLE_PREFETCH_AHEAD = cython.declare(
     cython.Py_ssize_t, DEFAULTS.qtable_prefetch_ahead_slots)
@@ -1752,6 +1549,8 @@ class CallerFromAlignments:
     """Compute pileups, scores, and peaks from FWTrack/PETrack alignments.
 
     Scoring caches belong to this instance and live until it is released.
+    PeakExecution and PileupStorage own its scheduling and temporary files;
+    neither helper imports scoring types or retains a reference to this caller.
     Independent instances may overlap; do not call one instance concurrently.
     Forked pools are serialized from creation through shutdown so one pool
     cannot inherit another pool's descriptors. Pools finish before an
@@ -1788,11 +1587,8 @@ class CallerFromAlignments:
     lambda_bg: cython.float
     # name of common chromosomes in ChIP and Control data
     chromosomes: list
-    # Refreshed once per public call; indices retain serial histogram order.
-    chromosome_indices: list
-    active_chromosomes: list
-    chromosome_work: list
-    chromosome_work_total: cython.long
+    peak_execution: object
+    pileup_storage: object
     # the pseudocount used to calcuate logLR, FE or logFE
     pseudocount: cython.double
     # prefix will be added to _pileup.bdg for treatment and
@@ -1810,10 +1606,8 @@ class CallerFromAlignments:
     no_lambda_flag: bool
     # whether it's in PE mode, will be detected during initiation
     PE_mode: bool
-    process_backend: str
     execution_policy = cython.declare(object, visibility="readonly")
     execution_threads: cython.int
-    execution_process_workers: cython.int
 
     # temporary data buffer
     # temporary [position, treat_pileup, ctrl_pileup] for a given chromosome
@@ -1845,10 +1639,6 @@ class CallerFromAlignments:
     optimal_p_cutoff: cython.float
     # file to save the pvalue-npeaks-totallength table
     cutoff_analysis_filename: bytes
-    # Record the names of temporary files for storing pileup values of
-    # each chromosome
-    pileup_data_files: dict
-    pileup_directory: object
 
     def __init__(self,
                  treat,
@@ -1919,8 +1709,8 @@ class CallerFromAlignments:
         self.execution_policy = resolve_execution_policy(
             threads, process_backend, execution_policy=execution_policy)
         self.execution_threads = self.execution_policy.threads
-        self.execution_process_workers = self.execution_policy.process_workers
-        self.process_backend = self.execution_policy.process_backend
+        self.peak_execution = PeakExecution(self.execution_policy)
+        self.pileup_storage = PileupStorage(self.execution_policy)
 
         # decide PE mode
         if isinstance(treat, FWTrack):
@@ -1963,13 +1753,6 @@ class CallerFromAlignments:
         chr1 = set(self.treat.get_chr_names())
         chr2 = set(self.ctrl.get_chr_names())
         self.chromosomes = sorted(list(chr1.intersection(chr2)))
-        self.chromosome_indices = []
-        self.active_chromosomes = []
-        self.chromosome_work = []
-        self.chromosome_work_total = 0
-
-        self.pileup_data_files = {}
-        self.pileup_directory = None
         self.pvalue_length = {}
         self.pvalue_npeaks = {}
         # step for optimal cutoff is 0.3 in -log10pvalue, we try from
@@ -2004,53 +1787,12 @@ class CallerFromAlignments:
 
     @cython.ccall
     def destroy(self):
-        """Remove the caller's owned pileup directory, including worker files
-        whose names were never returned. Cached paths are cleared so calling
-        again recreates storage using the standard tempfile location.
+        """Remove owned pileup files after workers join; safe to call again.
 
-        Each file is unlinked here, so the temporary directory is left
-        as before. Freeing a file's pages (2.75 GB for a large control)
-        is the slow part, and the kernel does it when the last
-        reference to the file goes: a descriptor opened before the
-        unlink holds that reference. Budgeted threads close the descriptors
-        and are joined here before the next phase can start. At budget one
-        the calling thread closes every descriptor.
+        A subsequent peak call allocates fresh storage. Scoring caches remain
+        caller-owned and are reset separately when an operation fails.
         """
-        f: bytes
-        fds: list = []
-        sizes: list = []
-
-        try:
-            for name in (os.listdir(self.pileup_directory)
-                         if self.pileup_directory is not None else []):
-                f = os.fsencode(os.path.join(self.pileup_directory, name))
-                # os.path.isfile(f), keeping the size
-                try:
-                    st = os.stat(f)
-                except (OSError, ValueError):
-                    continue
-                if not S_ISREG(st.st_mode):
-                    continue
-                # a bounded number of descriptors, on files large
-                # enough to be worth it
-                if (st.st_size >= CLOSE_LATER_MIN_BYTES and
-                        len(fds) < CLOSE_LATER_MAX_FILES):
-                    try:
-                        fds.append(os.open(f, os.O_RDONLY | os.O_CLOEXEC))
-                        sizes.append(st.st_size)
-                    except OSError:
-                        pass
-                os.unlink(f)
-        except BaseException:
-            close_unlinked_files(fds)
-            raise
-        if fds:
-            close_unlinked_files_later(fds, sizes, self.execution_policy)
-        if self.pileup_directory is not None:
-            os.rmdir(self.pileup_directory)
-            self.pileup_directory = None
-        self.pileup_data_files.clear()
-        return
+        self.pileup_storage.destroy()
 
     @cython.ccall
     def set_pseudocount(self, pseudocount: cython.float):
@@ -2071,19 +1813,17 @@ class CallerFromAlignments:
         """
         treat_pv: list
         ctrl_pv: list
-        temp_filename: str
+        cached: list
 
         assert chrom in self.chromosomes, "chromosome %s is not valid." % chrom
 
         # check backup file of pileup values. If not exists, create
         # it. Otherwise, load them instead of calculating new pileup
         # values.
-        if chrom in self.pileup_data_files:
-            try:
-                self.chr_pos_treat_ctrl = read_pileup_file(self.pileup_data_files[chrom])
-                return
-            except Exception:
-                pass
+        cached = self.pileup_storage.read(chrom)
+        if cached is not None:
+            self.chr_pos_treat_ctrl = cached
+            return
 
         # reor: set clean existing self.chr_pos_treat_ctrl
         if self.chr_pos_treat_ctrl:     # not a beautiful way to clean
@@ -2136,19 +1876,7 @@ class CallerFromAlignments:
         treat_pv = []
         ctrl_pv = []
 
-        # save data to temporary file, through the descriptor mkstemp
-        # opened: reopening the name with truncation ("wb") makes ext4
-        # flush the file to disk when it is closed
-        temp_fd, temp_filename = mkstemp(dir=self.pileup_directory)
-        self.pileup_data_files[chrom] = os.fsencode(temp_filename)
-        try:
-            write_pileup_file(temp_fd, self.chr_pos_treat_ctrl)
-        except BaseException as exc:
-            # write_pileup_file owns and closes the descriptor, even on failure.
-            os.unlink(temp_filename)
-            self.pileup_data_files.pop(chrom, None)
-            if not isinstance(exc, Exception):
-                raise
+        self.pileup_storage.write(chrom, self.chr_pos_treat_ctrl)
         return
 
     @cython.cfunc
@@ -2354,74 +2082,6 @@ class CallerFromAlignments:
         return
 
     @cython.cfunc
-    def _prepare_chromosome_work(self):
-        """Snapshot stored-location counts without changing serial indices."""
-        i: cython.long
-        w: cython.long
-
-        self.chromosome_indices = []
-        self.active_chromosomes = []
-        self.chromosome_work = []
-        self.chromosome_work_total = 0
-        for i in range(len(self.chromosomes)):
-            w = n_locations(self.treat, self.chromosomes[i])
-            if self.ctrl is not self.treat:
-                w += n_locations(self.ctrl, self.chromosomes[i])
-            if w == 0:
-                continue
-            self.chromosome_indices.append(i)
-            self.active_chromosomes.append(self.chromosomes[i])
-            self.chromosome_work.append((-w, i))
-            self.chromosome_work_total += w
-        self.chromosome_work.sort()
-
-    @cython.cfunc
-    def _peak_process_workers(self) -> cython.int:
-        """Apply the same budget, host and minimum-work gate in both phases."""
-        if not peak_processes_allowed(self.process_backend):
-            execution_info("Peak process backend: serial (%s)",
-                           process_backend_reason(self.process_backend))
-            return 0
-        if (len(self.chromosome_indices) < 2 or
-                self.chromosome_work_total < _MIN_PARALLEL_PEAK_LOCATIONS):
-            execution_info(
-                "Peak process backend: serial (workload: %d locations, %d nonempty chromosomes; minimum %d locations)",
-                self.chromosome_work_total, len(self.chromosome_indices),
-                _MIN_PARALLEL_PEAK_LOCATIONS)
-            return 0
-        return min(self.execution_process_workers, len(self.chromosome_indices))
-
-    @cython.cfunc
-    def _chromosome_batches(self, n_workers: cython.int) -> list:
-        """Largest first, at most tasks-per-worker * workers nonempty tasks.
-
-        Every task except a possible trailing batch weighs at least the
-        positive ceiling target. Zero-weight chromosomes never enter tasks.
-        """
-        i: cython.long
-        w: cython.long
-        target: cython.long
-        task_limit: cython.long
-        batch_weight: cython.long
-        batches: list = []
-        batch: list = []
-
-        task_limit = _CHROMOSOME_TASKS_PER_WORKER * n_workers
-        target = max(1, self.chromosome_work_total // task_limit +
-                     (self.chromosome_work_total % task_limit != 0))
-        batch_weight = 0
-        for (w, i) in self.chromosome_work:
-            batch.append(i)
-            batch_weight -= w
-            if batch_weight >= target:
-                batches.append(batch)
-                batch = []
-                batch_weight = 0
-        if batch:
-            batches.append(batch)
-        return batches
-
-    @cython.cfunc
     def _pscore_stat_in_workers(self, n_workers: cython.int) -> tuple:
         """Build the p-score histogram of all chromosomes in forked
         worker processes, which share the tracks copy-on-write.
@@ -2450,37 +2110,25 @@ class CallerFromAlignments:
         all_new: cython.bint
         chrom: bytes
 
-        batches = self._chromosome_batches(n_workers)
+        batches = self.peak_execution.batches(n_workers)
         # every worker's copy of the cache starts with no slot used
         self.pscore_cache.reset_histogram()
         # with no key held before the pass, every slot it uses is new
         all_new = self.pscore_cache.n == 0
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
-        with _worker_pool_lock:
-            if not peak_processes_allowed(self.process_backend):
-                execution_info("Peak process backend: serial after safety recheck (%s)",
-                     process_backend_reason(self.process_backend))
-                for i in self.chromosome_indices:
+        with self.peak_execution.pool(self, n_workers, len(batches),
+                                      initialize_peak_worker) as pool:
+            if pool is None:
+                for i in self.peak_execution.chromosome_indices:
                     self._pscore_stat_a_chromosome(i, True)
                 return self.pscore_cache.take_histogram()
-            execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
-            context = _PeakProcessContext()
-            pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=context,
-                                       initializer=initialize_peak_worker,
-                                       initargs=(self,))
-            try:
-                futures = {pool.submit(pscore_stat_worker, batches[k]): k
-                           for k in range(len(batches))}
-                for future in as_completed(futures):
-                    (chrom_files, keys, firsts, lengths) = future.result()
-                    for (chrom, temp_filename) in chrom_files:
-                        if temp_filename is not None:
-                            self.pileup_data_files[chrom] = temp_filename
-                    self.pscore_cache.merge_histogram(keys, firsts, lengths)
-            finally:
-                shutdown_peak_pool(pool, context.processes)
+            for part in self.peak_execution.results(pool, pscore_stat_worker, batches):
+                (chrom_files, keys, firsts, lengths) = part
+                for (chrom, temp_filename) in chrom_files:
+                    if temp_filename is not None:
+                        self.pileup_storage.files[chrom] = temp_filename
+                self.pscore_cache.merge_histogram(keys, firsts, lengths)
 
         if all_new:
             return self.pscore_cache.score_pending(self.execution_threads, True)
@@ -2523,12 +2171,12 @@ class CallerFromAlignments:
         # pscore_stat, the total length of the segments at each
         # p-score, is first summed per (observed, lambda) slot of the
         # p-score cache, then merged by p-score.
-        n_workers = self._peak_process_workers()
+        n_workers = self.peak_execution.workers()
         if n_workers > 0:
             (pscores, firsts, lengths) = self._pscore_stat_in_workers(n_workers)
         else:
             self.pscore_cache.reset_histogram()
-            for i in self.chromosome_indices:
+            for i in self.peak_execution.chromosome_indices:
                 self._pscore_stat_a_chromosome(i, True)
             (pscores, firsts, lengths) = self.pscore_cache.take_histogram()
 
@@ -2659,7 +2307,7 @@ class CallerFromAlignments:
         # print (list(pscore_stat.keys()))
         # print (list(self.pvalue_length.keys()))
         # print (list(self.pvalue_npeaks.keys()))
-        for i in self.chromosome_indices:
+        for i in self.peak_execution.chromosome_indices:
             chrom = self.chromosomes[i]
             self.pileup_treat_ctrl_a_chromosome(chrom)
             [pos_array, treat_array, ctrl_array] = self.chr_pos_treat_ctrl
@@ -2829,10 +2477,9 @@ class CallerFromAlignments:
         tmp_bytes: bytes
         n_workers: cython.int
 
-        if self.pileup_directory is None:
-            self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
+        self.pileup_storage.ensure()
         try:
-            self._prepare_chromosome_work()
+            self.peak_execution.prepare(self.treat, self.ctrl, self.chromosomes)
             peaks = PeakIO()
 
             # prepare p-q table
@@ -2870,7 +2517,7 @@ class CallerFromAlignments:
                     fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
             info("#3 Call peaks for each chromosome...")
-            n_workers = self._peak_process_workers()
+            n_workers = self.peak_execution.workers()
             if n_workers > 0 and not self.save_bedGraph:
                 # the bedGraph files are written chromosome by chromosome
                 # through one file handle, so -B keeps the serial loop
@@ -2882,7 +2529,7 @@ class CallerFromAlignments:
                                             max_gap,
                                             call_summits)
             else:
-                for chrom in self.active_chromosomes:
+                for chrom in self.peak_execution.active_chromosomes:
                     # treat/control bedGraph will be saved if requested by user.
                     self.__chrom_call_peak_using_certain_criteria(peaks,
                                                                   chrom,
@@ -2966,39 +2613,27 @@ class CallerFromAlignments:
         chrom: bytes
         t: tuple
 
-        batches = self._chromosome_batches(n_workers)
+        batches = self.peak_execution.batches(n_workers)
         tasks = [(batch, scoring_function_symbols, score_cutoff_s,
                   min_length, max_gap, call_summits) for batch in batches]
         results = {}
         # the workers need not inherit the heap's free memory
         macs3_release_free_heap()
-        with _worker_pool_lock:
-            if not peak_processes_allowed(self.process_backend):
-                execution_info("Peak process backend: serial after safety recheck (%s)",
-                     process_backend_reason(self.process_backend))
-                for chrom in self.active_chromosomes:
+        with self.peak_execution.pool(self, n_workers, len(batches),
+                                      initialize_peak_worker) as pool:
+            if pool is None:
+                for chrom in self.peak_execution.active_chromosomes:
                     self.__chrom_call_peak_using_certain_criteria(
                         peaks, chrom, scoring_function_symbols, score_cutoff_s,
                         min_length, max_gap, call_summits, False)
                 return
-            execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
-            context = _PeakProcessContext()
-            pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=context,
-                                       initializer=initialize_peak_worker,
-                                       initargs=(self,))
-            try:
-                futures = [pool.submit(call_peaks_worker, task) for task in tasks]
-                for future in as_completed(futures):
-                    part = future.result()
-                    for (chrom, temp_filename, chrom_peaks) in part:
-                        results[chrom] = (temp_filename, chrom_peaks)
-                        if temp_filename is not None:
-                            self.pileup_data_files[chrom] = temp_filename
-            finally:
-                shutdown_peak_pool(pool, context.processes)
+            for part in self.peak_execution.results(pool, call_peaks_worker, tasks):
+                for (chrom, temp_filename, chrom_peaks) in part:
+                    results[chrom] = (temp_filename, chrom_peaks)
+                    if temp_filename is not None:
+                        self.pileup_storage.files[chrom] = temp_filename
 
-        for chrom in self.active_chromosomes:
+        for chrom in self.peak_execution.active_chromosomes:
             (temp_filename, chrom_peaks) = results[chrom]
             for t in chrom_peaks:
                 peaks.add(chrom, t[0], t[1],
@@ -3808,10 +3443,9 @@ class CallerFromAlignments:
         chrs: set
         tmppeakset: list
 
-        if self.pileup_directory is None:
-            self.pileup_directory = mkdtemp(prefix="macs3-pileup-")
+        self.pileup_storage.ensure()
         try:
-            self._prepare_chromosome_work()
+            self.peak_execution.prepare(self.treat, self.ctrl, self.chromosomes)
             lvl1peaks = PeakIO()
             lvl2peaks = PeakIO()
 
@@ -3841,7 +3475,7 @@ class CallerFromAlignments:
                     fprintf(self.bedGraph_ctrl_f, tmp_bytes)
 
             info("#3 Call peaks for each chromosome...")
-            for chrom in self.active_chromosomes:
+            for chrom in self.peak_execution.active_chromosomes:
                 self.__chrom_call_broadpeak_using_certain_criteria(lvl1peaks,
                                                                    lvl2peaks,
                                                                    chrom,
@@ -4299,7 +3933,7 @@ def pscore_stat_worker(chroms: list) -> tuple:
     for i in sorted(chroms):
         caller._pscore_stat_a_chromosome(i, False)
         chrom = caller.chromosomes[i]
-        files.append((chrom, caller.pileup_data_files.get(chrom)))
+        files.append((chrom, caller.pileup_storage.files.get(chrom)))
     (keys, firsts, lengths) = caller.pscore_cache.take_histogram(True)
     return (files, keys, firsts, lengths)
 
@@ -4327,5 +3961,5 @@ def call_peaks_worker(task: tuple) -> list:
                                                       min_length,
                                                       max_gap,
                                                       call_summits)
-        out.append((chrom, caller.pileup_data_files.get(chrom), chrom_peaks))
+        out.append((chrom, caller.pileup_storage.files.get(chrom), chrom_peaks))
     return out

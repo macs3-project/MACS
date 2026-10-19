@@ -23,6 +23,8 @@ import time
 
 import numpy as np
 import MACS3.Signal.CallPeakUnit as unit
+import MACS3.Signal.CallerStorage as storage
+import MACS3.Signal.CallerExecution as execution
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
 from MACS3.Utilities.Performance import DEFAULTS
@@ -36,13 +38,13 @@ sentinel = root / 'unrelated-user-file'
 sentinel.write_bytes(b'keep me')
 before = set(root.iterdir())
 pools = []
-original_executor = unit.ProcessPoolExecutor
+original_executor = execution.ProcessPoolExecutor
 
 def recording_executor(*args, **kwargs):
     pools.append(kwargs)
     return original_executor(*args, **kwargs)
 
-unit.ProcessPoolExecutor = recording_executor
+execution.ProcessPoolExecutor = recording_executor
 
 def make(background=0.5, selected_backend=None):
     selected_backend = backend if selected_backend is None else selected_backend
@@ -98,10 +100,10 @@ fault_backend = ('auto' if scenario.startswith('pool_') or scenario in (
     'interrupt', 'shutdown_interrupt', 'shutdown_signal', 'shutdown_custom_signal')
     else backend)
 caller = make(0.0 if scenario == 'zero_lambda' else 0.5, fault_backend)
-real_write = unit.write_pileup_file
-real_executor = unit.ProcessPoolExecutor
-real_eligible = unit.peak_processes_allowed
-real_completed = unit.as_completed
+real_write = storage.write_pileup_file
+real_executor = execution.ProcessPoolExecutor
+real_eligible = execution.peak_processes_allowed
+real_completed = execution.as_completed
 real_stat_worker = unit.pscore_stat_worker
 closed_fds = []
 shutdowns = []
@@ -123,8 +125,8 @@ if scenario.startswith('pool_') or scenario in (
     # attributes are inspected. Real compiled precomputation and retry run.
     if scenario == 'pool_peak_partial':
         assert rows(call(caller)) == expected
-    unit.peak_processes_allowed = lambda backend: True
-    unit.as_completed = lambda futures: iter(futures)
+    execution.peak_processes_allowed = lambda backend: True
+    execution.as_completed = lambda futures: iter(futures)
 
     class FaultPool:
         def __init__(self, **kwargs):
@@ -174,7 +176,7 @@ if scenario.startswith('pool_') or scenario in (
             self.new_file()
             self.finished = True
 
-    unit.ProcessPoolExecutor = FaultPool
+    execution.ProcessPoolExecutor = FaultPool
 
 if scenario == 'real_shutdown_signal':
     def delayed_stat_worker(batch):
@@ -200,7 +202,7 @@ if scenario == 'real_shutdown_signal':
                 timer.join()
 
     unit.pscore_stat_worker = delayed_stat_worker
-    unit.ProcessPoolExecutor = InterruptedShutdown
+    execution.ProcessPoolExecutor = InterruptedShutdown
 
 if scenario in ('write_error', 'write_interrupt'):
     def fail_write(fd, arrays):
@@ -208,7 +210,7 @@ if scenario in ('write_error', 'write_interrupt'):
             stream.write(b'partial header')
         closed_fds.append(fd)
         raise error if scenario == 'write_interrupt' else OSError('disk full')
-    unit.write_pileup_file = fail_write
+    storage.write_pileup_file = fail_write
 
 try:
     if scenario in ('success', 'large_success', 'write_error'):
@@ -257,10 +259,10 @@ try:
     caller.destroy()
     caller.destroy()
     clean()
-    unit.write_pileup_file = real_write
-    unit.ProcessPoolExecutor = real_executor
-    unit.peak_processes_allowed = real_eligible
-    unit.as_completed = real_completed
+    storage.write_pileup_file = real_write
+    execution.ProcessPoolExecutor = real_executor
+    execution.peak_processes_allowed = real_eligible
+    execution.as_completed = real_completed
     unit.pscore_stat_worker = real_stat_worker
     if scenario != 'zero_lambda':
         assert rows(call(caller)) == expected
@@ -276,8 +278,8 @@ try:
         else:
             raise AssertionError('write descriptor remains open')
 finally:
-    unit.write_pileup_file = real_write
-    unit.ProcessPoolExecutor = real_executor
+    storage.write_pileup_file = real_write
+    execution.ProcessPoolExecutor = real_executor
     signal.signal(signal.SIGINT, saved_handler)
     unit.pscore_stat_worker = real_stat_worker
     caller.destroy()
