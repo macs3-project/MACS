@@ -151,7 +151,11 @@ def target(args, env, directory, operation, spec, sample=False):
                       directory / 'tmp' if sample else None)
     dump(directory / f'{operation}.metrics.json', metrics)
     if metrics['status'] or not result.exists():
-        raise RuntimeError(f'{operation} failed: {directory / (operation + ".log")}')
+        log = directory / f'{operation}.log'
+        detail = log.read_text(errors='replace')[-8000:]
+        raise RuntimeError(
+            f'{operation} failed (status={metrics["status"]}, '
+            f'timed_out={metrics["timed_out"]}): {log}\n{detail}')
     return metrics, json.loads(result.read_text())
 
 
@@ -254,6 +258,7 @@ def run(args):
                     raise RuntimeError('resource sampling incomplete: ' + str(row['sampling_errors']))
             except (RuntimeError, subprocess.TimeoutExpired) as exc:
                 row['error'] = str(exc)
+                print(f'{args.label}: {name}: {exc}', file=sys.stderr, flush=True)
             runs.append(row)
             dump(directory / 'run.json', row)
             dump(out / 'runs.json', runs)

@@ -141,6 +141,8 @@ else:
     assert result.returncode == 1, result.stdout + result.stderr
     row, = json.loads((output / 'runs.json').read_text())
     assert 'cli failed' in row['error']
+    assert 'timed_out=True' in row['error']
+    assert row['error'] in result.stderr
     metrics, = output.glob('small-frag-*/cli.metrics.json')
     assert json.loads(metrics.read_text())['timed_out'] is True
     result = invoke(tmp_path, 'compare', output, '--out', tmp_path / 'failed.md')
