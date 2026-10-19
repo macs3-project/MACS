@@ -32,8 +32,24 @@ def snapshot(track):
 
 
 def native_thread_count():
+    """Count tasks that can still run userspace code, including native workers."""
     if sys.platform == 'linux':
-        return len(list(Path('/proc/self/task').iterdir()))
+        count = 0
+        # Linux sets PF_EXITING before clearing the TID that wakes
+        # pthread_join; /proc may retain that task until release_task.
+        # Such a task cannot run the worker callback again. Do not count
+        # its stale directory as a leaked worker or wait for it to vanish.
+        # PF_EXITING is 0x4 in include/linux/sched.h; stat field 9 is flags.
+        for task in Path('/proc/self/task').iterdir():
+            try:
+                stat = (task / 'stat').read_bytes()
+            except (FileNotFoundError, ProcessLookupError):
+                continue  # Task was removed after directory enumeration.
+            # comm (field 2) can contain spaces and closing parentheses.
+            flags = int(stat.rsplit(b')', 1)[1].split()[6])
+            if not flags & 0x4:
+                count += 1
+        return count
     if sys.platform != 'darwin':
         raise RuntimeError('native thread observation requires Linux or macOS')
     lib = ctypes.CDLL(None)

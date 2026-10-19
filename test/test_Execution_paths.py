@@ -6,12 +6,71 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
 from conftest import macs3_env
 from test_Parser_bam_truncation import HEADER, record, write_bam
 from test_Parser_frag_eof import write_frag
+
+
+@pytest.fixture
+def linux_thread_counter(tmp_path, monkeypatch):
+    """Select Linux observation against controlled procfs task records."""
+    import execution_probe
+    monkeypatch.setattr(execution_probe, 'sys', SimpleNamespace(platform='linux'))
+    monkeypatch.setattr(execution_probe, 'Path', lambda path: tmp_path)
+    return execution_probe.native_thread_count
+
+
+def test_linux_thread_count_excludes_tasks_already_exiting(tmp_path, linux_thread_counter):
+    # pthread_join can finish while the kernel still lists a PF_EXITING task.
+    # Its state need not yet be Z; names can contain spaces and parentheses.
+    for tid, state, flags in [(1, 'R', 4194304), (2, 'S', 4194304),
+                              (3, 'R', 4194308), (4, 'Z', 4194308)]:
+        task = tmp_path / str(tid)
+        task.mkdir()
+        (task / 'stat').write_text(f'{tid} (inflate ) work) {state} 1 1 1 0 -1 {flags} 0\n')
+    # Linux comm is raw bytes, not necessarily valid UTF-8.
+    (tmp_path / '2' / 'stat').write_bytes(b'2 (worker\xff ) A) S 1 1 1 0 -1 4194304 0\n')
+    assert linux_thread_counter() == 2
+    # An additional live worker must still fail a two-thread cleanup bound.
+    (tmp_path / '3' / 'stat').write_text('3 (inflate worker) S 1 1 1 0 -1 4194304 0\n')
+    assert linux_thread_counter() == 3
+
+
+def test_linux_thread_count_handles_a_task_removed_during_observation(tmp_path, linux_thread_counter):
+    (tmp_path / 'gone').mkdir()  # stat disappeared after directory enumeration
+    live = tmp_path / 'live'
+    live.mkdir()
+    (live / 'stat').write_text('1 (main) R 1 1 1 0 -1 4194304 0\n')
+    assert linux_thread_counter() == 1
+
+
+@pytest.mark.parametrize('error', [ProcessLookupError, PermissionError])
+def test_linux_thread_count_distinguishes_vanished_and_unreadable_tasks(
+        tmp_path, linux_thread_counter, monkeypatch, error):
+    task = tmp_path / '1'
+    task.mkdir()
+
+    def read_bytes(path):
+        raise error('task stat read failed')
+
+    monkeypatch.setattr(Path, 'read_bytes', read_bytes)
+    if error is ProcessLookupError:
+        assert linux_thread_counter() == 0
+    else:
+        with pytest.raises(PermissionError):
+            linux_thread_counter()
+
+
+def test_linux_thread_count_does_not_hide_invalid_procfs_data(tmp_path, linux_thread_counter):
+    task = tmp_path / '1'
+    task.mkdir()
+    (task / 'stat').write_text('1 (main) R 1 1 1 0 -1 invalid 0\n')
+    with pytest.raises(ValueError):
+        linux_thread_counter()
 
 
 def probe(tmp_path, scenario, budget, *args):

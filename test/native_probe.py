@@ -74,7 +74,10 @@ def streams(manifest, cleanup=None):
             if track is not None:
                 track.destroy()
             if cleanup and sys.platform in ('darwin', 'linux'):
-                assert native_thread_count() <= before, 'stream retained native workers'
+                after = native_thread_count()
+                assert after <= before, (
+                    f'{kind}/{operation}, budget={budget}: '
+                    f'stream retained native workers ({before} -> {after})')
     print(json.dumps(results))
 
 
