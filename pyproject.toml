@@ -11,6 +11,9 @@ authors = [{name = "Tao Liu", email = "vladimir.liu@gmail.com"},
 readme = "README.md"
 requires-python = ">=3.12"
 license = "BSD-3-Clause"
+license-files = ["LICENSE", "MACS3/IO/libdeflate/COPYING",
+                 "MACS3/Signal/NUMPY_LICENSE.txt", "MACS3/fermi-lite/LICENSE.txt",
+                 "MACS3/fermi-lite/lib/COPYING"]
 classifiers =['Development Status :: 5 - Production/Stable',
               'Environment :: Console',
               'Intended Audience :: Developers',

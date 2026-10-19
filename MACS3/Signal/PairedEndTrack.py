@@ -46,7 +46,8 @@ from cython.cimports.libc.stdint import UINT32_MAX
 from cython.cimports.libc.string import memcpy
 from cython.cimports.MACS3.Signal.crefcount import Py_REFCNT
 from cython.cimports.MACS3.Signal.chugepages import (macs3_hp_available,
-                                                     macs3_hp_capsule)
+                                                     macs3_hp_capsule,
+                                                     PyDataMem_SetHandler)
 
 from MACS3.Utilities.Logger import logging
 from MACS3.Utilities.Threads import map_chromosomes
@@ -648,11 +649,11 @@ def new_track_array(n, dtype) -> cnp.ndarray:
     handler's reservation would add a quarter more address space."""
     if _TRACK_MEMORY is None:
         return np.zeros(n, dtype=dtype)
-    old = cnp.PyDataMem_SetHandler(_TRACK_MEMORY)
+    old = PyDataMem_SetHandler(_TRACK_MEMORY)
     try:
         a = np.zeros(n, dtype=dtype)
     finally:
-        cnp.PyDataMem_SetHandler(old)
+        PyDataMem_SetHandler(old)
     return a
 
 
@@ -2026,9 +2027,9 @@ class PETrackII:
                                                   refcheck=False)
                 self.locations[chromosome] = None
                 self.locations.pop(chromosome)
-                self.barcodes.resize(self.buffer_size,
+                self.barcodes[chromosome].resize(self.buffer_size,
                                      refcheck=False)
-                self.barcodes.resize(0,
+                self.barcodes[chromosome].resize(0,
                                      refcheck=False)
                 self.barcodes[chromosome] = None
                 self.barcodes.pop(chromosome)
