@@ -1,6 +1,6 @@
 # cython: language_level=3
 
-# The part of zlib's inflate API used by MACS3.IO.Parser to decompress
+# The part of zlib's inflate API used by MACS3.IO.BAMStream to decompress
 # BAM (BGZF) files in large blocks. Link the extension with libz.
 
 cdef extern from "zlib.h" nogil:

@@ -12,7 +12,8 @@ import sys
 
 
 SUITES = ['native_compatibility', 'native_streams', 'native_allocator', 'native_cli',
-          'Execution_paths', 'Performance', 'Parser_bam_truncation', 'Parser_frag_eof',
+          'Execution_paths', 'Performance', 'Parser_imports',
+          'Parser_bam_truncation', 'Parser_frag_eof',
           'chromosome_batching', 'CallPeakUnit_backend', 'CallPeakUnit_concurrency',
           'thread_lifecycle', 'pileup_lifecycle', 'PeakModel_allocation']
 
@@ -31,7 +32,8 @@ def main():
     import MACS3
     package = Path(MACS3.__file__).resolve().parent
     assert package.is_relative_to(root) != args.installed, package
-    for name in ('IO.Parser', 'Signal.PairedEndTrack', 'Signal.CallPeakUnit', 'Signal.PeakModel'):
+    for name in ('IO.Parser', 'IO.BAMStream', 'Signal.PairedEndTrack',
+                 'Signal.CallPeakUnit', 'Signal.PeakModel'):
         module = importlib.import_module('MACS3.' + name)
         path = Path(module.__file__).resolve()
         assert path.is_relative_to(package) and path.suffix in ('.so', '.pyd'), path

@@ -29,12 +29,12 @@ factors remain algorithm-owned and unchanged.
 | --- | --- | --- | --- |
 | cpu_limit | 8 execution participants | Execution.resolve_execution_policy; informational Threads.MAX_THREADS and CallPeakUnit.MAX_WORKERS | Default request only; explicit larger requests are allowed, clamped to availability. |
 | min_parallel_track_elements | 65,536 elements per chromosome | Threads.MIN_THREADED_SIZE; typed copies in FixWidthTrack and PairedEndTrack | Avoid thread handoff on small chromosomes; preserve >= comparison. |
-| bam_serial_input_bytes | 1,048,576 compressed bytes | Parser._BAM_IN_SIZE / shared BAM/FRAG stream | Positive initial read buffer; retain stream growth/fallback. |
-| bam_serial_output_bytes | 4,194,304 decompressed bytes | Parser._BAM_OUT_SIZE / shared BAM/FRAG stream | Initial window, not a record-size limit. |
-| bgzf_batch_input_bytes | 4,194,304 compressed bytes | Parser._BAM_PAR_IN | Parallel compressed batch capacity. |
-| bgzf_batch_output_bytes | 16,777,216 decompressed bytes | Parser._BAM_PAR_OUT | Parallel output budget, unrelated to float32 exactness. |
-| bgzf_tail_reserve_bytes | 262,144 decompressed bytes | Parser._BAM_PAR_HEAD | Prefix space for residual records; longer records still grow/fallback. |
-| bgzf_max_batch_jobs | 8,192 BGZF blocks/jobs | Parser._BAM_PAR_MAXJOBS / bgzf_split job allocation and bound | Allocate and dispatch with the same capacity; preserve stop/fallback behavior. |
+| bam_serial_input_bytes | 1,048,576 compressed bytes | BAMStream._BAM_IN_SIZE / shared BAM/FRAG stream | Positive initial read buffer; retain stream growth/fallback. |
+| bam_serial_output_bytes | 4,194,304 decompressed bytes | BAMStream._BAM_OUT_SIZE / shared BAM/FRAG stream | Initial window, not a record-size limit. |
+| bgzf_batch_input_bytes | 4,194,304 compressed bytes | BAMStream._BAM_PAR_IN | Parallel compressed batch capacity. |
+| bgzf_batch_output_bytes | 16,777,216 decompressed bytes | BAMStream._BAM_PAR_OUT | Parallel output budget, unrelated to float32 exactness. |
+| bgzf_tail_reserve_bytes | 262,144 decompressed bytes | BAMStream._BAM_PAR_HEAD | Prefix space for residual records; longer records still grow/fallback. |
+| bgzf_max_batch_jobs | 8,192 BGZF blocks/jobs | BAMStream._BAM_PAR_MAXJOBS / bgzf_split job allocation and bound | Allocate and dispatch with the same capacity; preserve stop/fallback behavior. |
 | frag_append_batch_records | 262,144 fragments | Parser._FRAG_BATCH / _FragBatch | Positive append staging capacity, not bytes. |
 | frag_parallel_min_bytes | 65,536 decompressed bytes | Parser._FRAG_PAR_MIN | Existing threaded line-walk eligibility threshold. |
 | frag_tasks_per_thread | 2 chunks per inflate thread | Parser._FRAG_TASKS_PER_THREAD / chunk sizing | Positive multiplier; preserve current pool reuse. |

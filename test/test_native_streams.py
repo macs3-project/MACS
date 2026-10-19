@@ -6,6 +6,7 @@ import json
 import multiprocessing
 import os
 from pathlib import Path
+import random
 import signal
 import subprocess
 import sys
@@ -21,6 +22,8 @@ from test_Parser_frag_eof import write_frag
 def native_probe(tmp_path, scenario, *args, extra_env=None):
     script = tmp_path / 'native_probe.py'
     script.write_bytes(Path(__file__).with_name('native_probe.py').read_bytes())
+    (tmp_path / 'execution_probe.py').write_bytes(
+        Path(__file__).with_name('execution_probe.py').read_bytes())
     temp = tmp_path / 'tmp'
     temp.mkdir(exist_ok=True)
     proc = subprocess.Popen([sys.executable, str(script), scenario, *map(str, args)],
@@ -87,11 +90,28 @@ def test_bad_compressed_member_across_budgets(tmp_path, kind, operation, damage,
 
 @pytest.mark.parametrize('kind', ['bam', 'bampe', 'frag'])
 @pytest.mark.parametrize('operation', ['build', 'append'])
-def test_mixed_members_and_padding_fall_back_without_data_loss(tmp_path, kind, operation):
+@pytest.mark.parametrize('native', [False, pytest.param(True, marks=pytest.mark.slow)])
+def test_mixed_members_and_padding_fall_back_without_data_loss(tmp_path, kind, operation, native):
     row = b'chr1\t10\t50\tA\t2\n' if kind == 'frag' else record()
     prefix = b'' if kind == 'frag' else HEADER
-    reference = encoded(tmp_path, kind, prefix + row * 15000, 'bgzf', 'reference')
-    first = encoded(tmp_path, kind, prefix + row * 5000, 'bgzf', 'first').read_bytes()[:-28]
+    prefix += row * 5000
+    count = 15000
+    if native:
+        # Exceed compressed batch input and decompressed header lookahead.
+        # A staged second input and a large record survive the serial handoff.
+        # Generated only for slow tests; ~2–4 s and <350 MiB per child.
+        noise = random.Random(771).randbytes(5 * 1024 * 1024)
+        if kind == 'frag':
+            prefix += row * ((READ_BUFFER_SIZE + 65536) // len(row) + 1)
+            count += (READ_BUFFER_SIZE + 65536) // len(row) + 1
+            prefix += b'chr2\t20\t60\t' + noise.hex().encode() + b'\t2\n'
+        else:
+            prefix += record(aux=byte_array(noise + b'\0' * (12 * 1024 * 1024)))
+        count += 1
+    reference = encoded(tmp_path, kind, prefix + row * 10000, 'bgzf', 'reference')
+    first = encoded(tmp_path, kind, prefix, 'bgzf', 'first').read_bytes()[:-28]
+    if native:
+        assert len(first) > 4 * 1024 * 1024
     tail = encoded(tmp_path, kind, row * 5000, 'bgzf', 'tail').read_bytes()
     mixed = tmp_path / 'mixed'
     mixed.write_bytes(first + b'\0' * 17 + gzip.compress(row * 5000) + tail)
@@ -100,8 +120,36 @@ def test_mixed_members_and_padding_fall_back_without_data_loss(tmp_path, kind, o
                                     for path in (reference, mixed) for budget in (1, 4)]))
     results = native_probe(tmp_path, 'streams', manifest)
     assert results[0][0] == 'ok', results
-    assert results[0][1] == 15000 * (2 if kind == 'frag' else 1)
+    assert results[0][1] == count * (2 if kind == 'frag' else 1)
     assert all(result == results[0] for result in results), results
+
+
+@pytest.mark.parametrize('kind', ['bam', 'bampe', 'frag'])
+@pytest.mark.parametrize('operation', ['build', 'append'])
+def test_native_stream_failure_releases_workers_before_next_load(tmp_path, kind, operation):
+    # Beyond header lookahead so failure occurs in the compiled stream.
+    # ~1–2 s per bounded child. Repeated failures must not retain worker pools.
+    if kind == 'frag':
+        row = b'chr1\t10\t50\tA\t2\n'
+        prefix = row * ((READ_BUFFER_SIZE + 65536) // len(row) + 1)
+    else:
+        row = record()
+        prefix = HEADER + record(aux=byte_array(b'\0' * (READ_BUFFER_SIZE + 65536)))
+    first = encoded(tmp_path, kind, prefix, 'bgzf', 'prefix').read_bytes()[:-28]
+    good = encoded(tmp_path, kind, prefix + row, 'bgzf', 'good')
+    damaged = bytearray(encoded(tmp_path, kind, row, 'bgzf', 'last').read_bytes())
+    size = int.from_bytes(damaged[16:18], 'little') + 1
+    damaged[size - 8] ^= 1
+    bad = tmp_path / 'bad'
+    bad.write_bytes(first + damaged)
+    cases = [[str(path), kind, operation, budget, 0]
+             for _ in range(3) for budget in (1, 4) for path in (good, bad, good)]
+    manifest = tmp_path / 'cases.json'
+    manifest.write_text(json.dumps(cases))
+    results = native_probe(tmp_path, 'streams', manifest, 'cleanup')
+    for index in range(0, len(results), 3):
+        assert results[index] == results[index + 2] == results[0]
+        assert results[index + 1][0] == 'BadGzipFile', results
 
 
 @pytest.mark.parametrize('encoding', ['plain', 'gzip', 'bgzf'])

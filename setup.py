@@ -178,7 +178,10 @@ def main():
                              ["MACS3/Signal/PeakVariants.py"],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.IO.Parser",
-                             ["MACS3/IO/Parser.py",
+                             ["MACS3/IO/Parser.py"],
+                             extra_compile_args=extra_c_args),
+                   Extension("MACS3.IO.BAMStream",
+                             ["MACS3/IO/BAMStream.py",
                               "MACS3/IO/bgzf_mt.c",
                               # libdeflate v1.26, vendored: decompression
                               # and CRC32 only
