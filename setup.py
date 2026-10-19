@@ -122,6 +122,7 @@ def main():
                    Extension("MACS3.Signal.PairedEndTrack",
                              ["MACS3/Signal/PairedEndTrack.py"],
                              include_dirs=numpy_include_dir,
+                             define_macros=[("NPY_TARGET_VERSION", "NPY_1_22_API_VERSION")],
                              extra_compile_args=extra_c_args),
                    Extension("MACS3.Signal.BedGraph",
                              ["MACS3/Signal/BedGraph.py"],

@@ -1596,7 +1596,28 @@ def mask_indices(mask: cnp.ndarray) -> cnp.ndarray:
     return out
 
 
-def shutdown_peak_pool(pool):
+class _PeakProcessContext:
+    """Own process handles even if executor startup stops before its manager.
+
+    ProcessPoolExecutor.shutdown cannot join a partially launched fork pool
+    before its manager thread exists. Record handles at the context boundary
+    so failure cleanup does not depend on executor implementation attributes.
+    """
+
+    def __init__(self):
+        self.context = multiprocessing.get_context('fork')
+        self.processes = []
+
+    def __getattr__(self, name):
+        return getattr(self.context, name)
+
+    def Process(self, *args, **kwargs):
+        process = self.context.Process(*args, **kwargs)
+        self.processes.append(process)
+        return process
+
+
+def shutdown_peak_pool(pool, processes=()):
     """Defer SIGINT until joining finishes, then restore the host's handler.
 
     On Python 3.12 an interrupted Thread.join can mark a live executor manager
@@ -1615,12 +1636,19 @@ def shutdown_peak_pool(pool):
     if defer_signal:
         signal.signal(signal.SIGINT, defer)
     try:
-        while True:
-            try:
-                pool.shutdown(wait=True, cancel_futures=True)
-                break
-            except KeyboardInterrupt as exc:
-                interrupted = exc
+        try:
+            while True:
+                try:
+                    pool.shutdown(wait=True, cancel_futures=True)
+                    break
+                except KeyboardInterrupt as exc:
+                    interrupted = exc
+        finally:
+            for process in processes:
+                if process.pid is not None:
+                    if process.is_alive():
+                        process.terminate()
+                    process.join()
     finally:
         if defer_signal:
             signal.signal(signal.SIGINT, handler)
@@ -2437,8 +2465,9 @@ class CallerFromAlignments:
                     self._pscore_stat_a_chromosome(i, True)
                 return self.pscore_cache.take_histogram()
             execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
+            context = _PeakProcessContext()
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=multiprocessing.get_context("fork"),
+                                       mp_context=context,
                                        initializer=initialize_peak_worker,
                                        initargs=(self,))
             try:
@@ -2451,7 +2480,7 @@ class CallerFromAlignments:
                             self.pileup_data_files[chrom] = temp_filename
                     self.pscore_cache.merge_histogram(keys, firsts, lengths)
             finally:
-                shutdown_peak_pool(pool)
+                shutdown_peak_pool(pool, context.processes)
 
         if all_new:
             return self.pscore_cache.score_pending(self.execution_threads, True)
@@ -2953,8 +2982,9 @@ class CallerFromAlignments:
                         min_length, max_gap, call_summits, False)
                 return
             execution_info("Peak process backend: fork, workers=%d", min(n_workers, len(batches)))
+            context = _PeakProcessContext()
             pool = ProcessPoolExecutor(max_workers=min(n_workers, len(batches)),
-                                       mp_context=multiprocessing.get_context("fork"),
+                                       mp_context=context,
                                        initializer=initialize_peak_worker,
                                        initargs=(self,))
             try:
@@ -2966,7 +2996,7 @@ class CallerFromAlignments:
                         if temp_filename is not None:
                             self.pileup_data_files[chrom] = temp_filename
             finally:
-                shutdown_peak_pool(pool)
+                shutdown_peak_pool(pool, context.processes)
 
         for chrom in self.active_chromosomes:
             (temp_filename, chrom_peaks) = results[chrom]

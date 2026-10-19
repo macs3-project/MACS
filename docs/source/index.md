@@ -200,6 +200,7 @@ docs/INSTALL.md
 docs/version_benchmark.md
 docs/performance_defaults.md
 docs/execution.md
+docs/native_validation.md
 docs/subcommands_index.md
 docs/fileformats_index.md
 docs/tutorial.md

@@ -1,5 +1,10 @@
 # cython: language_level=3
 
+# NumPy 1.26 supplies this C API but does not declare it in its Cython pxd.
+# The extension targets the 1.22 API, when NEP 49 handlers were introduced.
+cdef extern from "numpy/arrayobject.h":
+	object PyDataMem_SetHandler(object new_handler)
+
 # A numpy memory handler (PyDataMem_SetHandler) for arrays that grow by
 # resize, as the per-chromosome arrays of
 # MACS3.Signal.PairedEndTrack.PETrackI do while a file is read. An
