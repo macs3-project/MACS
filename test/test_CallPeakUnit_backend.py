@@ -17,6 +17,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 import MACS3.Signal.CallPeakUnit as unit
+import MACS3.Signal.CallerExecution as execution
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
 from MACS3.Utilities.Performance import DEFAULTS
@@ -27,7 +28,7 @@ def execution_policy(budget):
 
 def run(scenario, mode):
     pools = []
-    real_executor = unit.ProcessPoolExecutor
+    real_executor = execution.ProcessPoolExecutor
 
     def executor(*args, **kwargs):
         assert kwargs['mp_context'].get_start_method() == 'fork'
@@ -36,7 +37,7 @@ def run(scenario, mode):
         pools.append(kwargs['initargs'][0])
         return real_executor(*args, **kwargs)
 
-    unit.ProcessPoolExecutor = executor
+    execution.ProcessPoolExecutor = executor
 
     def rows(peaks):
         keys = ['start', 'end', 'length', 'score', 'pileup',
@@ -88,9 +89,9 @@ def run(scenario, mode):
         # Simulate Linux eligibility for individual rejection conditions.
         # The linux_fork case below alone validates real process execution.
         if scenario != 'linux_fork':
-            unit.sys.platform = 'linux'
+            sys.platform = 'linux'
         if scenario == 'lock_change':
-            real_eligible = unit.peak_processes_allowed
+            real_eligible = execution.peak_processes_allowed
             checks = 0
             def change_host_before_recheck(backend):
                 nonlocal checks, background
@@ -99,13 +100,13 @@ def run(scenario, mode):
                     background = threading.Thread(target=stop.wait)
                     background.start()
                 return real_eligible(backend)
-            unit.peak_processes_allowed = change_host_before_recheck
+            execution.peak_processes_allowed = change_host_before_recheck
         if scenario == 'macos':
-            unit.sys.platform = 'darwin'
+            sys.platform = 'darwin'
         elif scenario == 'unsupported':
-            unit.sys.platform = 'win32'
+            sys.platform = 'win32'
         elif scenario == 'no_fork':
-            unit.multiprocessing.get_all_start_methods = lambda: ['spawn']
+            execution.multiprocessing.get_all_start_methods = lambda: ['spawn']
         elif scenario == 'background':
             background = threading.Thread(target=stop.wait)
             background.start()

@@ -21,6 +21,7 @@ MACS3/IO/PeakIO.c
 MACS3/IO/BAM.c
 MACS3/Signal/BedGraph.c
 MACS3/Signal/CallPeakUnit.c
+MACS3/Signal/CallerStorage.c
 MACS3/Signal/FixWidthTrack.c
 MACS3/Signal/HMMR_EM.c
 MACS3/Signal/HMMR_HMM.c

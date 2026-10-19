@@ -16,6 +16,7 @@ from unittest.mock import patch
 import numpy as np
 from concurrent.futures import Future
 import MACS3.Signal.CallPeakUnit as unit
+import MACS3.Signal.CallerExecution as execution
 from MACS3.Utilities import Threads
 from MACS3.Signal.FixWidthTrack import FWTrack
 import MACS3.Signal.PeakModel as model_module
@@ -121,8 +122,8 @@ def run():
             lambda_bg=0.5, execution_policy=policy)
         eligibility = iter([True, True, False])
         try:
-            with patch.object(unit, 'peak_processes_allowed', lambda mode: next(eligibility)), \
-                 patch.object(unit, 'ProcessPoolExecutor', HistogramPool):
+            with patch.object(execution, 'peak_processes_allowed', lambda mode: next(eligibility)), \
+                 patch.object(execution, 'ProcessPoolExecutor', HistogramPool):
                 caller.call_peaks(['q'], [3.0], min_length=100)
                 from MACS3.Signal.Prob import poisson_cdf
                 pscores = observed_arrays[3]

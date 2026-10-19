@@ -9,6 +9,7 @@ import sys
 
 import numpy as np
 import MACS3.Signal.CallPeakUnit as unit
+import MACS3.Signal.CallerExecution as execution
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.IO.PeakIO import BroadPeakIO
 from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
@@ -145,8 +146,8 @@ def schedule(config):
         nonlocal checks
         checks += 1
         return backend == 'auto' and (phase == 'histogram' or checks > 1)
-    unit.peak_processes_allowed = eligible
-    unit.ProcessPoolExecutor = Recorder
+    execution.peak_processes_allowed = eligible
+    execution.ProcessPoolExecutor = Recorder
     calc = caller(track, ctrl, config.get('budget', 8), config.get('backend', 'auto'))
     try:
         try:
@@ -189,10 +190,10 @@ def outputs(config):
     if workload == 'disjoint':
         ctrl = make_track(kind, counts, prefix='other')
     # No mocking of host eligibility: Linux uses real eligible workers.
-    real_executor = unit.ProcessPoolExecutor
+    real_executor = execution.ProcessPoolExecutor
     pools = []
     completions = []
-    real_completed = unit.as_completed
+    real_completed = execution.as_completed
     def recording_executor(**kwargs):
         pools.append(kwargs['max_workers'])
         return real_executor(**kwargs)
@@ -201,8 +202,8 @@ def outputs(config):
         done = list(real_completed(futures))
         completions.append(len(done))
         return iter(reversed(list(futures)))
-    unit.ProcessPoolExecutor = recording_executor
-    unit.as_completed = reverse_completed
+    execution.ProcessPoolExecutor = recording_executor
+    execution.as_completed = reverse_completed
     expected = None
     artifacts = config.get('artifacts', False)
     for budget, backend in ((1, 'serial'), (4, 'auto')):
@@ -236,7 +237,7 @@ def outputs(config):
             assert files['cutoff.tsv'] == b'pscore\tqscore\tnpeaks\tlpeaks\tavelpeak\n'
     elif workload in ('tiny', 'normal', 'mixed'):
         assert expected[0], 'fixture must call peaks'
-    if unit.peak_processes_allowed('auto') and workload in ('normal', 'skewed') and not artifacts:
+    if execution.peak_processes_allowed('auto') and workload in ('normal', 'skewed') and not artifacts:
         assert pools and completions, 'fixture must exercise real Linux workers'
     return {'chromosomes_with_peaks': len(expected[0]), 'pools': len(pools)}
 

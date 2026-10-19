@@ -136,6 +136,7 @@ def process_start_failure(eligibility, phase, fail_at):
     from multiprocessing.process import BaseProcess
     from unittest.mock import patch
     import MACS3.Signal.CallPeakUnit as unit
+    import MACS3.Signal.CallerExecution as execution
     from MACS3.Signal.FixWidthTrack import FWTrack
     from MACS3.Utilities.Execution import CPUAvailability, ExecutionPolicy
     from MACS3.Utilities.Performance import DEFAULTS
@@ -147,7 +148,7 @@ def process_start_failure(eligibility, phase, fail_at):
     if eligibility == 'controlled':
         # Exercise real fork/start/join under a controlled host-safety decision.
         # Production macOS fallback has separate backend tests.
-        unit.peak_processes_allowed = lambda backend: backend == 'auto'
+        execution.peak_processes_allowed = lambda backend: backend == 'auto'
     track = FWTrack(fw=36, threads=1)
     for chrom in (b'chr1', b'chr2', b'chr3'):
         track.add_loc_arrays(chrom, np.full(DEFAULTS.min_parallel_peak_locations // 3 + 1,
@@ -163,7 +164,7 @@ def process_start_failure(eligibility, phase, fail_at):
         execution_policy=ExecutionPolicy(4, 4, CPUAvailability(4, (), ())))
     before = set(Path(os.environ['TMPDIR']).iterdir())
     if phase == 'calling':
-        with patch.object(unit, 'peak_processes_allowed', lambda backend: False):
+        with patch.object(execution, 'peak_processes_allowed', lambda backend: False):
             assert calc.call_peaks(['q'], [2.0], min_length=50).total > 0
     real_start = BaseProcess.start
     started = []
@@ -184,7 +185,7 @@ def process_start_failure(eligibility, phase, fail_at):
         assert all(not process.is_alive() for process in started)
         assert not multiprocessing.active_children()
         assert set(Path(os.environ['TMPDIR']).iterdir()) == before
-        with patch.object(unit, 'peak_processes_allowed', lambda backend: False):
+        with patch.object(execution, 'peak_processes_allowed', lambda backend: False):
             actual = rows(calc.call_peaks(['q'], [2.0], min_length=50))
             assert actual == expected, (actual, expected)
     finally:

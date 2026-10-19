@@ -49,10 +49,10 @@ factors remain algorithm-owned and unchanged.
 | pscore_pending_chunk_keys | 8,192 keys per scheduling claim | CallPeakUnit.PENDING_CHUNK / score_pending | Positive chunk; preserve serial threshold and chunk boundaries. |
 | qscore_min_slots | 16 hash slots | CallPeakUnit.QScoreTable.__cinit__ | Positive power of two; retain hint-based growth and half-full policy. |
 | qtable_prefetch_ahead_slots | 16 upcoming slots | CallPeakUnit.QTABLE_PREFETCH_AHEAD / q-table loops | Independent from qscore_min_slots despite equal value. |
-| chromosome_tasks_per_worker | 32 tasks per worker maximum | CallPeakUnit chromosome batching | Positive ceiling target; no empty-only tasks; large chromosomes stay indivisible. |
-| min_parallel_peak_locations | 262,144 stored treatment + distinct control locations | Both CallPeakUnit process phases | Conservative startup heuristic, with at least two nonempty chromosomes. FRAG multiplicities do not increase stored work. See [execution policy](execution.md#chromosome-work-and-process-startup). |
-| deferred_close_max_files | 256 descriptors per destroy operation | CallPeakUnit.CLOSE_LATER_MAX_FILES / destroy | Bound descriptor retention during budgeted, joined cleanup. |
-| deferred_close_min_bytes | 1,048,576 bytes per eligible file | CallPeakUnit.CLOSE_LATER_MIN_BYTES / destroy | Independent from serial compressed read capacity. |
+| chromosome_tasks_per_worker | 32 tasks per worker maximum | CallerExecution.PeakExecution.batches | Positive ceiling target; no empty-only tasks; large chromosomes stay indivisible. |
+| min_parallel_peak_locations | 262,144 stored treatment + distinct control locations | CallerExecution.PeakExecution.workers (both caller phases) | Conservative startup heuristic, with at least two nonempty chromosomes. FRAG multiplicities do not increase stored work. See [execution policy](execution.md#chromosome-work-and-process-startup). |
+| deferred_close_max_files | 256 descriptors per destroy operation | CallerStorage.CLOSE_LATER_MAX_FILES / destroy | Bound descriptor retention during budgeted, joined cleanup. |
+| deferred_close_min_bytes | 1,048,576 bytes per eligible file | CallerStorage.CLOSE_LATER_MIN_BYTES / destroy | Independent from serial compressed read capacity. |
 | peak_writer_min_bytes | 65,536 UTF-8 bytes | PeakIO._TextBuf.reserve | Initial buffer floor; preserve doubling and chromosome flush behavior. |
 | poisson_log_cache_max_entries | 4,194,304 entries per float64 table | Prob.LN_SUM_MAX / acquire_log_tables and scoring wrappers | Positive int32-safe bound; two current tables use up to 64 MiB, with temporary overlap possible. |
 | poisson_log_cache_min_entries | 1,024 entries per table | Prob.acquire_log_tables | Preserve current minimum allocation and growth; <= maximum. |

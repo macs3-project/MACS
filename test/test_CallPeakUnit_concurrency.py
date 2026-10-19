@@ -15,6 +15,7 @@ import threading
 import logging
 from concurrent.futures import ThreadPoolExecutor
 import MACS3.Signal.CallPeakUnit as unit
+import MACS3.Signal.CallerExecution as execution
 from MACS3.Signal.FixWidthTrack import FWTrack
 from MACS3.Utilities.Execution import ExecutionPolicy, CPUAvailability
 from MACS3.Utilities.Performance import DEFAULTS
@@ -78,7 +79,7 @@ for job in range(2):
         calc.destroy()
 assert baseline[0] != baseline[1]
 
-real_executor = unit.ProcessPoolExecutor
+real_executor = execution.ProcessPoolExecutor
 
 
 class FailingExecutor(real_executor):
@@ -95,7 +96,7 @@ class FailingExecutor(real_executor):
 
 if failure:
     budget = 3
-    unit.ProcessPoolExecutor = FailingExecutor
+    execution.ProcessPoolExecutor = FailingExecutor
     calc = caller(0)
     try:
         try:
@@ -104,7 +105,7 @@ if failure:
             assert str(exc) == 'injected submission failure'
         else:
             raise AssertionError('failure was not injected')
-        unit.ProcessPoolExecutor = real_executor
+        execution.ProcessPoolExecutor = real_executor
         assert run(calc, 0) == baseline[0]
     finally:
         calc.destroy()
@@ -114,7 +115,7 @@ if failure:
     finally:
         later.destroy()
 else:
-    unit.ProcessPoolExecutor = real_executor
+    execution.ProcessPoolExecutor = real_executor
     budget = 3 if parallel else 1
     for repeat in range(3):
         callers = [caller(job) for job in range(2)]

@@ -2645,7 +2645,7 @@ def test_run_uses_tempdir(macs3_argparser, tmp_path, write_bed, monkeypatch):
 def test_run_in_threaded_host_avoids_peak_pools(
         macs3_argparser, run_macs3, tmp_path, write_bed, monkeypatch,
         extra, suffixes):
-    import MACS3.Signal.CallPeakUnit as unit
+    import MACS3.Signal.CallerExecution as execution
 
     reads = _block(20) + _block(30, chrom="chr2")
     bed = write_bed(reads)
@@ -2658,7 +2658,7 @@ def test_run_in_threaded_host_avoids_peak_pools(
     def forbidden_pool(*args, **kwargs):
         pytest.fail("threaded CLI host created a peak process pool")
 
-    monkeypatch.setattr(unit, "ProcessPoolExecutor", forbidden_pool)
+    monkeypatch.setattr(execution, "ProcessPoolExecutor", forbidden_pool)
     stop = threading.Event()
     background = threading.Thread(target=stop.wait)
     background.start()
