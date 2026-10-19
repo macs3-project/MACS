@@ -24,10 +24,13 @@ class FragmentReceiver:
         return getattr(self.track, name)
 
 
-def streams(manifest):
+def streams(manifest, cleanup=None):
     from MACS3.IO.Parser import BAMParser, BAMPEParser, FragParser
     from MACS3.Signal.FixWidthTrack import FWTrack
     from MACS3.Signal.PairedEndTrack import PETrackI, PETrackII
+    if cleanup and sys.platform in ('darwin', 'linux'):
+        from execution_probe import native_thread_count
+        before = native_thread_count()
     results = []
     for case in json.loads(Path(manifest).read_text()):
         path, kind, operation, budget, cap = case
@@ -70,6 +73,8 @@ def streams(manifest):
                 parser.close()
             if track is not None:
                 track.destroy()
+            if cleanup and sys.platform in ('darwin', 'linux'):
+                assert native_thread_count() <= before, 'stream retained native workers'
     print(json.dumps(results))
 
 

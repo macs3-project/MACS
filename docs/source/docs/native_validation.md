@@ -11,7 +11,8 @@ uv run python scripts/run_native_regressions.py --run-slow
 
 The default suite includes exact PETrackII ordering against the installed
 NumPy's structured `argsort`, barcode association/subsets, repeated cleanup,
-compressed framing errors, mixed-member fallbacks, and BAM/BAMPE/FRAG CLI
+compressed framing errors, mixed-member fallbacks, fresh parser/stream import
+order, repeated stream failure/recovery, and BAM/BAMPE/FRAG CLI
 artifacts with multiple inputs, CPU budgets and backend policies. Existing
 execution, model, parser-boundary, scheduling and lifecycle regressions are
 included by the runner. Tests call public APIs and run native failure probes
@@ -20,8 +21,10 @@ directories. Subprocess imports follow the parent pytest installation.
 
 `--run-slow` additionally exercises corruption beyond the Python header
 reader's 10 MB lookahead, CLI inputs above the process threshold, and allocator
-growth. Individual large cases normally take about 1–5 seconds and use under
-150 MiB; fixtures are generated in pytest's temporary directory. Linux tests
+growth. Most individual large cases take about 1–5 seconds and use under
+150 MiB; read-ahead stream cases additionally generate 5 MiB of seeded random
+data and records spanning multiple buffers. Fixtures are generated in pytest's
+temporary directory. Linux tests
 select available/disabled/missing/invalid huge-page discovery using a small
 `LD_PRELOAD` shim that redirects only two sysfs reads. Real track allocation,
 mapping, growth, sorting and release remain intact. NumPy's handler diagnostics

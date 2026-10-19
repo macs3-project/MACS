@@ -1,8 +1,8 @@
 # cython: language_level=3
 
-# Multithreaded inflation of BGZF blocks, used by MACS3.IO.Parser to
-# read BAM files, and tasks on the same threads (the FRAG reader's line
-# walk); the C code is bgzf_mt.c, compiled into the Parser extension.
+# BGZF inflation and native tasks on the stream's budgeted pool.
+# bgzf_mt.c is compiled only into BAMStream; Parser submits its FRAG
+# callback through the stream's Cython interface, without owning the pool.
 
 cdef extern from "bgzf_mt.h" nogil:
     ctypedef struct bgzf_job_t:

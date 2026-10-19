@@ -14,12 +14,13 @@ LICENSES = ['LICENSE', 'MACS3/IO/libdeflate/COPYING',
             'MACS3/Signal/NUMPY_LICENSE.txt', 'MACS3/fermi-lite/LICENSE.txt',
             'MACS3/fermi-lite/lib/COPYING']
 NATIVE_INPUTS = ['MACS3/IO/bgzf_mt.c', 'MACS3/IO/bgzf_mt.h',
+                 'MACS3/IO/BAMStream.py', 'MACS3/IO/BAMStream.pxd',
                  'MACS3/IO/cbgzf_mt.pxd', 'MACS3/IO/czlib.pxd',
                  'MACS3/Signal/chugepages.pxd', 'MACS3/Signal/cmalloc.pxd',
                  'MACS3/Signal/cPosValCalculation.c', 'MACS3/Signal/cPosValCalculation.h',
                  'MACS3/Signal/swalign.c', 'MACS3/Signal/swalign.h']
-EXTENSIONS = ['IO/Parser', 'Signal/PairedEndTrack', 'Signal/CallPeakUnit',
-              'Signal/PeakModel', 'Signal/PileupV2']
+EXTENSIONS = ['IO/Parser', 'IO/BAMStream', 'Signal/PairedEndTrack',
+              'Signal/CallPeakUnit', 'Signal/PeakModel', 'Signal/PileupV2']
 
 
 def require(condition, message):
@@ -47,6 +48,10 @@ def check_sdist(path):
 def check_wheel(path):
     with zipfile.ZipFile(path) as bundle:
         names = bundle.namelist()
+        for name in ('MACS3/IO/BAMStream.py', 'MACS3/IO/BAMStream.pxd'):
+            require(name in names, f'{path}: missing internal stream source {name}')
+            require(bundle.read(name) == (ROOT / name).read_bytes(),
+                    f'{path}: stale internal stream source {name}')
         for module in EXTENSIONS:
             require(any(name.startswith('MACS3/' + module + '.') and name.endswith(('.so', '.pyd'))
                         for name in names), f'{path}: missing compiled {module}')
