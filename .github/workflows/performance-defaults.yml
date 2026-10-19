@@ -1,0 +1,120 @@
+name: Performance defaults evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats:
+        description: Measured repeats per revision and policy
+        default: '3'
+        required: true
+      large_records:
+        description: Fragments per large/many-contig treatment and control
+        default: '500000'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15-intel, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      REPEATS: ${{ inputs.repeats }}
+      LARGE_RECORDS: ${{ inputs.large_records }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Resolve one shared dependency environment
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pathlib, tomllib
+          dependencies = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['dependencies']
+          pathlib.Path('benchmark-requirements.txt').write_text('\n'.join(dependencies + ['numpy==2.3.5', 'Cython>=3', 'setuptools>=80', 'build', 'psutil', 'pytest']))
+          PY
+          python -m pip install -r benchmark-requirements.txt
+          python -m pip freeze > "$RUNNER_TEMP/benchmark-versions.txt"
+      - name: Build and install three isolated revisions
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/performance" "$RUNNER_TEMP/wheels"
+          for label in baseline extraction current; do
+            case "$label" in
+              baseline) ref=170556d ;;
+              extraction) ref=324f779 ;;
+              current) ref="$GITHUB_SHA" ;;
+            esac
+            tree="$RUNNER_TEMP/source-$label"
+            mkdir -p "$tree"
+            git archive "$ref" MACS3 bin setup.py pyproject.toml MANIFEST.in LICENSE README.md | tar -x -C "$tree"
+            vendor_ref="$(git rev-parse "$ref:MACS3/fermi-lite/lib")"
+            git -C MACS3/fermi-lite/lib archive "$vendor_ref" | tar -x -C "$tree/MACS3/fermi-lite/lib"
+            git rev-parse "$ref" > "$RUNNER_TEMP/performance/$label.sha"
+            python -m build --wheel --no-isolation --outdir "$RUNNER_TEMP/wheels/$label" "$tree" > "$RUNNER_TEMP/performance/build-$label.log" 2>&1
+            python -m venv --system-site-packages "$RUNNER_TEMP/env-$label"
+            "$RUNNER_TEMP/env-$label/bin/python" -m pip install --no-deps "$RUNNER_TEMP/wheels/$label/"*.whl
+          done
+      - name: Generate checksummed workload matrix
+        shell: bash
+        run: |
+          python scripts/benchmark_performance.py prepare --out "$RUNNER_TEMP/performance/data" --large "$LARGE_RECORDS"
+      - name: Measure host and Linux resource-constrained profiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          profiles=(host)
+          if [[ "$RUNNER_OS" == Linux ]]; then profiles+=(limited); fi
+          for profile in "${profiles[@]}"; do
+            constraints=()
+            if [[ "$profile" == limited ]]; then
+              cpus="$(python -c 'import os; print(",".join(map(str, sorted(os.sched_getaffinity(0))[:2])))')"
+              constraints=(--affinity "$cpus" --address-space-mib 2048)
+            fi
+            for rep in $(seq 1 "$REPEATS"); do
+              labels=(baseline extraction current)
+              if (( rep % 2 == 0 )); then labels=(current extraction baseline); fi
+              for label in "${labels[@]}"; do
+                python scripts/benchmark_performance.py run \
+                  --manifest "$RUNNER_TEMP/performance/data/manifest.json" \
+                  --out "$RUNNER_TEMP/performance/$profile-$label-$rep" \
+                  --label "$label" --revision "$(cat "$RUNNER_TEMP/performance/$label.sha")" \
+                  --profile "$profile" --python "$RUNNER_TEMP/env-$label/bin/python" \
+                  --repeats 1 "${constraints[@]}"
+              done
+            done
+          done
+      - name: Gate scientific output equality and cache lifetime
+        if: always()
+        shell: bash
+        run: |
+          directories=()
+          for path in "$RUNNER_TEMP/performance/"host-* "$RUNNER_TEMP/performance/"limited-*; do
+            if [[ -f "$path/metadata.json" ]]; then directories+=("$path"); fi
+          done
+          status=0
+          python scripts/benchmark_performance.py compare "${directories[@]}" --out "$RUNNER_TEMP/performance/report.md" || status=$?
+          if [[ -f "$RUNNER_TEMP/performance/report.md" ]]; then cat "$RUNNER_TEMP/performance/report.md" >> "$GITHUB_STEP_SUMMARY"; fi
+          exit "$status"
+      - name: Upload raw evidence, outputs and build logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: performance-defaults-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/performance/
+            ${{ runner.temp }}/benchmark-versions.txt
+          retention-days: 30
