@@ -5,9 +5,11 @@ the full 64 MiB log-cache probe deliberately exercises the production cap.
 """
 
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
+from types import SimpleNamespace
 
 import pytest
 
@@ -117,6 +119,51 @@ assert process_sample(os.getpid(), directory)[1] == 0
                             cwd=tmp_path, env=macs3_env(tmp_path),
                             capture_output=True, text=True, timeout=15)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.parametrize('alive,status,flags,stat_error,failed', [
+    (False, 'running', 0, None, False),
+    (True, 'zombie', 0, None, False),
+    (True, 'running', 0x4, None, False),
+    (True, 'running', 0, FileNotFoundError, False),
+    (True, 'running', 0, PermissionError, True),
+    (True, 'running', 0, None, True),
+])
+def test_sampler_distinguishes_exit_races_from_live_access_denial(
+        tmp_path, monkeypatch, alive, status, flags, stat_error, failed):
+    psutil = pytest.importorskip('psutil')
+    monkeypatch.syspath_prepend(str(SCRIPT.parent))
+    import benchmark_performance as benchmark
+
+    directory = tmp_path / 'private-tmp'
+    directory.mkdir()
+    fds = tmp_path / 'fds'
+    fds.mkdir()
+    (fds / '1').touch()
+    stat = tmp_path / 'stat'
+    stat.write_bytes(b'123 (worker\xff ) A) R 1 1 1 0 -1 ' + str(flags).encode() + b' 0\n')
+
+    def proc_path(path):
+        if path.endswith('/fd'):
+            return fds
+        assert path.endswith('/stat')
+        if stat_error:
+            raise stat_error('proc stat unavailable')
+        return stat
+
+    def denied(path):
+        raise PermissionError('descriptor access denied during exit')
+
+    process = SimpleNamespace(pid=123, children=lambda **kw: [],
+                              memory_info=lambda: SimpleNamespace(rss=1024),
+                              is_running=lambda: alive, status=lambda: status)
+    monkeypatch.setattr(psutil, 'Process', lambda pid: process)
+    monkeypatch.setattr(benchmark, 'Path', proc_path)
+    monkeypatch.setattr(benchmark, 'sys', SimpleNamespace(platform='linux'))
+    monkeypatch.setattr(benchmark, 'os', SimpleNamespace(sep=os.sep, readlink=denied))
+    rss, used, errors = benchmark.process_sample(123, directory)
+    assert (rss, used) == (1024, 0)
+    assert errors == ({'process metrics access denied'} if failed else set())
 
 
 @pytest.mark.slow

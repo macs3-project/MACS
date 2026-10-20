@@ -50,39 +50,65 @@ def artifacts(directory):
     return result
 
 
+def process_finished(process):
+    """Whether an unreadable process has already stopped executing userspace."""
+    import psutil
+    try:
+        if not process.is_running():
+            return True
+        if process.status() in (psutil.STATUS_ZOMBIE, psutil.STATUS_DEAD):
+            return True
+        if sys.platform == 'linux':
+            # exit_mm can remove access to /proc/PID/fd before the task is
+            # reaped or becomes a zombie. As in the native-thread observer,
+            # stat field 9's PF_EXITING (0x4) identifies that exit window.
+            stat = Path(f'/proc/{process.pid}/stat').read_bytes()
+            flags = int(stat.rsplit(b')', 1)[1].split()[6])
+            return bool(flags & 0x4)
+    except (psutil.NoSuchProcess, ProcessLookupError, FileNotFoundError):
+        return True
+    except (psutil.AccessDenied, PermissionError):
+        return False
+    return False
+
+
 def process_sample(pid, directory):
     """Sum tree RSS; deduplicate named/unlinked temp files by device+inode.
 
     Linux /proc exposes deleted open files. On macOS psutil.open_files cannot
     enumerate deleted files: report this gap, never call it a complete peak.
-    Races with exit/unlink are expected. Permission errors are recorded.
+    Races with exit/unlink are expected. Permission errors on live processes
+    are recorded; an exiting process can lose procfs access before reaping.
     """
     import psutil
     files, errors = {}, set()
     rss = 0
+    root = None
     try:
         root = psutil.Process(pid)
         processes = [root, *root.children(recursive=True)]
     except psutil.NoSuchProcess:
         processes = []
     except psutil.AccessDenied:
-        processes = []
-        errors.add('process tree access denied')
+        processes = [root] if root is not None else []
+        if root is None or not process_finished(root):
+            errors.add('process tree access denied')
 
-    def record(path):
+    def record(path, issues):
         try:
             st = path.stat()
             files[(st.st_dev, st.st_ino)] = st.st_size
         except FileNotFoundError:
             pass
         except PermissionError:
-            errors.add('temp file access denied')
+            issues.add('temp file access denied')
 
     for path in directory.rglob('*'):
         if path.is_file():
-            record(path)
+            record(path, errors)
     prefix = str(directory) + os.sep
     for process in processes:
+        process_errors = set()
         try:
             rss += process.memory_info().rss
             if sys.platform == 'linux':
@@ -90,17 +116,19 @@ def process_sample(pid, directory):
                 for fd in fd_dir.iterdir():
                     try:
                         if os.readlink(fd).startswith(prefix):
-                            record(fd)
+                            record(fd, process_errors)
                     except FileNotFoundError:
                         pass
             else:
                 for opened in process.open_files():
                     if opened.path.startswith(prefix):
-                        record(Path(opened.path))
+                        record(Path(opened.path), process_errors)
         except (psutil.NoSuchProcess, ProcessLookupError, FileNotFoundError):
             pass
         except (psutil.AccessDenied, PermissionError):
-            errors.add('process metrics access denied')
+            process_errors.add('process metrics access denied')
+        if process_errors and not process_finished(process):
+            errors.update(process_errors)
     return rss, sum(files.values()), errors
 
 

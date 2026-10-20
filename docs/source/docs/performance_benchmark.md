@@ -150,8 +150,11 @@ the measured CLI jobs.
   be missed. On macOS deleted descriptors are not enumerated by psutil, so the
   value is explicitly a **partial lower bound**. It cannot close the full temp
   storage acceptance criterion. Directory scans alone are not an exact peak.
-* After CLI exit, retained temp bytes or sampling permission failures fail the
-  run. Native module failure is not converted into a skip or pure-Python run.
+* After CLI exit, retained temp bytes or sampling permission failures on live
+  processes fail the run. Processes that have exited or entered the Linux
+  kernel exit path can lose procfs access before reaping; these expected exit
+  races are ignored. Native module failure is not converted into a skip or
+  pure-Python run.
 
 `compare` rejects missing/duplicate planned runs, input-definition differences,
 failed invocations, cache retention regressions, missing/empty peak artifacts,
