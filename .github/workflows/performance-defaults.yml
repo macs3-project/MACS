@@ -88,12 +88,13 @@ jobs:
               labels=(baseline extraction current)
               if (( rep % 2 == 0 )); then labels=(current extraction baseline); fi
               for label in "${labels[@]}"; do
+                # Bash 3.2 treats an empty array as unset under nounset.
                 python scripts/benchmark_performance.py run \
                   --manifest "$RUNNER_TEMP/performance/data/manifest.json" \
                   --out "$RUNNER_TEMP/performance/$profile-$label-$rep" \
                   --label "$label" --revision "$(cat "$RUNNER_TEMP/performance/$label.sha")" \
                   --profile "$profile" --python "$RUNNER_TEMP/env-$label/bin/python" \
-                  --repeats 1 "${constraints[@]}"
+                  --repeats 1 ${constraints[@]+"${constraints[@]}"}
               done
             done
           done
