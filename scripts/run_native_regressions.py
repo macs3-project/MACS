@@ -12,6 +12,7 @@ import sys
 
 
 SUITES = ['native_compatibility', 'native_streams', 'native_allocator', 'native_cli',
+          'performance_benchmark',
           'Execution_paths', 'Performance', 'Parser_imports',
           'Parser_bam_truncation', 'Parser_frag_eof',
           'chromosome_batching', 'CallPeakUnit_backend', 'CallPeakUnit_concurrency',

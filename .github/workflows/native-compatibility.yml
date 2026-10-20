@@ -61,7 +61,7 @@ jobs:
           python - <<'PY'
           import os, pathlib, tomllib
           dependencies = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['dependencies']
-          dependencies += ['build>=1.6.1', 'pytest', 'setuptools>=80', os.environ['NUMPY_SPEC'], os.environ['CYTHON_SPEC']]
+          dependencies += ['build>=1.6.1', 'pytest', 'psutil>=7', 'setuptools>=80', os.environ['NUMPY_SPEC'], os.environ['CYTHON_SPEC']]
           pathlib.Path(os.environ['RUNNER_TEMP'], 'native-requirements.txt').write_text('\n'.join(dependencies))
           PY
           python -m pip install -r "$RUNNER_TEMP/native-requirements.txt"

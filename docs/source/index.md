@@ -199,6 +199,8 @@ If you are using MACS version 1, please cite our 2008 paper [Model-based Analysi
 docs/INSTALL.md
 docs/version_benchmark.md
 docs/performance_defaults.md
+docs/performance_benchmark.md
+docs/performance_benchmark_report.md
 docs/execution.md
 docs/native_validation.md
 docs/subcommands_index.md

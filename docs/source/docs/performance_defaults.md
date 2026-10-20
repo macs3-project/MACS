@@ -1,5 +1,10 @@
 # Performance defaults (developer reference)
 
+For reproducible measurements, cache-lifetime probes and release gates, see
+[benchmarking performance defaults](performance_benchmark.md) and the
+[initial evidence report](performance_benchmark_report.md). Inventorying a
+value does not establish that it is optimal.
+
 `MACS3.Utilities.Performance.DEFAULTS` is an immutable, slotted record of
 internal policy defaults, including buffer tuning and process-startup
 heuristics. They are not CLI options or per-invocation settings. Every

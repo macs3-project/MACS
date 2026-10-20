@@ -121,6 +121,7 @@ def test_bgzf_native_threads_obey_budget(tmp_path):
     for budget in (1, 2, 4):
         result = probe(tmp_path, 'native', budget, path)
         assert result['extra_native_threads'] <= result['effective'] - 1
+        assert result['stream_open_samples'] > 0
 
 
 @pytest.mark.parametrize('scenario', ['track', 'model', 'cleanup'])

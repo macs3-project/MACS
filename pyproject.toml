@@ -41,4 +41,4 @@ Issues = "https://github.com/macs3-project/MACS/issues"
 Changelog = "https://github.com/macs3-project/MACS/blob/master/ChangeLog"
 
 [dependency-groups]
-dev = ["pytest>=9.0"]
+dev = ["pytest>=9.0", "psutil>=7"]

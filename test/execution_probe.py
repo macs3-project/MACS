@@ -2,6 +2,7 @@
 
 import ctypes
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -117,21 +118,38 @@ def run(scenario, budget, args):
             real_start(observer)
             assert ready.wait(5)
             before = counts[0]
+            stream_samples = []
+            real_open = io.open
+
+            def observed_open(filename, *open_args, **kwargs):
+                # The public file-open boundary is reached after native pool
+                # construction and before consumption. Sample synchronously
+                # here so a fast parse cannot hide every worker between polls.
+                # No private stream/pool symbol is patched or invoked.
+                if kwargs.get('buffering') == 0 and os.fspath(filename) == args[0]:
+                    count = native_thread_count()
+                    counts.append(count)
+                    stream_samples.append(count)
+                return real_open(filename, *open_args, **kwargs)
+
             try:
-                parser = FragParser(args[0], execution_policy=policy)
-                track = parser.build_petrack()
-                parser.close()
+                with patch.object(io, 'open', observed_open):
+                    parser = FragParser(args[0], execution_policy=policy)
+                    track = parser.build_petrack()
+                    parser.close()
                 assert parser.n == 180000
             finally:
                 stop.set()
                 observer.join(5)
             delta = max(counts) - before
+            assert stream_samples, 'native stream file-open boundary was not observed'
             assert delta <= policy.threads - 1, (counts, policy)
             if policy.threads == 1:
                 assert delta == 0, counts
             else:
                 assert delta > 0, 'the fixture did not exercise native workers'
-            result = {'effective': policy.threads, 'extra_native_threads': delta}
+            result = {'effective': policy.threads, 'extra_native_threads': delta,
+                      'stream_open_samples': len(stream_samples)}
         elif scenario == 'track':
             result = []
             for track_type in (FWTrack, PETrackI, PETrackII):
