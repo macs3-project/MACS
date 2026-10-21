@@ -5,7 +5,6 @@ include MACS3/Signal/cPosValCalculation.c MACS3/Signal/cPosValCalculation.h MACS
 include MACS3/IO/bgzf_mt.c MACS3/IO/bgzf_mt.h
 recursive-include MACS3/IO/libdeflate *.c *.h COPYING
 recursive-include docs *.md
-include docs/source/docs/benchmarks/773-macos.json
 recursive-include MACS3/fermi-lite *.c *.h
 global-exclude .ipynb_checkpoints/*
 prune test

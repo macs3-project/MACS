@@ -26,77 +26,49 @@ employed in any "DNA enrichment assay" to answer the fundamental
 question: *Where are the regions with significant read coverage
 compared to random background?*
 
-## Changes for MACS 3.0.5
+## Changes for MACS 3.1.0
 
-### Features added
+### Features and performance
 
-1. Added `PETrackII.return_anndata` to build a sparse barcode-by-peak
-   AnnData count matrix directly from single-cell fragment data. The
-   method preserves fragment counts and merges overlapping or adjacent
-   input regions.
+- **Major `callpeak` speedup:** Jacob Schreiber's auto-optimize work in
+  [PR #756](https://github.com/macs3-project/MACS/pull/756) measured 41–64×
+  faster results across four default workflows (BAM, FRAG, BAM with control,
+  and BAMPE). The speedup varies by workload, and large inputs can use more
+  peak memory.
+- Added `--threads` to supported commands for a per-run CPU budget. Set
+  `MACS3_NUM_THREADS` to choose a default, or pass an execution policy from
+  the Python API. See [CPU budgets and process backends](docs/execution.md).
+- Added `--process-backend {auto,serial}` to `callpeak` and `callvar`.
 
-2. Added `hmmratac --jump` to control the update factor used by the
-   fragment-length EM algorithm. The default is 0.5.
+### Fixes
 
-### Performance improvements
-
-1. Reworked and vectorized the NumPy-backed `PileupV2` implementation.
-   `callpeak`, `pileup`, peak-model construction, and the single-end
-   and paired-end track classes now use the optimized routines by
-   default. Now it has 1.4x speedup over 3.0.4.
-
-2. Improved the performance of `PETrackII.exclude` and sparse
-   barcode-by-peak matrix construction.
-
-3. Replaced `cykhash` caches with Python dictionaries and removed the
-   `cykhash` dependency.
-
-### Bugs fixed
-
-1. Fixed `bdgdiff` region scores being truncated to integers before
-   calculating their length-weighted mean. Decimal scores are now
-   preserved, including with cutoffs below 1 (#715).
-
-2. Fixed `callpeak --call-summits` assigning the first above-cutoff
-   chunk's score to a smoothed maximum in a below-cutoff gap. Invalid
-   gap maxima are now discarded (#741).
-
-3. Fixed an `IndexError` in bedGraph peak refinement when a peak has no
-   overlapping bedGraph content, as encountered in `hmmratac` (#735).
-
-4. `hmmratac --cutoff-analysis-only` now exits with status 0 after
-   successfully writing its report (#704).
-
-5. Fixed the summit-search padding coordinate mismatch. Summits near
-   peak edges are retained at their correct genomic positions, and
-   reported peak boundaries exclude the temporary padding (#747).
-
-6. Fixed summit shape filtering so negative values delimit the
-   candidate's supporting signal on both sides. The 50 bp
-   minimum-width and shape checks now use that region (#748).
-
-### Compatibility changes
-
-1. MACS3 now requires Python 3.12 or later and declares support for
-   Python 3.12, 3.13, and 3.14.
-
-2. `pandas` and `anndata` are now runtime dependencies for the AnnData
-   export API.
+- Automatic duplicate filtering now uses the control sample's own threshold
+  for control reads.
+- Corrected lower-tail Poisson probabilities for very large expected counts.
+- FRAG input may end without a trailing newline. Truncated BAM alignment
+  records are rejected as invalid input.
+- Improved reliability and cleanup when peak-calling workers fail or multiple
+  operations run concurrently.
 
 ### Documentation
 
-1. Added automated major-version and release-to-release performance
-   benchmarking and their documentation.
+- Clarified the Poisson tail convention used for reported p-values.
 
-2. Corrected the cutoff-analysis documentation for `callpeak`,
-   `bdgpeakcall`, and `hmmratac`, and updated the recommended MACS3
-   citation.
+### Acknowledgements
+
+Thanks to Jacob Schreiber ([PR #756](https://github.com/macs3-project/MACS/pull/756)),
+Cindy Krafft ([PR #753](https://github.com/macs3-project/MACS/pull/753),
+[PR #777](https://github.com/macs3-project/MACS/pull/777), and
+[PR #789](https://github.com/macs3-project/MACS/pull/789)), Michael R. Crusoe
+([PR #754](https://github.com/macs3-project/MACS/pull/754)), and Apoorva Garg
+([PR #793](https://github.com/macs3-project/MACS/pull/793)) for their
+contributions to this release.
 	
 ## Install
 
 Install MACS3 from [PyPI](https://pypi.org/project/macs3/) or, when the
 desired version is available, [Bioconda](https://bioconda.github.io/recipes/macs3/README.html).
-MACS3 3.0.5 requires Python 3.12 or later. See the
+MACS3 3.1.0 requires Python 3.12 or later. See the
 [installation guide](docs/INSTALL.md) for supported environments, build
 requirements, and source-install instructions.
 
@@ -158,10 +130,8 @@ from users.
 ## Contribute
 
 Please read our {doc}`Code of Conduct </CODE_OF_CONDUCT>` and
-{doc}`Contributing guide </CONTRIBUTING>`. Developers can consult the
-[performance defaults inventory](docs/performance_defaults.md). If you have any questions,
-suggestion/ideas, or just want to have conversions with developers and
-other users in the community, we recommend using the [MACS
+{doc}`Contributing guide </CONTRIBUTING>`. For questions, suggestions, or
+ideas, we recommend using the [MACS
 Discussions](https://github.com/macs3-project/MACS/discussions)
 instead of posting to our
 [Issues](https://github.com/macs3-project/MACS/issues) page.
@@ -197,12 +167,7 @@ If you are using MACS version 1, please cite our 2008 paper [Model-based Analysi
 :hidden:
 
 docs/INSTALL.md
-docs/version_benchmark.md
-docs/performance_defaults.md
-docs/performance_benchmark.md
-docs/performance_benchmark_report.md
 docs/execution.md
-docs/native_validation.md
 docs/subcommands_index.md
 docs/fileformats_index.md
 docs/tutorial.md

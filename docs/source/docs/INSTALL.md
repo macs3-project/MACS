@@ -1,6 +1,6 @@
 # Install MACS3
 
-MACS3 3.0.5 requires **Python 3.12 or later**. The project tests Python
+MACS3 3.1.0 requires **Python 3.12 or later**. The project tests Python
 3.12, 3.13, and 3.14 on Linux and macOS. Windows is not currently supported.
 
 We recommend installing MACS3 in a dedicated virtual environment. The
@@ -45,8 +45,8 @@ macs3 --version
 
 Bioconda packages may become available after the PyPI release. Check the
 [Bioconda MACS3 package](https://bioconda.github.io/recipes/macs3/README.html)
-to confirm that version 3.0.5 is available before using this method for the
-new release; use PyPI if you need 3.0.5 sooner.
+to confirm that version 3.1.0 is available before using this method for the
+new release; use PyPI if you need 3.1.0 sooner.
 
 ## Install from source
 
@@ -81,7 +81,7 @@ The package installer resolves the runtime dependencies declared in
 hmmlearn >=0.3.2, and scikit-learn >=1.3. Source builds use Cython >=3.0,
 NumPy >=1.25, and setuptools >=80.0. MACS3's Cython extension sources use
 the `.py` suffix and are compiled during the build. The `cykhash` package is
-**not** a dependency of MACS3 3.0.5.
+**not** a dependency of MACS3 3.1.0.
 
 The `callvar` extension also uses bundled fermi-lite code and the SIMDe
 submodule. If you install from a Git checkout, initialize that submodule as

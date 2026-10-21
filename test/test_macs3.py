@@ -164,9 +164,7 @@ def test_cli_version(run_macs3):
 
 
 def test_version_constant():
-    """Upstream bumped the version from 3.0.4 to 3.0.5 in 6cefb42 and
-    d8918ba (3.0.5 release, #744)."""
-    assert MACS_VERSION == "3.0.5"
+    assert MACS_VERSION == "3.1.0"
 
 
 def test_cli_no_subcommand(run_macs3):
