@@ -1,8 +1,105 @@
-# Initial performance-defaults evidence (#773)
+# Performance-defaults benchmark report (#773)
 
-Measured on October 19, 2026. No performance defaults or vendor constants were
-changed. This is a synthetic-workload report; it does not establish optimal
-buffer sizes, task thresholds, cache reserves or prefetch distances.
+Reviewed on October 20, 2026. This report combines the initial local measurements
+with a completed Linux and macOS workflow. No performance defaults or vendor
+constants were changed.
+
+## Findings in plain language
+
+**Recommendation: close #773 and its parent tracker #758 once this report update
+is merged. Keep the current performance defaults.** The requested benchmarks,
+output checks and documentation are complete. Closing these tickets means the
+planned follow-up work is complete; it does not mean every setting is optimal
+or that the current implementation is always faster.
+
+All **972 benchmark invocations** in the hosted run succeeded. The peak results
+and signal files matched across all tested revisions, CPU budgets and backends
+within each platform. The cache checks also passed: the current logarithm
+tables stay within their 64 MiB budget and are reused by later jobs.
+The file comparison excludes command/version comments in XLS headers; the
+scientific data must still match exactly.
+
+Linux timings were close to the original merged PR #756 baseline. Mac timings
+were more variable, and some current medians were slower. For example, the
+large FRAG case on the Intel Mac rose from 1.953 to 2.520 seconds, while the
+large BAM case on the ARM Mac rose from 0.761 to 0.971 seconds. These slower
+results remain part of the report. Three repetitions on hosted runners are
+not enough to separate all timing variation from the effects of safety fixes
+and execution-policy changes.
+
+The results do not show a consistent benefit from raising the CPU budget or
+identify a better set of defaults. Changing buffer sizes, cache budgets or
+worker thresholds would need a separate proposal and measurements supporting
+that particular change.
+
+## Completed cross-platform run
+
+[GitHub Actions run 39374432219](https://github.com/macs3-project/MACS/actions/runs/39374432219)
+tested commit `85f6d08fe97e5249d586c86d9e0bbc179e2774f2`, including the workflow
+fix subsequently merged in PR #795. All three runners built and installed the
+original baseline (`170556d`), the default-preserving extraction (`324f779`),
+and the current implementation. **The baseline is merged PR #756, not the
+`v3.0.5` release tag.**
+
+Each profile used three repetitions of nine generated cases: small and large
+BAM, BAMPE and FRAG, plus many-contig versions of each format. Current runs
+requested budgets of 1, 2, 4 and 8, with serial and automatic backends. A requested
+budget is an upper limit; available CPUs and the safety policy can reduce the
+actual worker count. The workflow alternated revision order between rounds.
+
+| Platform and profile | CLI invocations | Output/cache checks | Runtime change from baseline | Runtime change from extraction |
+| --- | ---: | --- | --- | --- |
+| Linux, host | 243 | Passed | 0.3% faster to 0.7% slower | 0.5% to 2.8% slower |
+| Linux, constrained | 243 | Passed | 0.7% faster to 5.7% slower | 0.8% faster to 5.1% slower |
+| macOS Intel | 243 | Passed | 14.1% faster to 29.0% slower | 36.3% faster to 23.4% slower |
+| macOS ARM | 243 | Passed | 3.3% faster to 27.6% slower | 16.7% faster to 7.0% slower |
+
+The runtime ranges above compare medians for the six large/many-contig cases,
+using the **requested 8/auto** policy for the current build and legacy defaults
+for both historical revisions. They are ranges across workloads, not confidence
+intervals or matched-policy speedups. The Intel Mac's baseline many-BAMPE runs,
+for example, ranged from 3.138 to 9.791 seconds. This variation limits how much
+we can infer from a single percentage.
+
+The [Linux summary](https://github.com/macs3-project/MACS/actions/runs/39374432219#summary-118469270581),
+[Intel Mac summary](https://github.com/macs3-project/MACS/actions/runs/39374432219#summary-118469270500)
+and [ARM Mac summary](https://github.com/macs3-project/MACS/actions/runs/39374432219#summary-118469270316)
+contain the full median/minimum/maximum tables, including the extraction and
+every tested CPU policy. All three report no output mismatches or failed runs.
+The workflow took 35 minutes 38 seconds overall, including builds and artifact
+uploads. Each summary group contains three measured repetitions.
+
+Linux's constrained profile limited CPU affinity to at most two CPUs and set
+a 2 GiB address-space limit for each process. This checks restricted execution;
+it does not test a shared 2 GiB physical-memory limit for the whole process tree.
+The environments used Python 3.14.8 on Linux and 3.14.7 on the Macs, with NumPy
+2.3.5. Each artifact records the resolved dependency versions, build logs,
+revision identifiers, input hashes, per-run measurements and outputs.
+
+The extraction and current builds passed the cache checks on every platform:
+two arrays totaling 64 MiB remained after preparation, warm requests did not
+allocate new tables, and repeated current callers retained the same cache
+budget after cleanup. The original baseline's native cache allocation is not
+visible to this observer; its limitation is reported rather than counted as a
+measured 64 MiB payload.
+
+Memory and temporary-storage measurements need care. Summed process RSS counts
+shared pages more than once, so it cannot prove unique physical-memory savings.
+Mac temp measurements omit deleted files that are still open. All successful
+runs finished without retained temp files or sampling errors, but a zero sample
+does not prove that no temporary storage was used.
+
+The [protocol](performance_benchmark.md) records reproducible commands,
+measurement definitions, profiling-build instructions and vendor ownership.
+The full hosted artifacts are available from the run page; they expire on
+November 19, 2026. The figures above preserve the main findings in this report.
+
+## Initial local measurements
+
+The following detailed tables preserve the original October 19 local run.
+They describe one Intel Mac and should not be read as the hosted-run results.
+This is a synthetic-workload report; it does not establish optimal buffer
+sizes, task thresholds, cache reserves or prefetch distances.
 
 The [protocol](performance_benchmark.md) specifies the revisions, generated
 datasets, commands, measurement semantics and gates. Local validation completed
@@ -13,13 +110,13 @@ The installed-wheel run including related native CLI/probability regressions
 passed 24 tests with one Linux-only skip. After the cache-observer correction,
 the focused launcher tests passed in both modes (3 passed, 1 Linux-only skip).
 
-The host is an Intel Core i5-8259U at 2.30 GHz (4 physical/8 logical CPUs),
+The local host is an Intel Core i5-8259U at 2.30 GHz (4 physical/8 logical CPUs),
 16 GiB RAM, macOS 15.7.7 x86_64. The matched environments use Python 3.14.6,
 NumPy 2.3.5, SciPy 1.16.3, Cython 3.3.0 and setuptools 84.0.0. Wheels were
 built with Apple clang 17.0.0 and the normal `-O3 -g0` extension flags.
 All tested tracks reported NumPy's `default_allocator` on this host.
 
-## Measured results
+### Local run coverage
 
 All **243 CLI invocations succeeded**. Each of the nine cases has 27 runs:
 three baseline defaults, three extraction defaults, and three repetitions of
@@ -41,7 +138,7 @@ run, exact CLI arguments, input/extension/wheel hashes, environment versions,
 cache phases and all policy variants. Local path prefixes are normalized to
 `<checkout>` and `<artifact-root>`; the scientific hashes are unchanged.
 
-### Wall time
+### Local wall time
 
 Median [minimum, maximum] seconds, three repetitions per cell. These are
 within-host implementation comparisons with different recorded historical
@@ -69,7 +166,7 @@ extraction. The comparisons include intervening safety fixes and execution
 policy changes; they do not isolate the cost of a specific fallback or
 extraction. The table does not justify retuning a default.
 
-### Selected CPU budgets
+### Local selected CPU budgets
 
 Current medians in seconds. Automatic peak processes fall back to serial
 on this Mac; native parser/track work can still use the selected budget.
@@ -90,7 +187,7 @@ These three-repetition synthetic results do not support a universal optimal
 CPU budget. Explicit serial-backend runs at 2/4/8 are also preserved in the
 audit data and passed the same output gate.
 
-### RSS and temporary storage
+### Local RSS and temporary storage
 
 Medians of sampled per-run peaks in MiB. Tree RSS double-counts shared pages
 across forked processes; lower values cannot be read as unique physical-memory
@@ -110,7 +207,7 @@ All runs finished with zero retained temp bytes and no sampling errors.
 | many-bampe | 138.80 | 56.62 | 93.79 | 66.24 | 66.24 |
 | many-frag | 158.36 | 71.44 | 90.05 | 56.19 | 56.19 |
 
-### Cache growth and lifetime
+### Local cache growth and lifetime
 
 The observer sees 16,384 bytes at the minimum prepared prefix, 1,048,608
 bytes after preparation at 65,536, and 67,108,864 bytes at the cap in both
@@ -137,15 +234,16 @@ and temporary construction; it is not the table payload alone.
 | macOS x86_64, generated small/large BAM/BAMPE/FRAG and 256 contigs | Measured; all output gates passed |
 | Current requested budgets 1, 2, 4, 8; explicit serial and automatic policies | Measured; all output gates passed |
 | Current 64 MiB log-cache payload, warm reuse and repeated caller cleanup | Public-API probe implemented and validated |
-| Linux host and constrained affinity/address space | Manual workflow added; measurements not collected locally |
-| Shared cgroup/VM memory ceiling | Pending; RLIMIT_AS is not a shared RSS cap |
-| macOS arm64 | Manual workflow added; measurements not collected locally |
+| Linux host and constrained affinity/address space | Measured in the hosted run; all output/cache checks passed |
+| Shared cgroup/VM memory ceiling | Not measured; a separate physical-memory limit would inform future tuning |
+| macOS arm64 | Measured in the hosted run; all output/cache checks passed |
 | Complete unlinked-file temp accounting on macOS | Unavailable to this sampler; reported as a partial lower bound |
-| Independent biological large-dataset replication | Pending |
+| Independent biological large-dataset replication | Not measured; useful for future tuning on real datasets |
 
-Ticket #773's cross-platform evidence remains open until the pending profiles
-are measured and reviewed. A configured workflow is not evidence of a passing
-run. Native failure/output mismatches must remain visible in the artifacts.
+The requested cross-platform profiles have now been measured and reviewed.
+The remaining measurement limits stay documented; they do not establish a
+reason to change a default or add a new requirement for closing this benchmark
+ticket. Future tuning must retain the output-equality checks.
 
 ## Historical diagnostic differences
 
@@ -163,7 +261,28 @@ policy, so their repeated jobs exercise probability APIs instead. The
 extraction already includes peak-process safety controls, but the probe does
 not synthesize an all-phase CPU budget for it.
 
-## Interpretation and next evidence
+## Closing #773 and the parent tracker #758
+
+**Both tickets are ready to close once this report update is merged.** #773
+asked for reproducible benchmark evidence before retuning. It did not require
+a speedup or a new set of defaults. The completed work records the comparisons,
+the Mac safety fallback, CPU policies, cache lifetime, resource measurements
+and their limits. No tuning change is proposed.
+
+The parent [tracker #758](https://github.com/macs3-project/MACS/issues/758)
+contains 15 ordered implementation tickets. As checked on October 20, the other
+14 tickets (#759 through #772) are all closed as completed. The
+[native regression and packaging run](https://github.com/macs3-project/MACS/actions/runs/39364431609)
+passed all nine jobs, covering Linux x64/ARM and macOS Intel/ARM, in-place
+compiled extensions, source and wheel packaging, and installed-wheel tests
+from clean checkouts. The defaults, backend choices and benchmark results are
+documented. Completing #773 therefore completes the remaining task in #758.
+
+Closing the tracker records completion of that plan. It does not certify all
+possible datasets, memory limits or future dependency versions. Those broader
+questions can be addressed by specific future changes with their own evidence.
+
+## Guidance for future tuning
 
 macOS serial peak-process execution is an intentional safety fallback from
 #761. Native parser/track threads can still use the selected budget. The
