@@ -28,13 +28,14 @@ compared to random background?*
 
 ## Changes for MACS 3.1.0
 
+See the [full 3.1.0 release notes](docs/release_notes/v3.1.0.md).
+
 ### Features and performance
 
 - **Major `callpeak` speedup:** Jacob Schreiber's auto-optimize work in
   [PR #756](https://github.com/macs3-project/MACS/pull/756) measured 41–64×
-  faster results across four default workflows (BAM, FRAG, BAM with control,
-  and BAMPE). The speedup varies by workload, and large inputs can use more
-  peak memory.
+  faster results across four default workflows on an 8-core host. Speedups
+  vary by workload, and large inputs can use more peak memory.
 - Added `--threads` to supported commands for a per-run CPU budget. Set
   `MACS3_NUM_THREADS` to choose a default, or pass an execution policy from
   the Python API. See [CPU budgets and process backends](docs/execution.md).
@@ -167,6 +168,7 @@ If you are using MACS version 1, please cite our 2008 paper [Model-based Analysi
 :hidden:
 
 docs/INSTALL.md
+docs/release_notes/v3.1.0.md
 docs/execution.md
 docs/subcommands_index.md
 docs/fileformats_index.md

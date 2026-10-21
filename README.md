@@ -35,10 +35,12 @@ website](https://macs3-project.github.io/MACS/).
 
 ## What's new in MACS 3.1.0
 
+See the [full 3.1.0 release notes](docs/source/docs/release_notes/v3.1.0.md).
+
 - **Major `callpeak` speedup:** Jacob Schreiber's auto-optimize work
-  (PR #756) measured 41–64× faster runs across four default workflows (BAM,
-  FRAG, BAM with control, and BAMPE). The speedup varies by workload, and
-  large inputs can use more peak memory.
+  (PR #756) measured 41–64× faster runs across four default workflows on an
+  8-core host. Speedups vary by workload, and large inputs can use more peak
+  memory.
 - Added `--threads` to supported commands to set a per-run CPU budget.
   `MACS3_NUM_THREADS` can provide a default, and Python callers can pass an
   execution policy through the public API.
