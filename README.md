@@ -33,26 +33,31 @@ background*.
 Please find MACS3 documentations through [MACS3
 website](https://macs3-project.github.io/MACS/).
 
-## What's new in MACS 3.0.5
+## What's new in MACS 3.1.0
 
-- Added `PETrackII.return_anndata` for efficient creation of sparse
-  barcode-by-peak AnnData matrices from single-cell fragment data.
-- Switched peak calling, pileup output, and peak-model construction to
-  faster NumPy-backed `PileupV2` routines, and optimized fragment
-  exclusion and score caches. Now it has 1.4x speedup over 3.0.4.
-- Added `hmmratac --jump` to control fragment-length EM updates.
-- Fixed decimal-score truncation in `bdgdiff` (#715), incorrect summit
-  scores for maxima in below-cutoff gaps (#741), and an `IndexError`
-  during `hmmratac` peak refinement (#735).
-- Corrected summit coordinates and peak boundaries around the temporary
-  search padding (#747), and fixed shape filtering of summit candidates
-  on both sides of a local maximum (#748).
-- Made successful `hmmratac --cutoff-analysis-only` runs exit with
-  status 0 (#704).
-- MACS3 now requires Python 3.12 or later. The `cykhash` dependency was
-  removed, while `pandas` and `anndata` were added for AnnData export.
+- **Major `callpeak` speedup:** Jacob Schreiber's auto-optimize work
+  (PR #756) measured 41–64× faster runs across four default workflows (BAM,
+  FRAG, BAM with control, and BAMPE). The speedup varies by workload, and
+  large inputs can use more peak memory.
+- Added `--threads` to supported commands to set a per-run CPU budget.
+  `MACS3_NUM_THREADS` can provide a default, and Python callers can pass an
+  execution policy through the public API.
+- Added `--process-backend {auto,serial}` to `callpeak` and `callvar`.
+- Fixed automatic duplicate filtering so control reads use the control's
+  own duplicate threshold.
+- Corrected lower-tail Poisson probabilities for very large expected counts.
+- Improved handling of incomplete inputs: final FRAG records no longer need a
+  trailing newline, and truncated BAM alignment records are rejected.
+- Improved reliability when peak-calling workers or concurrent operations
+  fail, including cleanup of temporary data.
 
-See the [ChangeLog](ChangeLog) for the complete release notes.
+See the [command-line documentation](https://macs3-project.github.io/MACS/)
+for command options and the [ChangeLog](ChangeLog) for release details.
+
+Thanks to Jacob Schreiber for the auto-optimize work (PR #755, #756); Cindy
+Krafft for the duplicate-threshold and Poisson fixes (PR #753, #777) and
+p-value documentation (PR #789); Michael R. Crusoe for spelling fixes
+(PR #754); and Apoorva Garg for the native aarch64 CI contribution (PR #793).
 
 ## Contribute
 

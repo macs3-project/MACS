@@ -50,9 +50,7 @@ def option(parser, dest):
 # ------------------------------------
 
 @pytest.mark.parametrize("name, value", [
-    # 3.0.4 -> 3.0.5: upstream bumped the version in 6cefb42 and d8918ba
-    # (3.0.5 release, #744).
-    ("MACS_VERSION", "3.0.5"),
+    ("MACS_VERSION", "3.1.0"),
     ("MAX_PAIRNUM", 1000),
     ("MAX_LAMBDA", 100000),
     ("FESTEP", 20),

@@ -77,7 +77,7 @@ sys.modules['cython'].cimports = sys.modules['cython.cimports']
 project = 'MACS3'
 copyright = '2026, Tao Liu, Philippa Doherty'
 author = 'Tao Liu, Philippa Doherty'
-release = '3.0.5'
+release = '3.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

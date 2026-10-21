@@ -3,7 +3,6 @@
 These are development defaults, not per-job settings. Compiled consumers
 copy them into typed values once at import, before entering native loops.
 Rebinding module attributes cannot configure an already imported extension.
-See docs/source/docs/performance_defaults.md for consumers and constraints.
 """
 
 from dataclasses import dataclass, fields

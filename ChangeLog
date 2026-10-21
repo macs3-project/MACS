@@ -1,3 +1,50 @@
+2026-10-20  Tao Liu  <vladimir.liu@gmail.com>
+	MACS 3.1.0
+
+	* Features and performance improvements
+
+	1) Added `--threads` to supported commands to set a per-invocation CPU
+	budget. `MACS3_NUM_THREADS` supplies a default when no command-line
+	value is given. Python callers can pass an execution policy to public
+	parser, track, model, and peak-caller APIs. (#787)
+
+	2) Added `--process-backend {auto,serial}` to `callpeak` and `callvar`
+	to select whether those commands may use process workers. (#779)
+
+	3) Jacob Schreiber's auto-optimize work speeds up `callpeak` by 41–64×
+	in four measured default workflows: BAM, FRAG, BAM with control, and
+	BAMPE. The speedup varies by workload, and large inputs can use more
+	peak memory. (#756)
+
+	* Bugs fixed
+
+	1) When duplicate filtering is automatic, control reads now use the
+	control sample's own duplicate threshold. (#753)
+
+	2) Restored the zero-count term in the large-lambda lower-tail Poisson
+	CDF, correcting probabilities for very large expected counts. (#777)
+
+	3) FRAG input now accepts a final record without a trailing newline;
+	truncated BAM alignment records are reported as invalid input. (#783,
+	#784)
+
+	4) Improved peak-calling reliability for overlapping callers,
+	concurrent score-table growth, process-worker failures, and temporary
+	file cleanup. (#774, #775, #779, #780, #781, #782)
+
+	* Documentation
+
+	1) Clarified the Poisson tail convention used for reported p-values.
+	(#789)
+
+	* Acknowledgements
+
+	Thanks to Jacob Schreiber for the `callpeak` auto-optimize work (#755,
+	#756); Cindy Krafft for the duplicate-threshold and Poisson fixes and
+	p-value documentation (#753, #777, #789); Michael R. Crusoe for
+	spelling fixes (#754); and Apoorva Garg for the
+	native aarch64 CI contribution (#793).
+
 2026-09-23  Tao Liu  <vladimir.liu@gmail.com>
 	MACS 3.0.5
 
