@@ -725,9 +725,8 @@ def pileup_LRC_as_list_equal(LRC_array: cnp.ndarray,
         return None
     starts = np.ascontiguousarray(LRC_array['l'])
     if left_sorted and not starts.flags.owndata:
-        # the field of a one-range array is contiguous, so
-        # `pileup_from_LRC_as_list` takes it without a copy and then
-        # fails to resize it: let it raise that error
+        # A singleton field can alias the track. Use the general path,
+        # which copies the starts before resizing its temporary buffers.
         return None
     if not left_sorted:
         starts = np.sort(starts)
