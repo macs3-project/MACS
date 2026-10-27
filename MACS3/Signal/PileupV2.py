@@ -369,7 +369,9 @@ def _pileup_sorted_unit_as_list(start_poss: cnp.ndarray,
     ret_v_ptr: cython.pointer(cython.float)
 
     if ls == 0 or le == 0:
-        raise Exception("length is 0")
+        # Down-sampling can leave a chromosome with no intervals.
+        # Preserve the legacy pileup shape and dtypes, even with a baseline.
+        return [np.empty(0, dtype="i4"), np.empty(0, dtype="f4")]
 
     start_ptr = cython.cast(cython.pointer(cython.int), start_poss.data)
     end_ptr = cython.cast(cython.pointer(cython.int), end_poss.data)
