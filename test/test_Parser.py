@@ -276,9 +276,9 @@ def test_guess_parser_detects_bed(write_bed, caplog, gz):
 @pytest.mark.parametrize("gz", [False, True], ids=["plain", "gz"])
 def test_guess_parser_detects_sam(make_alignments, tmp_path, caplog, gz):
     caplog.set_level(logging.INFO, logger="MACS3.IO.Parser")
-    # forward reads only: reverse ones hit the bug tested further below
     reads = [dict(name="r%d" % i, ref="chr1", pos=100 * i,
-                  flag=147 if i % 4 == 0 else 0) for i in range(12)]
+                  flag=147 if i % 4 == 0 else (16 if i % 3 == 0 else 0))
+             for i in range(12)]
     path = make_alignments(reads, name="reads.sam", fmt="sam")
     if gz:
         path = gzip_copy(path, tmp_path / "reads.sam.gz")
@@ -289,7 +289,8 @@ def test_guess_parser_detects_sam(make_alignments, tmp_path, caplog, gz):
                                        (["* Input file is gzipped."]
                                         if gz else []))
     assert fw_locations(p.build_fwtrack()) == {
-        b"chr1": ([100 * i for i in range(12) if i % 4], [])}
+        b"chr1": ([100 * i for i in range(12) if i % 4 and i % 3],
+                  [100 * i + 36 for i in range(12) if i % 4 and not i % 3])}
 
 
 def test_guess_parser_detects_bam(make_alignments, caplog):
@@ -906,13 +907,9 @@ SE_CASES = [
 
 
 def se_params():
-    # SAM reverse-strand reads are left out: SAMParser raises TypeError on
-    # them in this version.
     params = []
     for fmt in ("sam", "bam"):
         for flag, cigar, expected in SE_CASES:
-            if fmt == "sam" and expected is not None and expected[0] == 1:
-                continue
             params.append(pytest.param(fmt, flag, cigar, expected,
                                        id="%s-%d-%s" % (fmt, flag, cigar)))
     return params
@@ -945,17 +942,18 @@ def test_se_mapq_is_not_filtered(make_alignments, fmt, mapq):
 
 def test_sam_and_bam_give_identical_tracks(make_alignments):
     refs = (("chr1", 10000), ("chr2", 10000))
-    # kept reads are forward: SAMParser raises TypeError on reverse reads
-    # in this version
     reads = [dict(name="a", ref="chr1", pos=10),
              dict(name="b", ref="chr1", pos=20, cigar="4S30M2S"),
              dict(name="c", ref="chr2", pos=5, flag=99, cigar="20M3D16M"),
+             dict(name="rev", ref="chr1", pos=100, flag=16,
+                  cigar="5H5S10M2I3D100N4=2X1P13M"),
+             dict(name="mate1", ref="chr2", pos=200, flag=83),
              dict(name="d", ref="chr2", pos=7, flag=147),
              dict(name="f", ref="chr2", pos=9, flag=272),
              dict(name="e", ref=None, flag=4, cigar="*")]
     sam = make_alignments(reads, refs=refs, name="r.sam", fmt="sam")
     bam = make_alignments(reads, refs=refs, name="r.bam")
-    expected = {b"chr1": ([10, 20], []), b"chr2": ([5], [])}
+    expected = {b"chr1": ([10, 20], [232]), b"chr2": ([5], [236])}
     assert fw_locations(SAMParser(sam).build_fwtrack()) == expected
     assert fw_locations(BAMParser(bam).build_fwtrack()) == expected
 
