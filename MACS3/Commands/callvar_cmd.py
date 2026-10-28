@@ -31,6 +31,7 @@ from math import ceil
 # ------------------------------------
 # own python modules
 # ------------------------------------
+from MACS3.Utilities.Chromosome import check_chromosome_names
 from MACS3.Utilities.Constants import MACS_VERSION
 from MACS3.Utilities.OptValidator import opt_validate_callvar
 from MACS3.IO.PeakIO import PeakIO
@@ -98,14 +99,8 @@ VCFHEADER = """##fileformat=VCFv4.1
 
 def check_names(treat, control, error_stream):
     """check common chromosome names"""
-    tchrnames = set(treat.get_chr_names())
-    cchrnames = set(control.get_chr_names())
-    commonnames = tchrnames.intersection(cchrnames)
-    if len(commonnames) == 0:
-        error_stream("No common chromosome names can be found from treatment and control! Check your input files! MACS will quit...")
-        error_stream("Chromosome names in treatment: %s" % ",".join(sorted(tchrnames)))
-        error_stream("Chromosome names in control: %s" % ",".join(sorted(cchrnames)))
-        sys.exit()
+    check_chromosome_names(treat.get_chr_names(), control.get_chr_names(),
+                           error_stream)
 
 
 def run(args):
@@ -153,8 +148,8 @@ def run(args):
     tbam = BAMaccessor(tfile)
     if cfile:
         cbam = BAMaccessor(cfile)
-        assert tbam.get_chromosomes()[0] in cbam.get_chromosomes() or cbam.get_chromosomes()[0] in tbam.get_chromosomes(), Exception("It seems Treatment and Control BAM use different naming for chromosomes! Check headers of both files.")
-        # assert tbam.get_chromosomes() == cbam.get_chromosomes(), Exception("Treatment and Control BAM files have different orders of sorted chromosomes! Please check BAM Headers and re-sort BAM files.")
+        check_chromosome_names(tbam.get_chromosomes(), cbam.get_chromosomes(),
+                               options.error)
     else:
         cbam = None
 
