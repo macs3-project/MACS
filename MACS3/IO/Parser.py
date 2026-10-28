@@ -1138,12 +1138,11 @@ class SAMParser(GenericParser):
         thisline: bytes
 
         for thisline in self.fhd:
-            l_line = len(thisline)
             if thisline and thisline[0] != 64:  # 64 is b"@"
+                l_line = len(thisline)
+                self.fhd.seek(-l_line, 1)
                 break
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -1226,7 +1225,9 @@ class SAMParser(GenericParser):
         if bwflag & 16:
             # minus strand, we have to decipher CIGAR string
             thisstrand = 1
-            thisstart = atoi(thisfields[3]) - 1 + sum([cython.cast(cython.int, x) for x in findall(b"(\\d+)[MDNX=]", CIGAR)])  #reverse strand should be shifted alen bp
+            # Only reference-consuming operations contribute to the 5' end.
+            thisstart = atoi(thisfields[3]) - 1 + sum(
+                int(x) for x in findall(b"(\\d+)[MDNX=]", CIGAR))
         else:
             thisstrand = 0
             thisstart = atoi(thisfields[3]) - 1
