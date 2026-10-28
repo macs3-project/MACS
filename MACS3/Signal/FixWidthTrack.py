@@ -479,10 +479,11 @@ class FWTrack:
         """filter_dup for one strand of chromosome `k`.
 
         Returns locations[k][strand] itself when it holds at most one
-        position. Otherwise returns an array of the positions kept,
-        sets pointer[k][strand] to their number and adds it to
-        kept_total[0]. A plain int32 array (filter_dup_plain) that owns
-        its data, is held by nothing but locations[k], and holds at
+        position, adding its size to kept_total[0]. Otherwise returns
+        an array of the positions kept, sets pointer[k][strand] to
+        their number and adds it to kept_total[0]. A plain int32 array
+        (filter_dup_plain) that owns its data, is held by nothing but
+        locations[k], and holds at
         most pointer[k][strand] + 1 positions, the room the original's
         new array had, is filtered in place and shrunk, and returned;
         any other gets a new array and the old one is released.
@@ -502,6 +503,7 @@ class FWTrack:
         locs = self.locations[k][strand]
         size = locs.shape[0]
         if len(locs) <= 1:
+            kept_total[0] += size
             return locs         # do nothing
         # in place: filter_dup_i4 allows src == dst, since each write
         # trails its read. Only when the references to locs are

@@ -33,7 +33,7 @@ def snapshot(track):
 
 
 def native_thread_count():
-    """Count tasks that can still run userspace code, including native workers."""
+    """Count live worker threads, excluding joined OS teardown remnants."""
     if sys.platform == 'linux':
         count = 0
         # Linux sets PF_EXITING before clearing the TID that wakes
@@ -60,12 +60,18 @@ def native_thread_count():
     count = ctypes.c_uint()
     lib.task_threads.argtypes = [ctypes.c_uint, ctypes.POINTER(ctypes.POINTER(ctypes.c_uint)),
                                 ctypes.POINTER(ctypes.c_uint)]
+    # task_threads may still list Mach threads after pthread_join returns.
+    # The pthread list has already dropped these joined threads. Native BGZF
+    # workers use pthread_create, so live workers (even waiting ones) still map.
+    lib.pthread_from_mach_thread_np.argtypes = [ctypes.c_uint]
+    lib.pthread_from_mach_thread_np.restype = ctypes.c_void_p
     assert lib.task_threads(task, ctypes.byref(array), ctypes.byref(count)) == 0
     try:
+        return sum(bool(lib.pthread_from_mach_thread_np(array[i]))
+                   for i in range(count.value))
+    finally:
         for i in range(count.value):
             lib.mach_port_deallocate(task, array[i])
-        return count.value
-    finally:
         lib.vm_deallocate.argtypes = [ctypes.c_uint, ctypes.c_size_t, ctypes.c_size_t]
         lib.vm_deallocate(task, ctypes.cast(array, ctypes.c_void_p).value,
                           count.value * ctypes.sizeof(ctypes.c_uint))
