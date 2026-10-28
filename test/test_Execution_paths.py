@@ -73,6 +73,83 @@ def test_linux_thread_count_does_not_hide_invalid_procfs_data(tmp_path, linux_th
         linux_thread_counter()
 
 
+@pytest.fixture
+def darwin_thread_counter(monkeypatch):
+    """Model a Mach snapshot containing live pthreads and joined remnants."""
+    import ctypes
+    import execution_probe
+
+    ports = (ctypes.c_uint * 4)(101, 102, 103, 104)
+    state = SimpleNamespace(live={101, 102}, released=[], freed=[], error=0,
+                            lookup_error=False)
+
+    def task_self():
+        return 7
+
+    def task_threads(task, array, count):
+        assert task == 7
+        if state.error:
+            return state.error
+        ctypes.cast(array, ctypes.POINTER(ctypes.POINTER(ctypes.c_uint)))[0] = ports
+        ctypes.cast(count, ctypes.POINTER(ctypes.c_uint))[0] = len(ports)
+        return 0
+
+    def pthread_from_port(port):
+        if state.lookup_error:
+            raise OSError('injected observation failure')
+        return (1 << 40) + port if port in state.live else None
+
+    def port_deallocate(task, port):
+        assert task == 7
+        state.released.append(port)
+        return 0
+
+    def vm_deallocate(task, address, size):
+        assert task == 7
+        state.freed.append((address, size))
+        return 0
+
+    lib = SimpleNamespace(mach_task_self=task_self, task_threads=task_threads,
+                          pthread_from_mach_thread_np=pthread_from_port,
+                          mach_port_deallocate=port_deallocate,
+                          vm_deallocate=vm_deallocate)
+    monkeypatch.setattr(execution_probe, 'sys', SimpleNamespace(platform='darwin'))
+    monkeypatch.setattr(execution_probe.ctypes, 'CDLL', lambda _: lib)
+    state.count = execution_probe.native_thread_count
+    state.lib = lib
+    state.allocation = (ctypes.addressof(ports), ctypes.sizeof(ports))
+    return state
+
+
+def test_darwin_thread_count_excludes_joined_mach_remnants(darwin_thread_counter):
+    state = darwin_thread_counter
+    assert state.count() == 2
+    assert state.released == [101, 102, 103, 104]
+    assert state.freed == [state.allocation]
+    # A still-live worker must remain visible, including when it is waiting.
+    state.live.add(103)
+    assert state.count() == 3
+    import ctypes
+    assert state.lib.pthread_from_mach_thread_np.restype is ctypes.c_void_p
+
+
+def test_darwin_thread_count_propagates_enumeration_failure(darwin_thread_counter):
+    state = darwin_thread_counter
+    state.error = 5
+    with pytest.raises(AssertionError):
+        state.count()
+    assert state.released == state.freed == []
+
+
+def test_darwin_thread_count_releases_snapshot_on_lookup_failure(darwin_thread_counter):
+    state = darwin_thread_counter
+    state.lookup_error = True
+    with pytest.raises(OSError, match='injected observation failure'):
+        state.count()
+    assert state.released == [101, 102, 103, 104]
+    assert state.freed == [state.allocation]
+
+
 def probe(tmp_path, scenario, budget, *args):
     script = tmp_path / 'execution_probe.py'
     script.write_text(Path(__file__).with_name('execution_probe.py').read_text())

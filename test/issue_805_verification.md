@@ -101,3 +101,56 @@ repository suite was not run. `git diff --check` passed.
 Logs in the local verification directory: `build-fixed.log`,
 `pytest-inplace.log`, `build-wheel.log`, `install-wheel.log`, `pytest-wheel.log`.
 Related issues: #805 and #757.
+
+## macOS CI follow-up
+
+The first PR run failed on macOS/Python 3.13 in the pre-existing
+`test_native_stream_failure_releases_workers_before_next_load[build-bam]`.
+The native cleanup probe observed `stream retained native workers (1 -> 2)`
+after a successful load. The run otherwise had 5,075 passing tests, including
+all 33 singleton regressions, and 468 skipped tests. The x64, non-x64 and
+native compatibility workflows succeeded. Run:
+https://github.com/macs3-project/MACS/actions/runs/40770352244
+
+The pool already calls `pthread_join` for every worker before freeing its
+storage. The macOS test counter used the raw `task_threads` count, which can
+include a joined pthread's Mach thread during teardown. An independent C
+probe with 10,000 three-worker create/join cycles reproduced extra raw Mach
+threads after completed joins in 1,345 cycles; mapping the same snapshots
+through `pthread_from_mach_thread_np` reported zero extra pthreads. A separate
+held-worker probe counted all three live waiting workers. The initial
+six-case MACS3 stream cleanup selection passed locally before the counter
+change, consistent with an intermittent observation race.
+
+The macOS branch of the shared test counter now counts Mach ports that still
+map to pthreads using public `pthread_from_mach_thread_np`, with its pointer
+return type declared explicitly. Joined remnants are excluded; live pthread
+workers, including blocked ones, still count. Snapshot ports and memory are
+released in `finally`, including on observation failure. Linux observation,
+production parsing/pool code, timeouts, and strict cleanup bounds are unchanged.
+
+Apple's implementation searches the pthread list under its lock and removes
+exiting/joined threads from that list:
+https://github.com/apple-oss-distributions/libpthread/blob/main/src/pthread.c
+
+Added deterministic macOS-counter regressions for joined remnants versus a
+still-live worker, pointer return type, enumeration failure, and snapshot
+cleanup on lookup failure. Before the fix these produced 2 failures and
+1 passing control. Logs and independent probes are in the existing temporary
+verification directory (`thread-counter-before.log`, `mach-join-probe.c`,
+`mach-join-results.log`, `mach-map-probe.py`).
+
+Follow-up validation ran `test/test_Execution_paths.py`,
+`test/test_native_streams.py`, and `test/test_filter_dup_singletons.py`:
+
+- In-place compiled build: **132 passed, 43 skipped in 92.62s**.
+- Installed wheel, from the clean source checkout without in-place extensions:
+  **132 passed, 43 skipped in 87.07s**. Only changed test/helper files were
+  overlaid; the production wheel is unchanged by this test-only follow-up.
+- Both selections include all six build/append stream-failure cleanup cases,
+  actual native worker-budget observation, the three new counter regressions,
+  and all 33 singleton cases. Slow/host-specific skips use existing markers.
+- `git diff --check` passed.
+
+Final follow-up logs: `thread-counter-inplace.log` and
+`thread-counter-wheel.log` in `/private/tmp/macs805-verification/`.
