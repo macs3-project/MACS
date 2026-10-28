@@ -258,6 +258,89 @@ def test_cli_missing_ofile(run_macs3, se_bed):
 # opt_validate_pileup reached through the CLI
 # ------------------------------------
 
+@pytest.mark.parametrize("format_args", [[], ["-f", "AUTO"]],
+                         ids=["default", "explicit-auto"])
+@pytest.mark.parametrize("gzipped", [False, True], ids=["plain", "gzip"])
+def test_cli_auto_original_bed(run_macs3, tmp_path, format_args, gzipped):
+    """#803: the documented default must produce explicit BED's coverage."""
+    payload = b"chr1\t100\t150\tr\t0\t+\nchr1\t200\t250\tr\t0\t-\n"
+    path = tmp_path / ("reads.bed.gz" if gzipped else "reads.bed")
+    path.write_bytes(gzip.compress(payload) if gzipped else payload)
+    for name, flags in (("auto", format_args), ("bed", ["-f", "BED"])):
+        proc = run_macs3(["pileup", "-i", path, "-o", name + ".bdg"] + flags,
+                         timeout=20)
+        assert proc.returncode == 0, proc.stderr
+    expected = (b"chr1\t0\t50\t0.00000\n"
+                b"chr1\t50\t100\t1.00000\n"
+                b"chr1\t100\t250\t2.00000\n"
+                b"chr1\t250\t300\t1.00000\n")
+    assert (tmp_path / "auto.bdg").read_bytes() == expected
+    assert (tmp_path / "bed.bdg").read_bytes() == expected
+
+
+@pytest.mark.parametrize("fmt", ["BED", "SAM", "BAM", "ELAND", "ELANDEXPORT"])
+@pytest.mark.parametrize("format_args", [[], ["-f", "AUTO"]],
+                         ids=["default", "explicit-auto"])
+def test_cli_auto_single_end_formats(run_macs3, write_bed, make_alignments,
+                                     tmp_path, fmt, format_args):
+    path = write_se(fmt, SE_READS, write_bed, make_alignments)
+    for name, flags in (("auto", format_args), ("explicit", ["-f", fmt])):
+        proc = run_macs3(["pileup", "-i", path, "--extsize", "150",
+                          "-o", name + ".bdg"] + flags, timeout=20)
+        assert proc.returncode == 0, proc.stderr
+    assert (tmp_path / "auto.bdg").read_bytes() == \
+        (tmp_path / "explicit.bdg").read_bytes()
+    assert read_lines(tmp_path / "auto.bdg") == \
+        ref_bedgraph("chr1", se_intervals(SE_READS, "chr1", 150))
+
+
+@pytest.mark.parametrize("count", [1, 2])
+def test_cli_auto_short_bam(run_macs3, write_bed, make_alignments,
+                             tmp_path, count):
+    reads = [("chr1", 100, "+"), ("chr1", 200, "-")][:count]
+    path = write_se("BAM", reads, write_bed, make_alignments)
+    proc = run_macs3(["pileup", "-i", path, "-o", "out.bdg"], timeout=20)
+    assert proc.returncode == 0, proc.stderr
+    assert read_lines(tmp_path / "out.bdg") == \
+        ref_bedgraph("chr1", se_intervals(reads, "chr1", 200))
+
+
+@pytest.mark.parametrize("both", [False, True])
+def test_cli_auto_multiple_inputs(run_macs3, write_bed, make_alignments,
+                                  tmp_path, both):
+    bed = write_se("BED", SE_READS, write_bed, make_alignments)
+    sam = write_se("SAM", SE_READS, write_bed, make_alignments)
+    proc = run_macs3(["pileup", "-i", bed, sam, "--extsize", "50",
+                      "-o", "out.bdg"] + (["-B"] if both else []), timeout=20)
+    assert proc.returncode == 0, proc.stderr
+    assert read_lines(tmp_path / "out.bdg") == ref_bedgraph(
+        "chr1", se_intervals(SE_READS * 2, "chr1", 50, both=both))
+
+
+@pytest.mark.parametrize("format_args", [[], ["-f", "AUTO"]],
+                         ids=["default", "explicit-auto"])
+@pytest.mark.parametrize("payload", [b"", b"not an alignment\n"],
+                         ids=["empty", "malformed"])
+def test_cli_auto_unrecognizable_input(run_macs3, tmp_path, format_args,
+                                       payload):
+    path = tmp_path / "reads.bed"
+    path.write_bytes(payload)
+    proc = run_macs3(["pileup", "-i", path, "-o", "out.bdg"] + format_args,
+                     timeout=20)
+    assert proc.returncode == 1, proc.stderr
+    assert 'Format "AUTO" cannot be recognized!' not in proc.stderr
+    assert not (tmp_path / "out.bdg").exists()
+
+
+@pytest.mark.parametrize("format_args", [[], ["-f", "AUTO"]],
+                         ids=["default", "explicit-auto"])
+def test_direct_command_auto(macs3_argparser, se_bed, tmp_path, format_args):
+    run_pileup(macs3_argparser, ["-i", se_bed, "--outdir", tmp_path,
+                                 "-o", "out.bdg"] + format_args)
+    assert read_lines(tmp_path / "out.bdg") == \
+        ref_bedgraph("chr1", se_intervals(SE_READS, "chr1", 200))
+
+
 @pytest.mark.parametrize("extsize", ["0", "-5"])
 def test_cli_extsize_must_be_positive(run_macs3, parse_analysis_log, se_bed, tmp_path,
                                       extsize):
