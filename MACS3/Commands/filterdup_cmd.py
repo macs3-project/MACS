@@ -66,6 +66,8 @@ def run(o_options):
         info("# total tags in alignment file: %d" % (t0))
 
     if options.keepduplicates != "all":
+        if t0 == 0:
+            raise ValueError("No alignments found in input files.")
         if options.keepduplicates == "auto":
             info("calculate max duplicate tags in single position based on binomal distribution...")
             max_dup_tags = cal_max_dup_tags(options.gsize,t0)

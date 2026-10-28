@@ -1301,7 +1301,10 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def tsize(self) -> cython.int:
-        """Get tag size from BAM file -- read l_seq field.
+        """Average l_seq over up to ten records, stopping at clean EOF.
+
+        Raise ValueError if no alignments are present, and EOFError for
+        incomplete alignment size fields or bodies.
 
         Refer to: http://samtools.sourceforge.net/SAM1.pdf
 
@@ -1335,12 +1338,26 @@ class BAMParser(GenericParser):
             fread(nlength)
             fseek(ftell() + 4)
         while n < 10:
-            entrylength = unpack('<i', fread(4))[0]
+            size_data = fread(4)
+            if not size_data:
+                break
+            if len(size_data) != 4:
+                raise EOFError("Truncated BAM block_size field: expected 4 bytes, "
+                               "found %d" % len(size_data))
+            entrylength = unpack('<i', size_data)[0]
+            if entrylength < 32:
+                raise ValueError("Invalid BAM record: block_size is %d" %
+                                 entrylength)
             data = fread(entrylength)
+            if len(data) != entrylength:
+                raise EOFError("Truncated BAM record body: expected %d bytes, "
+                               "found %d" % (entrylength, len(data)))
             a = unpack('<i', data[16:20])[0]
             s += a
             n += 1
         fseek(0)
+        if n == 0:
+            raise ValueError("No alignments found in BAM file.")
         self.tag_size = cython.cast(cython.int, (s/n))
         return self.tag_size
 
