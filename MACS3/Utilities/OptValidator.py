@@ -561,6 +561,8 @@ def opt_validate_pileup(options):
         options.parser = ELANDResultParser
     elif options.format == "BED":
         options.parser = BEDParser
+    elif options.format == "AUTO":
+        options.parser = guess_parser
     elif options.format == "ELANDMULTI":
         options.parser = ELANDMultiParser
     elif options.format == "ELANDEXPORT":
