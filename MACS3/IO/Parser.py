@@ -580,9 +580,10 @@ class GenericParser:
         i = 0
         while True:
             # for each block of input
-            tmp += self.fhd.read(READ_BUFFER_SIZE)
-            if not tmp:
+            chunk = self.fhd.read(READ_BUFFER_SIZE)
+            if not chunk:
                 break
+            tmp += chunk
             lines = tmp.split(b"\n")
             tmp = lines[-1]
             for thisline in lines[:-1]:
@@ -617,9 +618,10 @@ class GenericParser:
         i = 0
         while True:
             # for each block of input
-            tmp += self.fhd.read(READ_BUFFER_SIZE)
-            if not tmp:
+            chunk = self.fhd.read(READ_BUFFER_SIZE)
+            if not chunk:
                 break
+            tmp += chunk
             lines = tmp.split(b"\n")
             tmp = lines[-1]
             for thisline in lines[:-1]:
@@ -691,10 +693,10 @@ class BEDParser(GenericParser):
             if thisline and (thisline[:5] != b"track") \
                and (thisline[:7] != b"browser") \
                and (thisline[0] != 35):  # 35 is b"#"
-                break
+                # Rewind only a data line; header-only input stays at EOF.
+                self.fhd.seek(-l_line, 1)
+                return
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -761,10 +763,10 @@ class BEDPEParser(GenericParser):
             if thisline and (thisline[:5] != b"track") \
                and (thisline[:7] != b"browser") \
                and (thisline[0] != 35):  # 35 is b"#"
-                break
+                # Rewind only a data line; header-only input stays at EOF.
+                self.fhd.seek(-l_line, 1)
+                return
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -787,6 +789,9 @@ class BEDPEParser(GenericParser):
     @cython.ccall
     def build_petrack(self):
         """Return a ``PETrackI`` constructed from the entire stream.
+
+        The last record may omit its newline. Input with no accepted
+        fragments, including empty/header-only input, raises ``ValueError``.
 
         Returns:
             PETrackI: Paired-end track populated from the input stream.
@@ -811,9 +816,10 @@ class BEDPEParser(GenericParser):
 
         while True:
             # for each block of input
-            tmp += self.fhd.read(READ_BUFFER_SIZE)
-            if not tmp:
+            chunk = self.fhd.read(READ_BUFFER_SIZE)
+            if not chunk:
                 break
+            tmp += chunk
             lines = tmp.split(b"\n")
             tmp = lines[-1]
             for thisline in lines[:-1]:
@@ -828,24 +834,32 @@ class BEDPEParser(GenericParser):
                 add_loc(chromosome, left_pos, right_pos)
         # last one
         if tmp:
-            (chromosome, left_pos, right_pos) = self.pe_parse_line(thisline)
+            (chromosome, left_pos, right_pos) = self.pe_parse_line(tmp)
             if left_pos >= 0 and chromosome:
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % tmp
                 i += 1
                 m += right_pos - left_pos
                 add_loc(chromosome, left_pos, right_pos)
+
+        self.close()
+        if i == 0:
+            raise ValueError("No valid fragments found in BEDPE input")
 
         self.d = cython.cast(cython.float, m) / i
         self.n = i
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
 
-        self.close()
         petrack.set_rlengths({"DUMMYCHROM": 0})
         return petrack
 
     @cython.ccall
     def append_petrack(self, petrack):
-        """Append fragments from the stream to an existing ``PETrackI``."""
+        """Append fragments from the stream to an existing ``PETrackI``.
+
+        The last record may omit its newline. An empty load preserves this
+        parser's existing statistics; if it has no prior fragments, it raises
+        ``ValueError``. Statistics describe this parser, not the supplied track.
+        """
         chromosome: bytes
         left_pos: cython.int
         right_pos: cython.int
@@ -856,9 +870,10 @@ class BEDPEParser(GenericParser):
         add_loc = petrack.add_loc
         while True:
             # for each block of input
-            tmp += self.fhd.read(READ_BUFFER_SIZE)
-            if not tmp:
+            chunk = self.fhd.read(READ_BUFFER_SIZE)
+            if not chunk:
                 break
+            tmp += chunk
             lines = tmp.split(b"\n")
             tmp = lines[-1]
             for thisline in lines[:-1]:
@@ -873,18 +888,22 @@ class BEDPEParser(GenericParser):
                 add_loc(chromosome, left_pos, right_pos)
         # last one
         if tmp:
-            (chromosome, left_pos, right_pos) = self.pe_parse_line(thisline)
+            (chromosome, left_pos, right_pos) = self.pe_parse_line(tmp)
             if left_pos >= 0 and chromosome:
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % tmp
                 i += 1
                 m += right_pos - left_pos
                 add_loc(chromosome, left_pos, right_pos)
 
-        self.d = (self.d * self.n + m) / (self.n + i)
-        self.n += i
+        self.close()
+        if self.n + i == 0:
+            raise ValueError("No valid fragments found in BEDPE input")
+
+        if i > 0:
+            self.d = (self.d * self.n + m) / (self.n + i)
+            self.n += i
 
         assert self.d >= 0, "Something went wrong (mean fragment size was negative)"
-        self.close()
         petrack.set_rlengths({"DUMMYCHROM": 0})
         return petrack
 
