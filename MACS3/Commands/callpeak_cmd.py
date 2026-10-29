@@ -67,7 +67,11 @@ def run(args):
     # 1 Read tag files
     info("#1 read %s files...", tag)
     if options.PE_MODE:
-        (treat, control) = load_frag_files_options(options)
+        try:
+            (treat, control) = load_frag_files_options(options)
+        except ValueError as exc:
+            error("%s", exc)
+            sys.exit(1)
     else:
         (treat, control) = load_tag_files_options(options)
     if control is not None:

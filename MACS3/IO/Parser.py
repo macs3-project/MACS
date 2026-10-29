@@ -23,6 +23,7 @@ import cython
 from cython.cimports.cpython import bool
 
 from cython.cimports.libc.stdlib import atoi, malloc, calloc, realloc, free
+from cython.cimports.libc.limits import INT_MAX, INT_MIN
 from cython.cimports.libc.string import memcpy, memmove, memset, memchr
 from cython.cimports.cpython.bytes import (PyBytes_FromStringAndSize,
                                          PyBytes_AS_STRING)
@@ -322,10 +323,12 @@ def _bam_load_petrack(stream: _BAMStream, references: list, petrack,
     The fragments kept, their coordinates and their order are those of
     parsing each record and calling ``petrack.add_loc(references[refID],
     start, start + abs(tlen))`` with ``start = min(pos, mate pos)``, with
-    the same flag filter as ``_bam_load_fwtrack``; records with refID -1
-    are dropped. Fragments are gathered over one decompressed block at a
-    time, grouped by chromosome (in order of first appearance) with their
-    order kept, and appended with ``petrack.add_loc_arrays``.
+    the same flag filter as ``_bam_load_fwtrack``. Both ends must have
+    valid positions on the same reference, and the inferred span must be
+    positive and fit signed 32-bit coordinates. Fragments are gathered over
+    one decompressed block at a time, grouped by chromosome (in order of
+    first appearance) with their order kept, and appended with
+    ``petrack.add_loc_arrays``.
 
     Returns the number of fragments added, and adds the sum of their
     lengths to ``tlen_sum[0]``.
@@ -396,22 +399,23 @@ def _bam_load_petrack(stream: _BAMStream, references: list, petrack,
                 pos = _le_int32(rec + 4)
                 nextpos = _le_int32(rec + 24)
                 tlen = _le_int32(rec + 28)
+                # TLEN has no usable span for missing/cross-reference mates.
+                # Reject INT_MIN before negation and check the end before
+                # addition, so neither operation can overflow a BAM int32.
+                if (refid < 0 or refid >= nref or
+                    _le_int32(rec + 20) != refid or
+                    pos < 0 or nextpos < 0 or tlen == 0 or tlen == INT_MIN):
+                    p += 4 + bs
+                    continue
                 # the leftmost end, so no CIGAR is needed
                 start = min(pos, nextpos)
                 if tlen < 0:
-                    tlen = cython.cast(cython.int,
-                                       0 - cython.cast(cython.uint, tlen))
-                if refid != -1:
+                    tlen = -tlen
+                if tlen <= INT_MAX - start:
                     r = refid
-                    if r < 0:
-                        r += nref
-                    if r < 0 or r >= nref:
-                        raise IndexError("list index out of range")
                     kref[nk] = r
                     kl[nk] = start
-                    kr[nk] = cython.cast(cython.int,
-                                         cython.cast(cython.uint, start) +
-                                         cython.cast(cython.uint, tlen))
+                    kr[nk] = start + tlen
                     m += tlen
                     nk += 1
             p += 4 + bs
@@ -1480,6 +1484,8 @@ class BAMPEParser(BAMParser):
 
     Track loaders raise EOFError for incomplete alignment size fields or
     bodies. After a failed append, discard the partially modified track.
+    Invalid template lengths, mate references and positions are skipped.
+    Input with no accepted fragments raises ValueError.
 
     Attributes:
         n: Total number of fragments.
@@ -1521,6 +1527,9 @@ class BAMPEParser(BAMParser):
             stream.close()
 
         info("%d fragments have been read." % i)
+        if i == 0:
+            raise ValueError("No valid fragments found in BAMPE input: %s"
+                             % self.filename)
         self.d = m / i
         self.n = i
         petrack.set_rlengths(rlengths)
@@ -1560,6 +1569,9 @@ class BAMPEParser(BAMParser):
             stream.close()
 
         info("%d fragments have been read." % i)
+        if i == 0:
+            raise ValueError("No valid fragments found in BAMPE input: %s"
+                             % self.filename)
         self.d = (self.d * self.n + m) / (self.n + i)
         self.n += i
         petrack.set_rlengths(rlengths)
