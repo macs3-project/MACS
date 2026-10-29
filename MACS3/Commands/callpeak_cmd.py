@@ -20,6 +20,7 @@ import tempfile
 # ------------------------------------
 from MACS3.Utilities.Chromosome import check_chromosome_names
 from MACS3.Utilities.Constants import MACS_VERSION, MAX_PAIRNUM
+from MACS3.Utilities.Track import require_nonempty_track
 from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_callpeak
 from MACS3.Signal.Prob import binomial_cdf_inv
@@ -44,6 +45,15 @@ def run(args):
     """
     # Parse options...
     options = opt_validate_callpeak(args)
+    try:
+        _run(options)
+    except ValueError as exc:
+        options.error("%s", exc)
+        sys.exit(1)
+
+
+def _run(options):
+    """Run with validated command-line options."""
     options.info(options.execution_policy.describe())
     options.debug("CPU limits: %s; detection notes: %s",
                   options.execution_policy.availability.limits,
@@ -67,15 +77,12 @@ def run(args):
     # 1 Read tag files
     info("#1 read %s files...", tag)
     if options.PE_MODE:
-        try:
-            (treat, control) = load_frag_files_options(options)
-        except ValueError as exc:
-            error("%s", exc)
-            sys.exit(1)
+        (treat, control) = load_frag_files_options(options)
     else:
         (treat, control) = load_tag_files_options(options)
+    require_nonempty_track(treat, options.format, "treatment")
     if control is not None:
-        # check if chromosome names are consistent. quit if not.
+        require_nonempty_track(control, options.format, "control")
         check_names(treat, control, error)
 
     info("#1 %s size = %.1f", tag, options.tsize)
@@ -93,10 +100,12 @@ def run(args):
             for l in bfhd:
                 barcodes_set.add(l.rstrip().encode())
         treat = treat.subset(barcodes_set)
+        require_nonempty_track(treat, options.format, "treatment after barcode selection")
         info("#   extracted %d fragments in treatment", treat.total)
         if control is not None:
             control = control.subset(barcodes_set)
-            info("#   extracted %d fragments in control", treat.total)
+            require_nonempty_track(control, options.format, "control after barcode selection")
+            info("#   extracted %d fragments in control", control.total)
 
     # handle duplicates
     if options.keepduplicates != "all":
@@ -114,6 +123,7 @@ def run(args):
 
         treat.filter_dup(treatment_max_dup_tags)
         t1 = treat.total
+        require_nonempty_track(treat, options.format, "treatment after duplicate filtering")
         info("#1  %ss after filtering in treatment: %d", tag, t1)
         tagsinfo += "# %ss after filtering in treatment: %d\n" % (tag, t1)
         if options.PE_MODE:
@@ -145,6 +155,7 @@ def run(args):
             control.filter_dup(control_max_dup_tags)
             #control.separate_dups(treatment_max_dup_tags) # changed 5-29; changed back since we don't need to call addbackdup+refinepeak anymore
             c1 = control.total
+            require_nonempty_track(control, options.format, "control after duplicate filtering")
 
             info("#1  %ss after filtering in control: %d", tag, c1)
             tagsinfo += "# %ss after filtering in control: %d\n" % (tag, c1)

@@ -95,7 +95,10 @@ def test_bampe_fragment_validation(tmp_path, encoding, operation):
              ('second_mate', valid + alignment(flag=147),
               [(100, 300), (200, 500)]),
              ('empty', b'', []),
-             ('filtered', alignment(flag=4), [])]
+             ('filtered', alignment(flag=4), []),
+             ('improper', alignment(flag=97) + alignment(flag=145), []),
+             ('r2_only', alignment(flag=147), []),
+             ('mate_unmapped', alignment(flag=73), [])]
     for name, fields in INVALID.items():
         invalid = alignment(**fields)
         cases.extend([(name, invalid, []),

@@ -84,7 +84,7 @@ def test_filterdup_mixed_singletons(tmp_path, write_bed, run_macs3, duplicate):
 
 @pytest.mark.parametrize("command", ["callpeak", "filterdup"])
 @pytest.mark.parametrize("content, error", [
-    ("", "No alignments found"), ("chr1\n", "IndexError"),
+    ("", "No usable alignments remain"), ("chr1\n", "IndexError"),
 ])
 def test_duplicate_filter_invalid_input(tmp_path, run_macs3,
                                        command, content, error):
@@ -97,8 +97,6 @@ def test_duplicate_filter_invalid_input(tmp_path, run_macs3,
         args += ["-i", path, "-o", "invalid-out.bed"]
     result = run_macs3(args, timeout=30)
     assert result.returncode > 0, result.stderr
-    if not content and command == "callpeak":
-        # Existing empty-input handling fails while calculating redundancy.
-        assert "ZeroDivisionError" in result.stderr
-    else:
-        assert error in result.stderr
+    assert error in result.stderr
+    if not content:
+        assert "Traceback" not in result.stderr

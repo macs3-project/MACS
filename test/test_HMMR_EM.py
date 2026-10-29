@@ -379,9 +379,10 @@ def test_hmmr_em_petrackII_counts():
                                                     rel=1e-5)
 
 
-def test_hmmr_em_no_fragment_in_range_raises():
-    with pytest.raises(ZeroDivisionError):
-        HMMR_EM(petrack_from_lengths([20, 30, 40, 50]), [200, 400, 600],
+@pytest.mark.parametrize("lengths", [[20, 30, 40, 50], [2000] * 200])
+def test_hmmr_em_no_fragment_in_range_raises(lengths):
+    with pytest.raises(ValueError, match="No sampled fragments within.*100, 1000"):
+        HMMR_EM(petrack_from_lengths(lengths), [200, 400, 600],
                 [10, 10, 10], sample_percentage=100)
 
 
@@ -441,3 +442,9 @@ def test_hmmr_em_sparse_tight_component_exits(capsys):
         "command\n"
 
 
+@pytest.mark.parametrize("lengths, percentage", [([], 100), ([200], 10),
+                                               ([200, 400, 600], 0)])
+def test_hmmr_em_no_sampled_fragments_raises(lengths, percentage):
+    with pytest.raises(ValueError, match="No fragments remain after sampling"):
+        HMMR_EM(petrack_from_lengths(lengths), [200, 400, 600],
+                [10, 10, 10], sample_percentage=percentage)
