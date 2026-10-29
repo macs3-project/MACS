@@ -18,6 +18,7 @@ import sys
 # own python modules
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
+from MACS3.Utilities.Track import require_nonempty_track
 from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_randsample
 
@@ -28,6 +29,15 @@ from MACS3.Utilities.OptValidator import opt_validate_randsample
 
 def run(options0):
     options = opt_validate_randsample(options0)
+    try:
+        _run(options)
+    except ValueError as exc:
+        options.error("%s", exc)
+        sys.exit(1)
+
+
+def _run(options):
+    """Run with validated command-line options."""
     options.info(options.execution_policy.describe())
     options.debug("CPU limits: %s; detection notes: %s",
                   options.execution_policy.availability.limits,
@@ -57,10 +67,13 @@ def run(options0):
         treat = load_tag_files_options(options)
 
         info("tag size = %d" % options.tsize)
+        require_nonempty_track(treat, options.format)
         treat.fw = options.tsize
 
         t0 = treat.total
         info(" total tags in alignment file: %d" % (t0))
+
+    require_nonempty_track(treat, options.format)
 
     if options.number:
         if options.number > t0:

@@ -1141,16 +1141,17 @@ def test_petrackII_rlengths():
     assert pe2.get_rlengths() == {b"chrA": INT32_MAX, b"chrB": 900}
 
 
-def test_petrackII_finalize_without_fragments_raises():
-    with pytest.raises(AssertionError, match="no fragments in PETrackII"):
-        PETrackII().finalize()
+def test_petrackII_finalize_without_fragments():
+    pe = PETrackII()
+    pe.finalize()
+    assert pe.total == pe.length == pe.average_template_length == 0
 
 
-def test_petrackII_finalize_with_only_zero_counts_raises():
+def test_petrackII_finalize_with_only_zero_counts():
     pe = PETrackII()
     pe.add_loc(b"chrA", 10, 30, b"B", 0)
-    with pytest.raises(AssertionError, match="no fragments in PETrackII"):
-        pe.finalize()
+    pe.finalize()
+    assert pe.total == pe.length == pe.average_template_length == 0
 
 
 def test_petrackII_get_locations_by_chr_missing_raises():
@@ -1213,9 +1214,15 @@ def test_petrackII_subset(selected):
     assert pe2_records(pe) == expected_pe2(FRAGS2)     # source untouched
 
 
-def test_petrackII_subset_without_matching_barcodes_raises():
-    with pytest.raises(AssertionError, match="no fragments in PETrackII"):
-        build_pe2(FRAGS2).subset({b"NOPE"})
+def test_petrackII_subset_without_matching_barcodes():
+    pe = build_pe2(FRAGS2)
+    pe.set_rlengths({b"chrA": 10000, b"chrB": 20000})
+    references = pe.get_rlengths().copy()
+    sub = pe.subset({b"NOPE"})
+    assert sub.total == sub.length == sub.average_template_length == 0
+    assert sub.get_chr_names() == set()
+    assert pe.get_rlengths() == references
+    assert pe2_records(pe) == expected_pe2(FRAGS2)
 
 
 def test_petrackII_pileup_a_chromosome_hand_example():

@@ -1193,8 +1193,9 @@ def test_barcodes_none_matching_fails(quick, atac, model_file, tmp_path):
     r = quick(["-i", frag, "-f", "FRAG", "--barcodes", bc, "--model",
                model_file] + TUNE)
     assert r.returncode == 1
-    assert isinstance(r.exc, AssertionError)
-    assert "no fragments in PETrackII" in str(r.exc)
+    assert r.exc is None
+    assert r.traceback == ""
+    assert any("No usable alignments remain" in message for message in msgs(r))
 
 
 @pytest.mark.parametrize("max_count", [None, 0, 1, 2])

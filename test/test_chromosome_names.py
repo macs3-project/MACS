@@ -30,10 +30,7 @@ def test_compiled_track_names(command, track_module, treatment, control):
             track = track_module.PETrackI(buffer_size=10)
             for name in names:
                 track.add_loc(name, 100, 150)
-        # Empty PETrackI.finalize() divides by zero (#808); name access
-        # itself is valid on the newly constructed empty track.
-        if names:
-            track.finalize()
+        track.finalize()
         tracks.append(track)
     messages = []
     if set(treatment).intersection(control):
@@ -79,11 +76,16 @@ def test_callpeak_disjoint_names(run_macs3, tmp_path, fmt, treatment, control):
         "-f", fmt, "-g", "1e6", "--nomodel", "--extsize", "100", "-n", "x",
     ], timeout=30)
     assert result.returncode == 1, result.stderr
-    assert "No common chromosome names" in result.stderr
-    for label, names in (("treatment", treatment), ("control", control)):
-        expected = ",".join(sorted(n.decode("utf-8", errors="backslashreplace")
-                                   for n in names))
-        assert f"Chromosome names in {label}: {expected}" in result.stderr
+    if not treatment or not control:
+        role = "treatment" if not treatment else "control"
+        assert f"No usable alignments remain in {role}" in result.stderr
+        assert "No common chromosome names" not in result.stderr
+    else:
+        assert "No common chromosome names" in result.stderr
+        for label, names in (("treatment", treatment), ("control", control)):
+            expected = ",".join(sorted(n.decode("utf-8", errors="backslashreplace")
+                                       for n in names))
+            assert f"Chromosome names in {label}: {expected}" in result.stderr
     assert "Traceback" not in result.stderr
     assert not list(tmp_path.glob("x_peaks.*"))
 

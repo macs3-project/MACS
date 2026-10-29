@@ -157,6 +157,11 @@ class HMMR_EM:
         # first, let's prepare the lengths data
         # sample down
         self.__petrack = petrack.sample_percent_copy(self.sample_percentage/100.0, seed=self.seed)  # may need to provide seed option for init function
+        if self.__petrack.total == 0:
+            raise ValueError(
+                "No fragments remain after sampling for EM training; "
+                "increase the sample percentage or provide more fragments. "
+                "For hmmratac, use --no-fragem with suitable fragment parameters.")
         self.__data = self.__petrack.fraglengths()
         # fhd = open("allfrag.txt","w")
         # for d in self.__data:
@@ -164,6 +169,13 @@ class HMMR_EM:
         # fhd.close()
         # then we only keep those with fragment lengths within certain range
         self.__data = self.__data[np.logical_and(self.__data >= self.min_fraglen, self.__data <= self.max_fraglen)]
+
+        if self.__data.shape[0] == 0:
+            raise ValueError(
+                f"No sampled fragments within the EM fragment-length range "
+                f"[{self.min_fraglen}, {self.max_fraglen}] bp; adjust min_fraglen/"
+                "max_fraglen or provide suitable fragments. For hmmratac, "
+                "use --no-fragem with suitable fragment parameters.")
 
         info(f"# Downsampled {self.__data.shape[0]} fragments will be used for EM training...")
         # next, we will calculate the weights -- ie the proportion of fragments in each length category

@@ -921,7 +921,8 @@ class PETrackI:
                                     execution_policy=self.execution_policy)
 
         self.is_sorted = True
-        self.average_template_length = cython.cast(cython.float, self.length) / self.total
+        self.average_template_length = (cython.cast(cython.float, self.length) / self.total
+                                        if self.total else 0.0)
         return
 
     @cython.ccall
@@ -1023,6 +1024,8 @@ class PETrackI:
         i: cython.int
 
         chrnames = list(self.get_chr_names())
+        if not chrnames:
+            return np.array([], dtype=np.int32)
         locs = self.locations[chrnames[0]]
         sizes = locs['r'] - locs['l']
         for i in range(1, len(chrnames)):
@@ -1200,7 +1203,7 @@ class PETrackI:
         for i in range(len(big)):
             self.length -= cython.cast(cython.ulonglong, removed[i])
             self.total += self.size[big[i]]
-        self.average_template_length = self.length / self.total
+        self.average_template_length = self.length / self.total if self.total else 0.0
         return
 
     @cython.ccall
@@ -1344,7 +1347,8 @@ class PETrackI:
             self.size[k] = self.locations[k].shape[0]
             self.length += (self.locations[k]['r'] - self.locations[k]['l']).sum()
             self.total += self.size[k]
-        self.average_template_length = cython.cast(cython.float, self.length)/self.total
+        self.average_template_length = (cython.cast(cython.float, self.length) / self.total
+                                        if self.total else 0.0)
         return
 
     @cython.ccall
@@ -1410,7 +1414,9 @@ class PETrackI:
             ret_petrackI.size[k] = loc.shape[0]
             ret_petrackI.length += (loc['r'] - loc['l']).sum()
             ret_petrackI.total += ret_petrackI.size[k]
-        ret_petrackI.average_template_length = cython.cast(cython.float, ret_petrackI.length)/ret_petrackI.total
+        ret_petrackI.average_template_length = (
+            cython.cast(cython.float, ret_petrackI.length) / ret_petrackI.total
+            if ret_petrackI.total else 0.0)
         ret_petrackI.set_rlengths(self.get_rlengths())
         return ret_petrackI
 
@@ -1434,7 +1440,7 @@ class PETrackI:
         """
         percent: cython.float
 
-        percent = cython.cast(cython.float, samplesize)/self.total
+        percent = cython.cast(cython.float, samplesize) / self.total if self.total else 0.0
         self.sample_percent(percent, seed)
         return
 
@@ -1470,7 +1476,7 @@ class PETrackI:
         """
         percent: cython.float
 
-        percent = cython.cast(cython.float, samplesize)/self.total
+        percent = cython.cast(cython.float, samplesize) / self.total if self.total else 0.0
         return self.sample_percent_copy(percent, seed)
 
     @cython.ccall
@@ -2097,10 +2103,9 @@ class PETrackII:
         The method updates ``total`` and ``average_template_length`` using count
         weights and marks the track as sorted.
         
-        Raises
-        ------
-        AssertionError
-            If no fragments are present when finalizing.
+        Notes
+        -----
+        Empty tracks have zero total, length and average template length.
 
         Examples
         --------
@@ -2146,11 +2151,9 @@ class PETrackII:
                                     execution_policy=self.execution_policy):
             self.total += count  # self.size[c]
 
-        assert self.total > 0, "Error: no fragments in PETrackII"
-
         self.is_sorted = True
-        self.average_template_length = cython.cast(cython.float,
-                                                   self.length) / self.total
+        self.average_template_length = (cython.cast(cython.float, self.length) / self.total
+                                        if self.total else 0.0)
         return
 
     @cython.ccall
@@ -2325,7 +2328,7 @@ class PETrackII:
         # pass some values from self to ret
         ret.annotation = self.annotation
         ret.is_sorted = self.is_sorted
-        ret.rlengths = self.rlengths
+        ret.rlengths = self.rlengths.copy()
         ret.buffer_size = self.buffer_size
         # ret.total = 0
         ret.length = 0
@@ -2602,10 +2605,9 @@ class PETrackII:
             total_counts += chrom_total
 
         self.total = total_counts
-        assert self.total > 0, "Error: no fragments in PETrackII"
         self.is_sorted = True
-        self.average_template_length = cython.cast(cython.float,
-                                                   self.length) / self.total
+        self.average_template_length = (cython.cast(cython.float, self.length) / self.total
+                                        if self.total else 0.0)
         return
     
     @cython.boundscheck(False)  # do not check that np indices are valid

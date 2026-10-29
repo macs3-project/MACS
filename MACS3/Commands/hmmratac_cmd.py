@@ -20,6 +20,7 @@ import tempfile
 # ------------------------------------
 # own python modules
 # ------------------------------------
+from MACS3.Utilities.Track import require_nonempty_track
 from MACS3.Utilities.OptValidator import opt_validate_hmmratac
 from MACS3.IO.PeakIO import PeakIO
 from MACS3.IO.Parser import BAMPEParser, BEDPEParser, FragParser  # BAMaccessor
@@ -52,6 +53,15 @@ def run(args):
 
     """
     options = opt_validate_hmmratac(args)
+    try:
+        _run(options)
+    except ValueError as exc:
+        options.error("%s", exc)
+        sys.exit(1)
+
+
+def _run(options):
+    """Run with validated command-line options."""
     options.info(options.execution_policy.describe())
     options.debug("CPU limits: %s; detection notes: %s",
                   options.execution_policy.availability.limits,
@@ -142,6 +152,7 @@ def run(args):
 
     # remember to finalize the petrack
     petrack.finalize()
+    require_nonempty_track(petrack, options.format)
 
     options.info(f"#  Read {petrack.total} fragments.")
 
@@ -176,6 +187,7 @@ def run(args):
 
         before_total = petrack.total
         petrack.exclude(blacklist_regions)
+        require_nonempty_track(petrack, options.format, "input after blacklist filtering")
         removed_n = before_total - petrack.total
         options.info(f"#  We removed {removed_n} fragments overlapping with blacklisted regions.")
         options.info(f"#  There are {petrack.total} fragments left.")

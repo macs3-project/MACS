@@ -18,6 +18,7 @@ import sys
 # own python modules
 # ------------------------------------
 # from MACS3.Utilities.Constants import *
+from MACS3.Utilities.Track import require_nonempty_track
 from MACS3.Utilities.OptValidator import validate_execution_options
 from MACS3.Utilities.OptValidator import opt_validate_filterdup
 from MACS3.Signal.Prob import binomial_cdf_inv
@@ -32,6 +33,15 @@ def run(o_options):
     """
     # Parse options...
     options = opt_validate_filterdup(o_options)
+    try:
+        _run(options)
+    except ValueError as exc:
+        options.error("%s", exc)
+        sys.exit(1)
+
+
+def _run(options):
+    """Run with validated command-line options."""
     options.info(options.execution_policy.describe())
     options.debug("CPU limits: %s; detection notes: %s",
                   options.execution_policy.availability.limits,
@@ -60,14 +70,15 @@ def run(o_options):
         inputtrack = load_tag_files_options(options)
 
         info("# tag size = %d" % options.tsize)
+        require_nonempty_track(inputtrack, options.format)
         inputtrack.fw = options.tsize
 
         t0 = inputtrack.total
         info("# total tags in alignment file: %d" % (t0))
 
+    require_nonempty_track(inputtrack, options.format)
+
     if options.keepduplicates != "all":
-        if t0 == 0:
-            raise ValueError("No alignments found in input files.")
         if options.keepduplicates == "auto":
             info("calculate max duplicate tags in single position based on binomal distribution...")
             max_dup_tags = cal_max_dup_tags(options.gsize,t0)
@@ -80,6 +91,7 @@ def run(o_options):
 
         inputtrack.filter_dup(max_dup_tags)
         t1 = inputtrack.total
+        require_nonempty_track(inputtrack, options.format, "input after duplicate filtering")
 
         info(" tags after filtering in alignment file: %d" % (t1))
         info(" Redundant rate of alignment file: %.2f" % (float(t0-t1)/t0))
