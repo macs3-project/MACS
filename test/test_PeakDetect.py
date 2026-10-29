@@ -78,6 +78,34 @@ def make_opt(**overrides):
     return SimpleNamespace(**params)
 
 
+@pytest.mark.parametrize("with_control,bad_role", [
+    (False, "Treatment"), (True, "Treatment"), (True, "Control")])
+@pytest.mark.parametrize("total,length", [(0, 0), (10, 0)])
+def test_call_peaks_rejects_empty_or_zero_length_fragments(
+        with_control, bad_role, total, length):
+    good = DummyTrack(total=10, length=2000)
+    bad = DummyTrack(total=total, length=length)
+    treat = bad if bad_role == "Treatment" else good
+    control = (bad if bad_role == "Control" else good) if with_control else None
+    detector = PeakDetect(opt=make_opt(PE_MODE=True), treat=treat, control=control)
+    with pytest.raises(ValueError, match=bad_role +
+                       " must contain positive-length fragments"):
+        detector.call_peaks()
+
+
+@pytest.mark.parametrize("with_control", [False, True])
+@pytest.mark.parametrize("tocontrol", [False, True])
+def test_call_peaks_rejects_nonpositive_background(with_control, tocontrol):
+    # A positive PE span can still underflow the float32 background at an
+    # extreme genome size. Reject it before invoking the Poisson scorer.
+    track = DummyTrack(total=1, length=1, average_template_length=1)
+    detector = PeakDetect(opt=make_opt(PE_MODE=True, gsize=1e100,
+                                      tocontrol=tocontrol),
+                          treat=track, control=track if with_control else None)
+    with pytest.raises(ValueError, match="Background lambda must be > 0"):
+        detector.call_peaks()
+
+
 def test_call_peaks_with_control_scales_control_parameters(monkeypatch):
     captured = {}
 

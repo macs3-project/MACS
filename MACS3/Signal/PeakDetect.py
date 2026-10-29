@@ -108,6 +108,12 @@ class PeakDetect:
         Scan the whole genome for peaks. RESULTS WILL BE SAVED IN
         self.final_peaks and self.final_negative_peaks.
         """
+        if self.PE_MODE:
+            for name, track in (("Treatment", self.treat),
+                                ("Control", self.control)):
+                if track is not None and (track.total <= 0 or track.length <= 0):
+                    raise ValueError("%s must contain positive-length fragments"
+                                     % name)
         if self.control:                # w/ control
             # if self.opt.broad:
             #    (self.peaks,self.broadpeaks) = self.__call_peaks_w_control()
@@ -183,6 +189,10 @@ class PeakDetect:
             # control sample is bigger
             lambda_bg = float(treat_sum) / self.gsize
             treat_scale = 1.0
+
+        if not lambda_bg > 0:
+            raise ValueError("Background lambda must be > 0; check input "
+                             "fragment lengths and genome size")
 
         # prepare d_s for control data
         if self.sregion:
@@ -336,6 +346,10 @@ class PeakDetect:
         else:
             lambda_bg = float(d) * treat_total / self.gsize
         treat_scale = 1.0
+
+        if not lambda_bg > 0:
+            raise ValueError("Background lambda must be > 0; check input "
+                             "fragment lengths and genome size")
 
         # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
