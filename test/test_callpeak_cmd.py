@@ -1232,18 +1232,18 @@ def test_control_lambda_windows(run_macs3, tmp_path, write_bed, extra,
         "chr1\t0\t1000\t0.00000", "chr1\t1000\t1100\t20.00000"]
 
 
-@pytest.mark.parametrize("extra,message", [
-    (["--slocal", "50"], "AssertionError: 50 can't be smaller than 100!"),
-    (["--llocal", "50"], "AssertionError: 50 can't be smaller than 100!"),
-    (["--llocal", "500"], "AssertionError: 500 can't be smaller than 1000!"),
+@pytest.mark.parametrize("extra,status,message", [
+    (["--slocal", "50"], 0, "Increasing --slocal from 50 to 100"),
+    (["--llocal", "50"], 1, "--llocal must be at least --slocal"),
+    (["--llocal", "500"], 1, "--llocal must be at least --slocal"),
 ])
 def test_control_window_smaller_than_d(run_macs3, tmp_path, write_bed,
-                                       extra, message):
+                                       extra, status, message):
     t = write_bed(_block(20), name="t.bed")
     c = write_bed(_control_reads(), name="c.bed")
     proc = _cp(run_macs3, ["-t", t, "-c", c] + SYN + extra, tmp_path / "out")
-    assert proc.returncode == 1
-    assert proc.stderr.rstrip().splitlines()[-1] == message
+    assert proc.returncode == status, proc.stderr
+    assert message in proc.stderr
 
 
 # control of 40 reads (20 at 1300, 20 at 5000) against 20 treatment reads

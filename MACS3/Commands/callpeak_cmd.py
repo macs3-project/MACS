@@ -284,6 +284,11 @@ def run(args):
         ofhd_xls.write("# Sequencing ends will be shifted towards 5' by %d bp(s)\n" % (options.shift * -1))
 
     ofhd_xls.write("# d = %d\n" % (options.d))
+    if control and not options.nolambda and (
+            peakdetect.sregion != options.smalllocal or
+            peakdetect.lregion != options.largelocal):
+        ofhd_xls.write("# Effective local windows: slocal=%d, llocal=%d\n" %
+                       (peakdetect.sregion, peakdetect.lregion))
     try:
         ofhd_xls.write("# alternative fragment length(s) may be %s bps\n" % ','.join(map(str,peakmodel.alternative_d)))
     except:

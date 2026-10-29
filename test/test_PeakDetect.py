@@ -1,5 +1,6 @@
 import sys
 import types
+from math import ceil
 from types import SimpleNamespace
 
 import pytest
@@ -355,6 +356,9 @@ def expected_caller_args(opt, treat, control):
             d_arg = d
             treat_sum = treat.total * d
             control_sum = control.total * d
+        if not opt.nolambda:
+            s = max(s, ceil(d_arg)) if s else 0
+            l = max(l, ceil(d_arg)) if l else 0
         ratio = treat_sum / control_sum if opt.ratio == 1.0 else opt.ratio
         if opt.tocontrol:
             lambda_bg, treat_scale, base = control_sum / opt.gsize, 1 / ratio, 1.0
@@ -587,15 +591,15 @@ def test_ratio_pe_mode_control_sum_is_integer(recorder):
 
 
 @pytest.mark.parametrize("slocal,llocal,msg", [
-    (100, 600, "100 can't be smaller than 150!"),
-    (200, 120, "120 can't be smaller than 150!"),
-    (400, 300, "300 can't be smaller than 400!"),
+    (-1, 600, "--slocal and --llocal must be non-negative"),
+    (200, -1, "--slocal and --llocal must be non-negative"),
+    (400, 300, "--llocal must be at least --slocal"),
 ])
-def test_local_window_assertions(recorder, slocal, llocal, msg):
+def test_invalid_local_windows(recorder, slocal, llocal, msg):
     opt, _ = opt_and_log(d=150, smalllocal=slocal, largelocal=llocal)
     treat, control = se_dummy()
     pd = PeakDetect(opt=opt, treat=treat, control=control)
-    with pytest.raises(AssertionError, match=msg):
+    with pytest.raises(ValueError, match=msg):
         pd.call_peaks()
     assert recorder == []
 

@@ -327,6 +327,16 @@ serializing the tracks and preserves copy-on-write sharing.
   project. Remember that if the region is set too small, a sharp spike
   in the input data may kill a significant peak.
 
+  With a control sample, an enabled window shorter than the treatment
+  fragment length is automatically enlarged, with a warning, to the
+  fragment length rounded up to the next integer. For paired-end input,
+  this is the mean treatment fragment length. For single-end input, it
+  is the modeled fragment length or `--extsize` with `--nomodel`.
+  The effective sizes are recorded in the peaks XLS header when adjusted.
+  Setting a window to `0` disables it; sizes must be non-negative and
+  `--llocal` must be at least `--slocal` when both are enabled. With a control,
+  `--nolambda` ignores these window settings and uses the global background.
+
 - `--nomodel`
 
   While on, MACS3 will bypass building the shifting model. Please

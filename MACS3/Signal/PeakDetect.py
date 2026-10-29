@@ -11,6 +11,7 @@ the distribution).
 # Python modules
 # ------------------------------------
 import cython
+from math import ceil
 from MACS3.Utilities.Execution import resolve_execution_policy
 
 # ------------------------------------
@@ -194,12 +195,25 @@ class PeakDetect:
             raise ValueError("Background lambda must be > 0; check input "
                              "fragment lengths and genome size")
 
-        # prepare d_s for control data
-        if self.sregion:
-            assert self.d <= self.sregion, f"{self.sregion:} can't be smaller than {self.d:}!"
-        if self.lregion:
-            assert self.d <= self.lregion, f"{self.lregion:} can't be smaller than {self.d:}!"
-            assert self.sregion <= self.lregion, f"{self.lregion:} can't be smaller than {self.sregion:}!"
+        # The fragment length is only known after loading/modeling the data.
+        # Keep enabled local windows at least that long, including fractional
+        # paired-end means. Disabled windows and --nolambda need no adjustment.
+        if not self.nolambda:
+            if self.sregion < 0 or self.lregion < 0:
+                raise ValueError("--slocal and --llocal must be non-negative "
+                                 "(0 disables the window)")
+            if self.sregion and self.lregion and self.lregion < self.sregion:
+                raise ValueError("--llocal must be at least --slocal when "
+                                 "both windows are enabled")
+            minimum_window = ceil(d)
+            if self.sregion and self.sregion < d:
+                self.warn(f"Increasing --slocal from {self.sregion} to "
+                          f"{minimum_window} to cover fragment length {d:g}")
+                self.sregion = minimum_window
+            if self.lregion and self.lregion < d:
+                self.warn(f"Increasing --llocal from {self.lregion} to "
+                          f"{minimum_window} to cover fragment length {d:g}")
+                self.lregion = minimum_window
 
         # Now prepare a list of extension sizes
         ctrl_d_s = [self.d]   # note, d doesn't make sense in PE mode.
@@ -215,7 +229,7 @@ class PeakDetect:
         ctrl_scale_s.append(tmp_v)
 
         # slocal size local
-        if self.sregion:
+        if not self.nolambda and self.sregion:
             ctrl_d_s.append(self.sregion)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
@@ -225,7 +239,7 @@ class PeakDetect:
             ctrl_scale_s.append(tmp_v)
 
         # llocal size local
-        if self.lregion and self.lregion > self.sregion:
+        if not self.nolambda and self.lregion and self.lregion > self.sregion:
             ctrl_d_s.append(self.lregion)
             if not self.opt.tocontrol:
                 # if user want to scale everything to ChIP data
