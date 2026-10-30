@@ -337,6 +337,10 @@ serializing the tracks and preserves copy-on-write sharing.
   `--llocal` must be at least `--slocal` when both are enabled. With a control,
   `--nolambda` ignores these window settings and uses the global background.
 
+  Without a control sample, only the large local window is considered.
+  Setting `--llocal 0` uses the global background, giving the same peak
+  calls as `--nolambda`.
+
 - `--nomodel`
 
   While on, MACS3 will bypass building the shifting model. Please

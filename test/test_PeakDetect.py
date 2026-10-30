@@ -604,11 +604,16 @@ def test_invalid_local_windows(recorder, slocal, llocal, msg):
     assert recorder == []
 
 
-def test_without_control_llocal_zero(recorder):
-    """Without control the lambda window is llocal, so 0 cannot be used."""
-    opt, _ = opt_and_log(largelocal=0)
-    with pytest.raises(ZeroDivisionError):
-        PeakDetect(opt=opt, treat=se_dummy()[0], control=None).call_peaks()
+@pytest.mark.parametrize("paired", [False, True])
+def test_without_control_llocal_zero(recorder, paired):
+    """Disabling the only local window retains the global background."""
+    opt, _ = opt_and_log(largelocal=0, PE_MODE=paired)
+    treat = pe_dummy()[0] if paired else se_dummy()[0]
+    PeakDetect(opt=opt, treat=treat, control=None).call_peaks()
+    assert recorder[0].kwargs["ctrl_d_s"] == []
+    assert recorder[0].kwargs["ctrl_scaling_factor_s"] == []
+    expected = (treat.length if paired else opt.d * treat.total) / opt.gsize
+    assert recorder[0].kwargs["lambda_bg"] == pytest.approx(expected)
 
 
 # ------------------------------------
