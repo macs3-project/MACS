@@ -1106,12 +1106,14 @@ def test_bam_sniff_false_on_text(write_bed, gz):
     p.close()
 
 
-def test_bam_sniff_raises_when_records_have_no_sequence(make_alignments):
+def test_bam_sniff_infers_size_when_records_have_no_sequence(make_alignments):
     reads = [dict(name="r%d" % i, ref="chr1", pos=100 * i, seq="", qual="")
              for i in range(10)]
-    with pytest.raises(Exception,
-                       match=r"^File is not of a valid BAM format! 0$"):
-        BAMParser(make_alignments(reads)).sniff()
+    p = BAMParser(make_alignments(reads))
+    assert p.sniff() is True
+    assert p.tsize() == 36
+    assert fw_locations(p.build_fwtrack()) == {
+        b"chr1": ([100 * i for i in range(10)], [])}
 
 
 @pytest.mark.parametrize("buffer_size", [1, 2, 7, 100000])

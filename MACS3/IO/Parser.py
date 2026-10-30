@@ -12,7 +12,7 @@ the distribution).
 # python modules
 # ------------------------------------
 import struct
-from struct import unpack
+from struct import unpack, unpack_from
 from re import findall
 import gzip
 import io
@@ -1324,15 +1324,13 @@ class BAMParser(GenericParser):
 
     @cython.ccall
     def tsize(self) -> cython.int:
-        """Average l_seq over up to ten records, stopping at clean EOF.
+        """Average query length over up to ten records, stopping at clean EOF.
 
-        Raise ValueError if no alignments are present, and EOFError for
-        incomplete alignment size fields or bodies.
+        Use query-consuming CIGAR operations when SEQ is missing (l_seq=0).
+        Raise ValueError for empty inputs or unusable lengths, and EOFError
+        for incomplete alignment size fields or bodies.
 
         Refer to: http://samtools.sourceforge.net/SAM1.pdf
-
-        * This may not work for BAM file from bedToBAM (bedtools),
-        since the l_seq field seems to be 0.
         """
         x: cython.int
         header_len: cython.int
@@ -1340,6 +1338,12 @@ class BAMParser(GenericParser):
         nlength: cython.int
         n: cython.int = 0          # successful read of tag size
         s: cython.double = 0        # sum of tag sizes
+        cigar_start: cython.int
+        cigar_count: cython.int
+        cigar_word: cython.uint
+        operation: cython.int
+        query_length: cython.longlong
+        j: cython.int
 
         if self.tag_size != -1:
             # if we have already calculated tag size (!= -1),  return it.
@@ -1376,6 +1380,31 @@ class BAMParser(GenericParser):
                 raise EOFError("Truncated BAM record body: expected %d bytes, "
                                "found %d" % (entrylength, len(data)))
             a = unpack('<i', data[16:20])[0]
+            if a < 0:
+                raise ValueError("Invalid BAM record: negative l_seq")
+            if a == 0:
+                cigar_start = 32 + data[8]
+                cigar_count = unpack('<H', data[12:14])[0]
+                if data[8] == 0:
+                    raise ValueError("Invalid BAM record: read name is missing")
+                if cigar_start + 4 * cigar_count > entrylength:
+                    raise ValueError("Invalid BAM record: CIGAR runs past the record")
+                query_length = 0
+                for j in range(cigar_count):
+                    cigar_word = unpack_from('<I', data, cigar_start + 4 * j)[0]
+                    operation = cigar_word & 15
+                    if operation > 8 or (cigar_word >> 4) == 0:
+                        raise ValueError("Invalid BAM record: invalid CIGAR operation")
+                    if operation in (0, 1, 4, 7, 8):  # M, I, S, =, X
+                        query_length += cigar_word >> 4
+                if query_length <= 0:
+                    raise ValueError(
+                        "Cannot infer BAM tag size: SEQ is missing and CIGAR "
+                        "has no query bases. Supply SEQ or a query-consuming "
+                        "CIGAR; for commands supporting it, specify -s/--tsize.")
+                if query_length > INT_MAX:
+                    raise ValueError("Invalid BAM record: inferred tag size exceeds INT_MAX")
+                a = query_length
             s += a
             n += 1
         fseek(0)
