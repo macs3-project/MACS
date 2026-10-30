@@ -129,7 +129,9 @@ def test_header_only_bam_filterdup(make_alignments, run_macs3, tmp_path,
         args += ["-s", "50"]
     result = run_macs3(args, timeout=30)
     assert result.returncode > 0
-    assert "No alignments" in result.stderr
+    expected = ("No usable alignments" if explicit_size and fmt == "BAM"
+                else "No alignments")
+    assert expected in result.stderr
     assert "ZeroDivisionError" not in result.stderr
     assert "struct.error" not in result.stderr
 
