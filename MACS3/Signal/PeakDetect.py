@@ -368,7 +368,7 @@ class PeakDetect:
         # slocal and d-size local bias are not calculated!
         # nothing done here. should this match w control??
 
-        if not self.nolambda:
+        if not self.nolambda and self.lregion:
             if self.PE_MODE:
                 ctrl_scale_s = [float(treat_length) / (self.lregion*treat_total*2),]
             else:
