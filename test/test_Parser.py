@@ -361,17 +361,10 @@ def test_guess_parser_unrecognised_format_raises(write_bed, gz):
         guess_parser(path)
 
 
-def test_guess_parser_one_column_text_raises_index_error(tmp_path):
-    """Text that is no supported format, with fewer than 3 tab-separated
-    fields per line, raises IndexError rather than "Can't detect format!".
-
-    Pins the current output. BEDParser.sniff, tried second, indexes the
-    third column of each line and raises before the remaining candidates
-    are tried. The input is not in any supported format and the docstring
-    only promises an Exception, which IndexError is.
-    """
+def test_guess_parser_one_column_text_reports_unknown_format(tmp_path):
+    """Incompatible fields must not abort the candidate search."""
     path = write_text(tmp_path / "notes.txt", "hello world\nsecond line\n")
-    with pytest.raises(IndexError):
+    with pytest.raises(ValueError, match=r"^Can't detect format!$"):
         guess_parser(path)
 
 
@@ -999,15 +992,10 @@ def test_sam_tsize_skips_filtered_reads(tmp_path):
     assert p.sniff() is True
 
 
-def test_sam_too_few_columns_raises_index_error(tmp_path):
-    """A record with 4 columns (no CIGAR) cannot be parsed.
-
-    Pins the current output. The SAM spec requires 11 columns but says
-    nothing about how a reader fails; the original raises IndexError.
-    """
+def test_sam_too_few_columns_skipped(tmp_path):
+    """Incomplete records do not contribute alignments."""
     path = write_text(tmp_path / "r.sam", SAM_HEADER + "r1\t0\tchr1\t101\n")
-    with pytest.raises(IndexError):
-        SAMParser(path).build_fwtrack()
+    assert fw_locations(SAMParser(path).build_fwtrack()) == {}
 
 
 @pytest.mark.parametrize("buffer_size", [1, 2, 100000])

@@ -53,22 +53,15 @@ def test_sam_edge_inputs(tmp_path, gz, case):
         stream.write(text)
     run_probe(tmp_path, path, case, '''
 parser = Parser.SAMParser(sys.argv[1])
-if sys.argv[2] == 'truncated':
-    try:
-        parser.build_fwtrack()
-    except IndexError:
-        pass
-    else:
-        raise AssertionError('Truncated SAM record must raise IndexError')
+track = parser.build_fwtrack()
+track.finalize()
+if sys.argv[2] in ('missing-cigar', 'invalid-cigar'):
+    # Preserve existing permissive behavior; no reference operations.
+    plus, minus = track.get_locations_by_chr(b'chr1')
+    assert plus.tolist() == [] and minus.tolist() == [4999]
 else:
-    track = parser.build_fwtrack()
-    track.finalize()
-    if sys.argv[2] in ('missing-cigar', 'invalid-cigar'):
-        # Preserve existing permissive behavior; no reference operations.
-        plus, minus = track.get_locations_by_chr(b'chr1')
-        assert plus.tolist() == [] and minus.tolist() == [4999]
-    else:
-        assert track.get_chr_names() == set()
+    # Empty/header-only input and incomplete records add no alignments.
+    assert track.get_chr_names() == set()
 ''')
 
 
