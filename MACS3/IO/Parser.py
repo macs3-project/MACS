@@ -101,7 +101,7 @@ def guess_parser(fname, buffer_size: cython.long = 100000,
             return t_parser
         else:
             t_parser.close()
-    raise Exception("Can't detect format!")
+    raise ValueError("Can't detect format!")
 
 
 # ------------------------------------
@@ -552,6 +552,8 @@ class GenericParser:
         while n < 10 and m < 10000:
             m += 1
             thisline = self.fhd.readline()
+            if not thisline:
+                break
             this_taglength = self.tlen_parse_line(thisline)
             if this_taglength > 0:
                 # this_taglength == 0 means this line doesn't contain
@@ -662,13 +664,18 @@ class GenericParser:
         """Return ``True`` when the input appears compatible with this parser."""
         t: cython.int
 
-        t = self.tsize()
-        if t <= 10 or t >= 10000:  # tsize too small or too big
-            self.fhd.seek(0)
+        try:
+            t = self.tsize()
+        except (IndexError, ValueError):
+            # A different text format may have fewer fields or nonnumeric
+            # values where this parser expects coordinates.
             return False
-        else:
+        finally:
             self.fhd.seek(0)
             self.skip_first_commentlines()
+        if t <= 10 or t >= 10000:  # tsize too small or too big
+            return False
+        else:
             return True
 
     @cython.ccall
@@ -729,6 +736,8 @@ class BEDParser(GenericParser):
         thisfields: list
 
         thisline = thisline.rstrip()
+        if not thisline:
+            return (b"", -1, -1)
         thisfields = thisline.split(b'\t')
         chromname = thisfields[0]
         try:
@@ -925,10 +934,10 @@ class ELANDResultParser(GenericParser):
         for thisline in self.fhd:
             l_line = len(thisline)
             if thisline and thisline[0] != 35:  # 35 is b"#"
-                break
+                # Header-only and empty inputs stay at EOF.
+                self.fhd.seek(-l_line, 1)
+                return
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -1007,10 +1016,10 @@ class ELANDMultiParser(GenericParser):
         for thisline in self.fhd:
             l_line = len(thisline)
             if thisline and thisline[0] != 35:  # 35 is b"#"
-                break
+                # Header-only and empty inputs stay at EOF.
+                self.fhd.seek(-l_line, 1)
+                return
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -1093,10 +1102,10 @@ class ELANDExportParser(GenericParser):
         for thisline in self.fhd:
             l_line = len(thisline)
             if thisline and thisline[0] != 35:  # 35 is b"#"
-                break
+                # Header-only and empty inputs stay at EOF.
+                self.fhd.seek(-l_line, 1)
+                return
 
-        # rewind from SEEK_CUR
-        self.fhd.seek(-l_line, 1)
         return
 
     @cython.cfunc
@@ -1178,6 +1187,8 @@ class SAMParser(GenericParser):
         if not thisline:
             return 0
         thisfields = thisline.split(b'\t')
+        if thisline.startswith(b'@') or len(thisfields) < 11:
+            return 0
         bwflag = atoi(thisfields[1])
         if bwflag & 4 or bwflag & 512 or bwflag & 256 or bwflag & 2048:
             # unmapped sequence or bad sequence or 2nd or sup alignment
@@ -1219,6 +1230,8 @@ class SAMParser(GenericParser):
         if not thisline:
             return (b"", -1, -1)
         thisfields = thisline.split(b'\t')
+        if thisline.startswith(b'@') or len(thisfields) < 11:
+            return (b"", -1, -1)
         # thistagname = thisfields[0]         # name of tag
         thisref = thisfields[2]
         bwflag = atoi(thisfields[1])
@@ -1617,9 +1630,9 @@ class BowtieParser(GenericParser):
 
         thisline = thisline.rstrip()
         if not thisline:
-            return (b"", -1, -1)
-        if thisline[0] == b"#":
-            return (b"", -1, -1)  # comment line is skipped
+            return 0
+        if thisline.startswith(b"#"):
+            return 0  # comment line is skipped
         thisfields = thisline.split(b'\t')  # I hope it will never bring me more trouble
         return len(thisfields[4])
 
@@ -1671,7 +1684,7 @@ class BowtieParser(GenericParser):
         thisline = thisline.rstrip()
         if not thisline:
             return (b"", -1, -1)
-        if thisline[0] == b"#":
+        if thisline.startswith(b"#"):
             return (b"", -1, -1)  # comment line is skipped
         # I hope it will never bring me more trouble
         thisfields = thisline.split(b'\t')
