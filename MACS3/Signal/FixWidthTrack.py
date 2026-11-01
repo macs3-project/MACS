@@ -870,6 +870,9 @@ class FWTrack:
             cpeaks = peaks.get_data_from_chrom(chrom)
             prev_i = 0
             prev_j = 0
+            # Empty strands skip the scan and rewind loops below.
+            i = 0
+            j = 0
             for m in range(len(cpeaks)):
                 startpos = cpeaks[m]["start"] - window_size
                 endpos = cpeaks[m]["end"] + window_size
