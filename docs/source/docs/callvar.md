@@ -84,9 +84,11 @@ Here is a brief overview of these options:
   invoked at all. If so, speed and sensitivity can be higher but
   specificity will be significantly lower.
 - `--fermi-overlap`: The minimal overlap for fermi to initially
-  assemble two reads. Must be between 1 and read length. A longer
-  fermiMinOverlap is needed while read length is small (e.g. 30 for
-  36bp read, but 33 for 100bp read may work). Default is 30. 
+  assemble two reads, between 1 and 63 (the fermi-lite k-mer limit).
+  Choose an overlap no longer than the reads; for 25bp reads, try 20.
+  If assembly produces no unitigs, `auto` retains any first-pass calls,
+  while `on` skips the peak and continues to the next one. Default is 30.
+
 - `--top2alleles-mratio`: The reads for the top 2 most frequent
   alleles (e.g. a ref allele and an alternative allele) at a loci
   shouldn't be too few comparing to total reads mapped. The minimum
@@ -107,6 +109,12 @@ Here is a brief overview of these options:
   the process being faster. Creating too many parrallel processes need
   memory operations and may negate benefit from multi
   processing. Default: 1 
+
+Alignments containing CIGAR `N` (spliced reads) are skipped with a warning
+in both treatment and control. Their MD tags omit the skipped reference
+bases, so they cannot be used to reconstruct the DNA reference for
+`callvar`. Other alignments in the same peak remain eligible. Peaks with
+no usable treatment reads produce no variant calls.
 
 ## Example Usage
 

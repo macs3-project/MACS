@@ -188,13 +188,19 @@ def run(args):
 
             # t0 = time()
             try:
-                if cbam:
-                    ra_collection = RACollection(chrom, peak,
-                                                 tbam.get_reads_in_region(chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate),
-                                                 cbam.get_reads_in_region(chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate))
-                else:
-                    ra_collection = RACollection(chrom, peak,
-                                                 tbam.get_reads_in_region(chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate))
+                reads = [tbam.get_reads_in_region(chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate),
+                         cbam.get_reads_in_region(chrom, peak["start"], peak["end"], maxDuplicate=maxDuplicate) if cbam else []]
+                for sample, alignments in enumerate(reads):
+                    # MD tags do not describe skipped reference bases. Keep
+                    # spliced alignments out of this DNA variant caller.
+                    unspliced = [read for read in alignments
+                                 if not any(op & 15 == 3 for op in read["cigar"])]
+                    skipped = len(alignments) - len(unspliced)
+                    if skipped:
+                        options.warn("Skipped %d spliced %s alignments (CIGAR N) in this peak",
+                                     skipped, "treatment" if sample == 0 else "control")
+                    reads[sample] = unspliced
+                ra_collection = RACollection(chrom, peak, reads[0], reads[1])
             except Exception:
                 info("No reads found in this peak. Skipped")
                 # while there is no reads in peak region, simply skip it.
@@ -255,7 +261,7 @@ def run(args):
                     if peak_variants.n_variants() > 0:
                         peak_variants.fix_indels()
                         ovcf.write(peak_variants.toVCF())
-                        continue
+                    continue
                 # uncomment the following to print those assembled unitigs and their alignments to reference genome
                 # for u in unitig_collection["URAs_list"]:
                 #    print(u["seq"].decode(), u["lpos"], u["rpos"], u["count"])

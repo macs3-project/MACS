@@ -652,7 +652,7 @@ float fml_correct_core(const fml_opt_t *opt, int flt_uniq, int n, bseq1_t *seq)
 	mode = bfc_ch_hist(ch, hist, hist_high);
 	for (i = opt->min_cnt; i < 256; ++i)
 		sum_k += hist[i], tot_k += i * hist[i];
-	kcov = (float)tot_k / sum_k;
+	kcov = sum_k? (float)tot_k / sum_k : 0.;
 	bfc_opt.min_cov = (int)(BFC_EC_MIN_COV_COEF * kcov + .499);
 	bfc_opt.min_cov = bfc_opt.min_cov < opt->max_cnt? bfc_opt.min_cov : opt->max_cnt;
 	bfc_opt.min_cov = bfc_opt.min_cov > opt->min_cnt? bfc_opt.min_cov : opt->min_cnt;

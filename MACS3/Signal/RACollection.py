@@ -276,6 +276,8 @@ class RACollection:
             if read["lpos"] > prev_r:
                 read = ralist[i - 1]
                 read_refseq = read.get_REFSEQ()
+                if len(read_refseq) != read["rpos"] - read["lpos"]:
+                    raise ValueError("Reconstructed sequence does not match read reference span")
                 ind = read["lpos"] - start
                 ind_r = ind + read["rpos"] - read["lpos"]
                 seq[ind: ind_r] = read_refseq
@@ -283,6 +285,8 @@ class RACollection:
         # last
         read = ralist[-1]
         read_refseq = read.get_REFSEQ()
+        if len(read_refseq) != read["rpos"] - read["lpos"]:
+            raise ValueError("Reconstructed sequence does not match read reference span")
         ind = read["lpos"] - start
         ind_r = ind + read["rpos"] - read["lpos"]
         seq[ind: ind_r] = read_refseq
@@ -374,6 +378,9 @@ class RACollection:
         # unitig: bytes                 # final unitig
         unitig_list: list             # contain of: list sequences in format: bytes
         # n: cython.pointer(cython.int)
+
+        if not 1 <= fermiMinOverlap <= 63:
+            raise ValueError("fermi overlap must be between 1 and 63")
 
         n_seqs = len(self.RAlists[0]) + len(self.RAlists[1])
 
@@ -767,6 +774,9 @@ class RACollection:
         n_unitigs_0: cython.int
         n_unitigs_1: cython.int
 
+        if not 1 <= fermiMinOverlap <= 63:
+            raise ValueError("fermi overlap must be between 1 and 63")
+
         # first round of assembly
         # print (" First round to assemble unitigs")
         unitig_list = self.fermi_assemble(fermiMinOverlap, opt_flag=0x80)
@@ -833,7 +843,7 @@ class RACollection:
                                                   self.peak,
                                                   unmapped_RAlist_T,
                                                   unmapped_RAlist_C)
-            unitigs_2nd = unmapped_ra_collection.fermi_assemble(fermiMinOverlap/2,
+            unitigs_2nd = unmapped_ra_collection.fermi_assemble(max(1, fermiMinOverlap // 2),
                                                                 opt_flag=0x80)
 
             if unitigs_2nd:
