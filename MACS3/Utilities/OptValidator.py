@@ -710,7 +710,9 @@ def opt_validate_callvar(options):
 
     validate_execution_options(options, callvar=True)
 
-    # methods should be valid:
+    if not 1 <= options.fermiMinOverlap <= 63:
+        options.error("--fermi-overlap must be between 1 and 63.")
+        sys.exit(1)
 
     return options
 

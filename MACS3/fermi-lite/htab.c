@@ -21,6 +21,8 @@ bfc_ch_t *bfc_ch_init(int k, int l_pre)
 	bfc_ch_t *ch;
 	int i;
 	assert(k <= 63);
+	/* get_subhash uses 2*k-l_pre as a shift when k <= 32. */
+	if (l_pre > k * 2) l_pre = k * 2;
 	if (k * 2 - l_pre > BFC_CH_KEYBITS)
 		l_pre = k * 2 - BFC_CH_KEYBITS;
 	if (l_pre > BFC_CH_MAXPRE) l_pre = BFC_CH_MAXPRE;

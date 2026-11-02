@@ -26,7 +26,6 @@ the distribution).
 import datetime
 import math
 import re
-import signal
 import sys
 
 import numpy as np
@@ -919,20 +918,14 @@ def test_callvar_fermi_overlap_in_header(snv_data, tmp_path, run_macs3):
     assert records(out) == [het_expected(), hom_expected()]
 
 
-def test_callvar_fermi_overlap_longer_than_reads_aborts(snv_data, tmp_path,
+def test_callvar_fermi_overlap_longer_than_reads_skips_assembly(snv_data, tmp_path,
                                                        run_macs3):
-    """--fermi-overlap 60 with 50 bp reads makes fermi-lite abort callvar
-    with an assertion in mr_insert_multi (mrope.c).
-
-    Pins the current output. The --fermi-overlap help requires a value
-    between 1 and the read length; outside that range the behaviour is not
-    documented.
-    """
+    """No eligible assembly reads: finish both peaks without native abort."""
     treat, ctrl, peaks = snv_data
     res, out, args = callvar(run_macs3, tmp_path, treat, peaks, "-F", "on",
                              "--fermi-overlap", 60)
-    assert res.returncode == -signal.SIGABRT
-    assert "mr_insert_multi: Assertion" in res.stderr
+    assert res.returncode == 0, res.stderr
+    assert res.stderr.count("Failed to assemble unitigs") == 2
     assert records(out) == []
 
 

@@ -95,6 +95,13 @@ struct rld_t *fml_fmi_gen(int n, bseq1_t *seq, int is_mt)
 		free(s->seq);
 	}
 	free(seq);
+	/* Filtering can remove every read (e.g. reads shorter than the
+	 * requested overlap). No index can be built from an empty string. */
+	if (str.l == 0) {
+		free(str.s);
+		mr_destroy(mr);
+		return 0;
+	}
 	mr_insert_multi(mr, str.l, (uint8_t*)str.s, is_mt);
 	free(str.s);
 
@@ -279,10 +286,16 @@ fml_utg_t *fml_assemble(const fml_opt_t *opt0, int n_seqs, bseq1_t *seqs, int *n
 	fml_utg_t *utg;
 	fml_opt_t opt = *opt0;
 	float kcov;
+	*n_utg = 0;
+	if (n_seqs == 0) {
+		free(seqs);
+		return 0;
+	}
 	fml_opt_adjust(&opt, n_seqs, seqs);
 	if (opt.ec_k >= 0) fml_correct(&opt, n_seqs, seqs);
 	kcov = fml_fltuniq(&opt, n_seqs, seqs);
 	e = fml_seq2fmi(&opt, n_seqs, seqs);
+	if (e == 0) return 0; /* fml_seq2fmi has consumed and freed seqs */
 	g = fml_fmi2mag(&opt, e);
 	opt.mag_opt.min_ensr = opt.mag_opt.min_ensr > kcov * MAG_MIN_NSR_COEF? opt.mag_opt.min_ensr : (int)(kcov * MAG_MIN_NSR_COEF + .499);
 	opt.mag_opt.min_ensr = opt.mag_opt.min_ensr < opt0->max_cnt? opt.mag_opt.min_ensr : opt0->max_cnt;
