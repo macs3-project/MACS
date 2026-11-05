@@ -94,7 +94,7 @@ def test_llocal_zero_invalid_input_terminates(run_macs3, tmp_path, fmt, empty):
         diagnostic = 'Strand'
     else:
         content = 'chr1\tbad\tend' + ('\tbarcode\t1' if fmt == 'FRAG' else '') + '\n'
-        diagnostic = 'Right position'
+        diagnostic = "Invalid start coordinate b'bad'"
     treatment = tmp_path / ('invalid.' + fmt.lower())
     treatment.write_text(content)
     result = run_macs3(['callpeak', '-f', fmt, '-t', treatment, '-g', '100000',

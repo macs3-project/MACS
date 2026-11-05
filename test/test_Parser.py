@@ -686,7 +686,7 @@ def test_bedpe_right_not_after_left_raises(write_bedpe, left, right):
     line = ("chr1\t%d\t%d" % (left, right)).encode()
     msg = ("Right position must be larger than left position, check your "
            "BED file at line: " + repr(line))
-    with pytest.raises(AssertionError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=re.escape(msg)):
         BEDPEParser(path).build_petrack()
 
 
@@ -1385,7 +1385,7 @@ def test_frag_right_not_after_left_raises(write_frag, left, right):
     line = ("chr1\t%d\t%d\tB\t1" % (left, right)).encode()
     msg = ("Right position must be larger than left position, check your "
            "BED file at line: " + repr(line))
-    with pytest.raises(AssertionError, match=re.escape(msg)):
+    with pytest.raises(ValueError, match=re.escape(msg)):
         FragParser(path).build_petrack()
 
 

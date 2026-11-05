@@ -96,7 +96,7 @@ elif mode == 'malformed':
         else:
             raise AssertionError('malformed record accepted')
     assert errors[0] == errors[1], errors
-    assert errors[0][0] == ('Exception' if cap == 0 else 'AssertionError')
+    assert errors[0][0] == ('Exception' if cap == 0 else 'ValueError')
     assert ('Less than 5 columns' if cap == 0 else
             'Right position must be larger') in errors[0][1]
 

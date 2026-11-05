@@ -108,9 +108,9 @@ def test_frag_empty_and_malformed_inputs(tmp_path):
 
         cases = [('', ValueError, 'No valid fragments'),
                  ('chr1\\t10\\t30\\tBC0\\n', Exception, 'Less than 5 columns'),
-                 ('chr1\\t30\\t10\\tBC0\\t1\\n', AssertionError,
+                 ('chr1\\t30\\t10\\tBC0\\t1\\n', ValueError,
                   'Right position must be larger'),
-                 ('chr1\\t10\\t10\\tBC0\\t1\\n', AssertionError,
+                 ('chr1\\t10\\t10\\tBC0\\t1\\n', ValueError,
                   'Right position must be larger')]
         for text, error, message in cases:
             path = Path('invalid.tsv')
