@@ -176,6 +176,41 @@ def test_valid_parameters_do_not_require_convergence(monkeypatch):
     assert hmm.hmm_training([[1.] * 4] * 3, [3]) is model
 
 
+def test_training_covariance_failure_during_estep(monkeypatch):
+    # Force a bad M-step so the next real E-step fails inside fit(),
+    # independently of platform-specific BLAS rounding on constant data.
+    original = hmm.GaussianHMM._do_mstep
+
+    def degenerate_step(model, stats):
+        original(model, stats)
+        damage(model, "indefinite")
+
+    monkeypatch.setattr(hmm.GaussianHMM, "_do_mstep", degenerate_step)
+    observations, lengths, _ = sample_hmm(814, n_seq=1, length=240)
+    with pytest.raises(ValueError, match="Invalid HMM model:.*during training") as error:
+        hmm.hmm_training(observations, lengths)
+    assert "-l/--lower" in str(error.value)
+    assert str(error.value.__cause__) == "'covars' must be symmetric, positive-definite"
+
+
+@pytest.mark.parametrize("kind,message", [
+    ("gaussian", "lengths array does not sum to samples"),
+    ("gaussian", "Input contains NaN"),
+    ("poisson", "'covars' must be symmetric, positive-definite"),
+])
+def test_unrelated_training_errors_are_preserved(monkeypatch, kind, message):
+    failure = ValueError(message)
+
+    def fail_fit(*args, **kwargs):
+        raise failure
+
+    model_class = hmm.GaussianHMM if kind == "gaussian" else hmm.PoissonHMM
+    monkeypatch.setattr(model_class, "fit", fail_fit)
+    with pytest.raises(ValueError) as error:
+        hmm.hmm_training([[1.] * 4] * 3, [3], hmm_type=kind)
+    assert error.value is failure
+
+
 def test_zero_poisson_rates_and_zero_probabilities_are_valid():
     model = hand_poisson()
     model.lambdas_[0, 0] = 0
@@ -223,12 +258,18 @@ def test_constant_training_rejected_in_compiled_build(tmp_path):
 
 
 @pytest.mark.parametrize("extra", [[], ["--modelonly"]])
-def test_cli_rejects_degenerate_fit_before_saving(tmp_path, atac, extra):
+@pytest.mark.parametrize("case", ["cli-training", "cli-training-estep"])
+def test_cli_rejects_degenerate_fit_before_saving(tmp_path, atac, extra, case):
     output = tmp_path / "out"
-    result = run_probe(tmp_path, "cli-training", MACS3_SCRIPT, atac.bedpe,
+    result = run_probe(tmp_path, case, MACS3_SCRIPT, atac.bedpe,
                        output, *extra)
     assert result.returncode == 1, result.stdout + result.stderr
-    assert "state 1 covariance must be positive-definite" in result.stderr
+    assert "Invalid HMM model:" in result.stderr
+    assert "positive-definite" in result.stderr
+    if case == "cli-training-estep":
+        assert "covariance failure during training" in result.stderr
+    else:
+        assert "state 1 covariance must be positive-definite" in result.stderr
     assert "-l/--lower" in result.stderr
     assert "HMM converged:" not in result.stderr
     assert "Write HMM parameters" not in result.stderr

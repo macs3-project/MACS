@@ -145,3 +145,46 @@ Further evidence: `/private/tmp/macs814-final-inplace.log`,
 `/private/tmp/macs814-verification/` (`final-build-wheel.log`,
 `final-install-wheel.log`, `final-wheel-tests.log`,
 `release-wheel-tests.log`, clean source, and the installed wheel).
+
+## CI follow-up: covariance failure inside training
+
+The initial commit `40fe08d` failed the constant-data probe in the
+[x64 Python 3.14 PR job](https://github.com/macs3-project/MACS/actions/runs/41972723326/job/127064434750)
+and its
+[push job](https://github.com/macs3-project/MACS/actions/runs/41972662476/job/127064247673).
+Each run had one failing test, with 5,453 passes and 471 skips; fail-fast
+cancelled the Python 3.12/3.13 companion jobs. Linux used NumPy 2.5.4,
+SciPy 1.18.1, scikit-learn 1.9.1, and hmmlearn 0.3.3.
+
+On that backend, the constant-data model becomes unusable before fitting
+finishes: a later E-step raises hmmlearn's covariance `ValueError` inside
+`fit()`. On the local backend, fitting returns and post-fit validation
+rejects the covariance. The probe previously assumed the latter path.
+This synthetic failure is distinct from reproducing the unavailable
+original BAM-driven failure.
+
+Translate Gaussian positive-definiteness errors raised inside `fit()`
+into the same actionable model error, retaining the original exception
+as its cause. Other input errors and Poisson fitting errors propagate
+unchanged. The constant-data probe requires rejection with training
+guidance without depending on which invalid parameter is detected first.
+
+A deterministic regression forces an invalid covariance in a real M-step
+and observes the next real E-step fail inside `fit()`. Against the
+initial compiled extension, it fails with the same unwrapped covariance
+error as CI (the three unrelated-error controls pass). CLI probes cover
+both early E-step failure and invalid models returned by fitting, with
+and without `--modelonly`, using the parent's compiled installation and
+30-second timeouts.
+
+Follow-up validation: the two affected API modules, including all new
+CLI/training subprocess probes, pass **151 tests with 1 existing skip**
+in-place (61.80 seconds) and against the rebuilt installed wheel
+(61.99 seconds). The wheel runner verifies the installed compiled module
+path and absence of in-place source extensions; the installed HMM source
+and clean-source tests/probe match the final workspace files. The skip
+remains the explicitly disabled legacy prediction test. Build and test
+evidence is in `/private/tmp/macs814-ci-build.log`,
+`/private/tmp/macs814-ci-repro.log`, `/private/tmp/macs814-ci-inplace.log`,
+and `/private/tmp/macs814-ci-fix/` (`build-wheel.log`, `install-wheel.log`,
+`wheel-tests.log`, and the installed wheel).

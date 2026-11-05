@@ -18,22 +18,31 @@ def main():
             hmm.hmm_training([[1.0] * 4 for _ in range(200)], [200])
         except ValueError as exc:
             assert "Invalid HMM model" in str(exc), str(exc)
-            assert "positive-definite" in str(exc), str(exc)
             assert "-l/--lower" in str(exc), str(exc)
+            assert "-u/--upper" in str(exc), str(exc)
         else:
             raise AssertionError("Training returned a rank-deficient model")
-    elif case == "cli-training":
+    elif case in ("cli-training", "cli-training-estep"):
         script, bedpe, outdir, *extra = args
-        real_fit = hmm.GaussianHMM.fit
+        if case == "cli-training":
+            real_fit = hmm.GaussianHMM.fit
 
-        def degenerate_fit(self, *fit_args, **fit_kwargs):
-            # A controlled final M-step result, not a reproduction of
-            # the reporter's unavailable BAM-driven training failure.
-            fitted = real_fit(self, *fit_args, **fit_kwargs)
-            fitted.covars_[1] = np.diag([1e12, 1e12, 1e12, -3e-5])
-            return fitted
+            def degenerate_fit(self, *fit_args, **fit_kwargs):
+                # A controlled final M-step result, not a reproduction of
+                # the reporter's unavailable BAM-driven training failure.
+                fitted = real_fit(self, *fit_args, **fit_kwargs)
+                fitted.covars_[1] = np.diag([1e12, 1e12, 1e12, -3e-5])
+                return fitted
 
-        hmm.GaussianHMM.fit = degenerate_fit
+            hmm.GaussianHMM.fit = degenerate_fit
+        else:
+            real_mstep = hmm.GaussianHMM._do_mstep
+
+            def degenerate_step(self, stats):
+                real_mstep(self, stats)
+                self.covars_[1] = np.diag([1e12, 1e12, 1e12, -3e-5])
+
+            hmm.GaussianHMM._do_mstep = degenerate_step
         sys.argv = [script, "hmmratac", "-i", bedpe, "-f", "BEDPE",
                     "--outdir", outdir, "-l", "4", "-u", "20", "-c", "2",
                     *extra]

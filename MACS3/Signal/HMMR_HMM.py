@@ -154,7 +154,16 @@ def hmm_training(training_data: list, training_data_lengths: list,
         hmm_model = GaussianHMM(n_components=n_states, covariance_type=covar, random_state=rs, verbose=False)
     if hmm_type == "poisson":
         hmm_model = PoissonHMM(n_components=n_states, random_state=rs, verbose=False)
-    hmm_model = hmm_model.fit(training_data, training_data_lengths)
+    try:
+        hmm_model = hmm_model.fit(training_data, training_data_lengths)
+    except ValueError as exc:
+        # Some numerical backends detect a degenerate M-step during the
+        # following E-step, before fit() can return for validation below.
+        if (hmm_type == "gaussian" and "covars" in str(exc)
+                and "positive-definite" in str(exc)):
+            raise _invalid_hmm_model(
+                f"Gaussian covariance failure during training: {exc}") from exc
+        raise
     assert hmm_model.n_features == 4
     _validate_hmm_model(hmm_model)
     return hmm_model
