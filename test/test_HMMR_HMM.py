@@ -653,16 +653,10 @@ def test_hmm_model_init_not_json(tmp_path):
 def test_hmm_model_init_always_builds_three_states(tmp_path):
     # The model file labels exactly three states (i_open_region,
     # i_nucleosomal_region, i_background_region) and hmmratac only trains
-    # 3-state models, so hmm_model_init builds 3 components whatever the
-    # file holds. A 2-state model written by hmm_model_save loads, but
-    # hmmlearn rejects it when it is used.
+    # 3-state models, so a saved 2-state model must be rejected on load.
     X, lens, _ = sample_hmm(14)
     model = hmm_training(X, lens, n_states=2, random_seed=5)
     f = str(tmp_path / "model.json")
     hmm_model_save(f, model, 10, 1, 0, 0, "gaussian")
-    loaded = hmm_model_init(f)[0]
-    assert loaded.n_components == 3
-    assert loaded.startprob_.shape == (2,)
-    with pytest.raises(ValueError,
-                       match="startprob_ must have length n_components"):
-        hmm_predict(X, lens, loaded)
+    with pytest.raises(ValueError, match="startprob_ must have shape"):
+        hmm_model_init(f)

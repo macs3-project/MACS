@@ -52,6 +52,95 @@ def get_weighted_density(x: cython.int, m: cython.float,
 # ------------------------------------
 
 
+def _invalid_hmm_model(reason):
+    return ValueError(
+        f"Invalid HMM model: {reason}. Review the training regions and "
+        "adjust -l/--lower or -u/--upper cutoffs, or supply representative "
+        "regions with -t/--training. Retrain if using a saved model.")
+
+
+def _hmm_array(value, shape, name):
+    try:
+        values = np.asarray(value)
+    except (TypeError, ValueError) as exc:
+        raise _invalid_hmm_model(f"{name} must contain numeric values") from exc
+    if values.dtype.kind not in "biuf":
+        raise _invalid_hmm_model(f"{name} must contain numeric values")
+    if values.shape != shape:
+        raise _invalid_hmm_model(f"{name} must have shape {shape}")
+    if not np.isfinite(values).all():
+        raise _invalid_hmm_model(f"{name} must contain only finite values")
+    return values
+
+
+def _validate_hmm_model(hmm_model):
+    """Reject unusable fitted parameters without modifying the model.
+
+    A convergence flag does not guarantee usable emission parameters.
+    In particular, hmmlearn's final M-step can leave invalid covariances
+    that are only discovered on the next prediction.
+    """
+    n = getattr(hmm_model, "n_components", None)
+    f = getattr(hmm_model, "n_features", None)
+    if not hasattr(hmm_model, "n_features"):
+        # hmmlearn also accepts manually configured models and infers
+        # their feature count from the emissions on first prediction.
+        emissions = (getattr(hmm_model, "means_", None)
+                     if isinstance(hmm_model, GaussianHMM)
+                     else getattr(hmm_model, "lambdas_", None))
+        try:
+            if isinstance(hmm_model, PoissonHMM):
+                emissions = np.atleast_2d(emissions)
+            f = np.asarray(emissions).shape[1]
+        except (TypeError, ValueError, IndexError):
+            pass
+    if not isinstance(n, (int, np.integer)) or n <= 0:
+        raise _invalid_hmm_model("n_components must be a positive integer")
+    if not isinstance(f, (int, np.integer)) or f <= 0:
+        raise _invalid_hmm_model("n_features must be a positive integer")
+    for name, shape in (("startprob_", (n,)), ("transmat_", (n, n))):
+        probabilities = _hmm_array(getattr(hmm_model, name, None), shape, name)
+        if (np.any(probabilities < 0)
+                or not np.allclose(probabilities.sum(axis=-1), 1)):
+            raise _invalid_hmm_model(
+                f"{name} must be nonnegative and sum to 1 per distribution")
+
+    if isinstance(hmm_model, PoissonHMM):
+        rates = _hmm_array(np.atleast_2d(getattr(hmm_model, "lambdas_", None)),
+                           (n, f), "lambdas_")
+        if np.any(rates < 0):
+            raise _invalid_hmm_model("lambdas_ must be nonnegative")
+    elif isinstance(hmm_model, GaussianHMM):
+        _hmm_array(getattr(hmm_model, "means_", None), (n, f), "means_")
+        kind = hmm_model.covariance_type
+        # Inspect hmmlearn's stored representation: the public covars_
+        # property expands diagonal/tied/spherical arrays and can conceal
+        # malformed shapes (or expand spherical training arrays repeatedly).
+        covars = getattr(hmm_model, "_covars_", None)
+        if kind == "spherical":
+            shape = np.shape(covars)
+            if shape not in ((n,), (n, 1), (n, f)):
+                raise _invalid_hmm_model("spherical covariance has an invalid shape")
+        elif kind in ("full", "diag", "tied"):
+            shape = {"full": (n, f, f), "diag": (n, f), "tied": (f, f)}[kind]
+        else:
+            raise _invalid_hmm_model(f"unknown covariance type {kind}")
+        covars = _hmm_array(covars, shape, "covariance")
+        if kind in ("diag", "spherical"):
+            if np.any(covars <= 0):
+                raise _invalid_hmm_model("covariance variances must be positive")
+        else:
+            matrices = covars if kind == "full" else covars[np.newaxis, :, :]
+            for state, covariance in enumerate(matrices):
+                label = f"state {state} covariance" if kind == "full" else "shared covariance"
+                if not np.allclose(covariance, covariance.T):
+                    raise _invalid_hmm_model(f"{label} must be symmetric")
+                try:
+                    np.linalg.cholesky(covariance.astype(float, copy=False))
+                except np.linalg.LinAlgError as exc:
+                    raise _invalid_hmm_model(f"{label} must be positive-definite") from exc
+
+
 @cython.ccall
 def hmm_training(training_data: list, training_data_lengths: list,
                  n_states: cython.int = 3, random_seed: cython.int = 12345,
@@ -65,14 +154,25 @@ def hmm_training(training_data: list, training_data_lengths: list,
         hmm_model = GaussianHMM(n_components=n_states, covariance_type=covar, random_state=rs, verbose=False)
     if hmm_type == "poisson":
         hmm_model = PoissonHMM(n_components=n_states, random_state=rs, verbose=False)
-    hmm_model = hmm_model.fit(training_data, training_data_lengths)
+    try:
+        hmm_model = hmm_model.fit(training_data, training_data_lengths)
+    except ValueError as exc:
+        # Some numerical backends detect a degenerate M-step during the
+        # following E-step, before fit() can return for validation below.
+        if (hmm_type == "gaussian" and "covars" in str(exc)
+                and "positive-definite" in str(exc)):
+            raise _invalid_hmm_model(
+                f"Gaussian covariance failure during training: {exc}") from exc
+        raise
     assert hmm_model.n_features == 4
+    _validate_hmm_model(hmm_model)
     return hmm_model
 
 
 @cython.ccall
 @cython.returns(cnp.ndarray)
 def hmm_predict(signals: list, lens: list, hmm_model):
+    _validate_hmm_model(hmm_model)
     predictions = hmm_model.predict_proba(signals, lens)
     return predictions
 
@@ -82,12 +182,13 @@ def hmm_model_save(model_file: str, hmm_model, hmm_binsize: cython.int,
                    i_open_region: cython.int, i_nucleosomal_region: cython.int,
                    i_background_region: cython.int, hmm_type: str):
     if hmm_type == "gaussian":
+        if hmm_model.covariance_type not in ("diag", "full"):
+            raise Exception(f"Unknown covariance type {hmm_model.covariance_type}")
+        _validate_hmm_model(hmm_model)
         if hmm_model.covariance_type == "diag":
             covars = hmm_model.covars_.diagonal(axis1=1, axis2=2)
         elif hmm_model.covariance_type == "full":
             covars = hmm_model.covars_
-        else:
-            raise Exception(f"Unknown covariance type {hmm_model.covariance_type}")
         with open(model_file, "w") as f:
             json.dump({"startprob": hmm_model.startprob_.tolist(),
                        "transmat": hmm_model.transmat_.tolist(),
@@ -101,6 +202,7 @@ def hmm_model_save(model_file: str, hmm_model, hmm_binsize: cython.int,
                        "hmm_binsize": int(hmm_binsize),
                        "hmm_type": hmm_type}, f)
     if hmm_type == "poisson":
+        _validate_hmm_model(hmm_model)
         with open(model_file, "w") as f:
             json.dump({"startprob": hmm_model.startprob_.tolist(),
                        "transmat": hmm_model.transmat_.tolist(),
@@ -121,7 +223,11 @@ def hmm_model_init(model_file: str) -> list:
         if hmm_type == "gaussian":
             hmm_model = GaussianHMM(n_components=3, covariance_type=m["covariance_type"])
             hmm_model.means_ = np.array(m["means"])
-            hmm_model.covars_ = np.array(m["covars"])
+            try:
+                covars = np.array(m["covars"])
+                hmm_model.covars_ = covars
+            except (ValueError, TypeError, IndexError) as exc:
+                raise _invalid_hmm_model(f"invalid covariance: {exc}") from exc
             hmm_model.covariance_type = m["covariance_type"]
         if hmm_type == "poisson":
             hmm_model = PoissonHMM(n_components=3)
@@ -129,5 +235,6 @@ def hmm_model_init(model_file: str) -> list:
         hmm_model.startprob_ = np.array(m["startprob"])
         hmm_model.transmat_ = np.array(m["transmat"])
         hmm_model.n_features = m["n_features"]
+        _validate_hmm_model(hmm_model)
         return [hmm_model, m["i_open_region"], m["i_background_region"],
                 m["i_nucleosomal_region"], m["hmm_binsize"], hmm_type]
