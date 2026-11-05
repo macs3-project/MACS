@@ -297,6 +297,21 @@ While there's no universal rule, here are a few suggestions:
   
 ## Tune the HMM model
 
+HMMRATAC checks fitted and loaded models before decoding. Gaussian
+covariances must be finite, symmetric, and positive definite; invalid
+emission parameters or state probabilities also stop the run. A model
+that fails these checks is rejected before saving the trained model,
+including with `--modelonly`. A convergence message alone does not
+guarantee valid parameters.
+
+If training produces a degenerate model, review the cutoff analysis and
+adjust `-l/--lower` and `-u/--upper` to select representative training
+regions, or supply regions with `-t/--training`. A single region is
+allowed when it provides sufficient variation. The `-c/--prescan-cutoff`
+option controls regions selected for decoding and does not change the
+training data. If a saved model fails validation, retrain it with suitable
+training regions.
+
 It's highly recommended to check the runtime message of the HMM model
 after training. An example is like this:
 
