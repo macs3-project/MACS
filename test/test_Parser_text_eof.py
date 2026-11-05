@@ -79,7 +79,7 @@ elif mode in ('malformed', 'invalid'):
     assert errors[0] == errors[1], errors
     expected = (('IndexError' if fmt == 'BED' else 'Exception')
                 if mode == 'malformed' else
-                ('StrandFormatError' if fmt == 'BED' else 'AssertionError'))
+                ('StrandFormatError' if fmt == 'BED' else 'ValueError'))
     assert errors[0][0] == expected, errors
     if mode == 'malformed' and fmt == 'BEDPE':
         assert 'broken' in errors[0][1], errors

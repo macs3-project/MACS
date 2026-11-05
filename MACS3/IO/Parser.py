@@ -759,6 +759,23 @@ class BEDParser(GenericParser):
                     0)
 
 
+@cython.cfunc
+def _fragment_coordinate(field: bytes, name: str, line: bytes) -> cython.int:
+    """Parse a complete signed decimal coordinate within the track's int32 range."""
+    token: bytes = field.strip()
+    digits: bytes = token[1:] if token[:1] in (b"+", b"-") else token
+    if not digits.isdigit():
+        raise ValueError(f"Invalid {name} coordinate {field!r}: expected an integer at line: {line!r}")
+    # Check the range before conversion to a C int; never wrap large values.
+    digits = digits.lstrip(b"0") or b"0"
+    if len(digits) > 10:
+        raise ValueError(f"Invalid {name} coordinate {field!r}: outside the signed 32-bit range at line: {line!r}")
+    value = int((b"-" if token[:1] == b"-" else b"") + digits)
+    if value < -2147483648 or value > 2147483647:
+        raise ValueError(f"Invalid {name} coordinate {field!r}: outside the signed 32-bit range at line: {line!r}")
+    return value
+
+
 @cython.cclass
 class BEDPEParser(GenericParser):
     """Parser for three-column BEDPE-style fragments (chrom, left, right)."""
@@ -793,8 +810,8 @@ class BEDPEParser(GenericParser):
         thisfields = thisline.split(b'\t')
         try:
             return (thisfields[0],
-                    atoi(thisfields[1]),
-                    atoi(thisfields[2]))
+                    _fragment_coordinate(thisfields[1], "start", thisline),
+                    _fragment_coordinate(thisfields[2], "end", thisline))
         except IndexError:
             raise Exception("Less than 3 columns found at this line: %s\n" %
                             thisline)
@@ -839,7 +856,8 @@ class BEDPEParser(GenericParser):
                 (chromosome, left_pos, right_pos) = self.pe_parse_line(thisline)
                 if left_pos < 0 or not chromosome:
                     continue
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                if right_pos <= left_pos:
+                    raise ValueError("Right position must be larger than left position, check your BED file at line: %s" % thisline)
                 m += right_pos - left_pos
                 i += 1
                 if i % 1000000 == 0:
@@ -849,7 +867,8 @@ class BEDPEParser(GenericParser):
         if tmp:
             (chromosome, left_pos, right_pos) = self.pe_parse_line(tmp)
             if left_pos >= 0 and chromosome:
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % tmp
+                if right_pos <= left_pos:
+                    raise ValueError("Right position must be larger than left position, check your BED file at line: %s" % tmp)
                 i += 1
                 m += right_pos - left_pos
                 add_loc(chromosome, left_pos, right_pos)
@@ -893,7 +912,8 @@ class BEDPEParser(GenericParser):
                 (chromosome, left_pos, right_pos) = self.pe_parse_line(thisline)
                 if left_pos < 0 or not chromosome:
                     continue
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+                if right_pos <= left_pos:
+                    raise ValueError("Right position must be larger than left position, check your BED file at line: %s" % thisline)
                 m += right_pos - left_pos
                 i += 1
                 if i % 1000000 == 0:
@@ -903,7 +923,8 @@ class BEDPEParser(GenericParser):
         if tmp:
             (chromosome, left_pos, right_pos) = self.pe_parse_line(tmp)
             if left_pos >= 0 and chromosome:
-                assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % tmp
+                if right_pos <= left_pos:
+                    raise ValueError("Right position must be larger than left position, check your BED file at line: %s" % tmp)
                 i += 1
                 m += right_pos - left_pos
                 add_loc(chromosome, left_pos, right_pos)
@@ -2929,8 +2950,8 @@ class FragParser(GenericParser):
                 thiscount = 65535
                 warn(f"The count in this line is over 65535, and will be capped at 65535: {thisline}")
             return (thisfields[0],
-                    atoi(thisfields[1]),
-                    atoi(thisfields[2]),
+                    _fragment_coordinate(thisfields[1], "start", thisline),
+                    _fragment_coordinate(thisfields[2], "end", thisline),
                     thisfields[3],
                     thiscount)
         except IndexError:
@@ -2952,7 +2973,8 @@ class FragParser(GenericParser):
         (chromosome, left_pos, right_pos, barcode, count) = self.pe_parse_line(thisline)
         if left_pos < 0 or not chromosome:
             return False
-        assert right_pos > left_pos, "Right position must be larger than left position, check your BED file at line: %s" % thisline
+        if right_pos <= left_pos:
+            raise ValueError("Right position must be larger than left position, check your BED file at line: %s" % thisline)
         flen[0] = right_pos - left_pos
         if max_count:
             count = min(count, max_count)
@@ -3254,13 +3276,13 @@ class FragParser(GenericParser):
                             if nt >= 4:
                                 f4end = tabs[4] if nt == 5 else e
                                 clen = tabs[0] - p
-                                left = _frag_atoi(tabs[0] + 1, tabs[1])
-                                if clen == 0 or left < 0:
-                                    # skipped, as add_line skips it
-                                    p = nl + 1
-                                    continue
-                                right = _frag_atoi(tabs[1] + 1, tabs[2])
-                                if right > left:
+                                # Only complete decimal fields are accepted
+                                # here. Signs, long fields and malformed values
+                                # go through add_line for checked conversion.
+                                t = _frag_digits(tabs[0] + 1, cython.address(left))
+                                s = _frag_digits(tabs[1] + 1, cython.address(right))
+                                if (t == tabs[1] and s == tabs[2] and
+                                        clen > 0 and right > left):
                                     count = _frag_atoi(tabs[3] + 1, f4end)
                                     bstart = tabs[2] + 1
                                     blen = tabs[3] - bstart

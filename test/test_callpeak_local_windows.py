@@ -124,7 +124,8 @@ def test_invalid_fragments_terminate(run_macs3, tmp_path, content):
     result = run_macs3(['callpeak', '-f', 'BEDPE', '-t', treatment,
                         '-c', control, '-g', '100000', '-n', 'invalid'], timeout=30)
     assert result.returncode > 0, result.stderr
-    assert 'No valid fragments' in result.stderr or 'Right position' in result.stderr
+    diagnostic = "Invalid start coordinate b'bad'" if content else 'No valid fragments'
+    assert diagnostic in result.stderr
 
 
 @pytest.mark.parametrize('paired', [False, True])
